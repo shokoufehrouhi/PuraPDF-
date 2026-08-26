@@ -2,6 +2,9 @@
 // pages via pdfrx - needs a real engine (native PDFium bindings), same
 // reason as integration_test/pdf_to_images_test.dart. Run with:
 //   flutter test integration_test/compress_high_test.dart -d macos
+//
+// NOTE: only checks size/validity, not pixel content — see the note atop
+// pdf_to_images_test.dart on why a pixel-content check was unreliable here.
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui';

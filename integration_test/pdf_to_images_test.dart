@@ -4,6 +4,18 @@
 // is required because pdfrx needs its native PDFium bindings — unavailable
 // in the headless VM test harness. See test/image_pdf_test.dart for the
 // Images -> PDF direction, which is covered by ordinary unit tests.
+//
+// NOTE: this only checks output validity (file exists, decodes, has real
+// dimensions) — not pixel content. Investigating a real bug report (pages
+// rendering into only the top-left portion of the canvas — fixed by using
+// PdfPage.render's fullWidth/fullHeight instead of width/height, see
+// pdf_repository_impl.dart), pdfium's render() was observed returning a
+// fully blank frame when driven through `flutter test -d macos`'s bare
+// `test()`/`testWidgets()` harness on this machine, even for a
+// manually-verified-correct source PDF, regardless of the width/height vs
+// fullWidth/fullHeight fix. Pixel-content assertions here would be
+// unreliable for reasons that look harness-specific rather than
+// app-specific — the fix should be confirmed by running the real app.
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';

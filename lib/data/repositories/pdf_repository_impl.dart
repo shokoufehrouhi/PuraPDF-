@@ -91,9 +91,14 @@ class PdfRepositoryImpl implements PdfRepository {
         final rx.PdfPage page = source.pages[i];
         final int width = (page.width * 1.3).round();
         final int height = (page.height * 1.3).round();
+        // fullWidth/fullHeight (not width/height!) control the actual
+        // render scale — passing width/height alone renders the page at
+        // its natural 72dpi size into the top-left corner of a width x
+        // height canvas, leaving the rest blank. See PdfPage.render's doc
+        // comment.
         final rx.PdfImage? rendered = await page.render(
-          width: width,
-          height: height,
+          fullWidth: width.toDouble(),
+          fullHeight: height.toDouble(),
         );
         if (rendered == null) continue;
 
@@ -249,11 +254,16 @@ class PdfRepositoryImpl implements PdfRepository {
       for (int i = 0; i < doc.pages.length; i++) {
         final rx.PdfPage page = doc.pages[i];
         // Render at ~144dpi (2x the PDF's 72dpi base) for a usable image.
+        // fullWidth/fullHeight (not width/height!) control the actual
+        // render scale — passing width/height alone renders the page at
+        // its natural 72dpi size into the top-left corner of a width x
+        // height canvas, leaving the rest blank. See PdfPage.render's doc
+        // comment.
         final int width = (page.width * 2).round();
         final int height = (page.height * 2).round();
         final rx.PdfImage? rendered = await page.render(
-          width: width,
-          height: height,
+          fullWidth: width.toDouble(),
+          fullHeight: height.toDouble(),
         );
         if (rendered == null) continue;
 
