@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
@@ -10,6 +11,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../domain/entities/compress_result.dart';
 import '../../domain/entities/compression_level.dart';
+import '../../domain/entities/history_file.dart';
 import '../../domain/entities/image_output_format.dart';
 import '../../domain/entities/page_range.dart';
 import '../../domain/repositories/pdf_repository.dart';
@@ -38,6 +40,7 @@ class PdfRepositoryImpl implements PdfRepository {
     final String outPath =
         '${dir.path}/purapdf_compressed_${DateTime.now().millisecondsSinceEpoch}.pdf';
     await File(outPath).writeAsBytes(outBytes, flush: true);
+    await _recordGenerated(outPath);
 
     return CompressResult(
       outputPath: outPath,
@@ -142,6 +145,7 @@ class PdfRepositoryImpl implements PdfRepository {
       await encoder.addFile(File(path));
     }
     await encoder.close();
+    await _recordGenerated(zipPath);
     return zipPath;
   }
 
@@ -211,6 +215,7 @@ class PdfRepositoryImpl implements PdfRepository {
         final String outPath =
             '${dir.path}/purapdf_page_${ts}_${i + 1}.${format.extension}';
         await File(outPath).writeAsBytes(encoded, flush: true);
+        await _recordGenerated(outPath);
         outputPaths.add(outPath);
       }
     } finally {
@@ -244,6 +249,104 @@ class PdfRepositoryImpl implements PdfRepository {
     final Directory dir = await getApplicationDocumentsDirectory();
     final String outPath = '${dir.path}/$fileName';
     await File(outPath).writeAsBytes(bytes, flush: true);
+    await _recordGenerated(outPath);
     return outPath;
+  }
+
+  // --- History index -------------------------------------------------
+  //
+  // Every method above writes into the same app documents directory, so
+  // rather than re-deriving "files we made" from a filename convention
+  // (which breaks the moment a file is renamed), we keep a small JSON
+  // index of {path, createdAt} alongside the files themselves. It is
+  // self-healing: listGeneratedFiles() drops entries whose file no longer
+  // exists (e.g. deleted outside the app) instead of erroring.
+
+  Future<File> _indexFile() async {
+    final Directory dir = await getApplicationDocumentsDirectory();
+    return File('${dir.path}/.purapdf_history_index.json');
+  }
+
+  Future<List<Map<String, dynamic>>> _readIndex() async {
+    final File file = await _indexFile();
+    if (!file.existsSync()) return [];
+    try {
+      final decoded = jsonDecode(await file.readAsString()) as List<dynamic>;
+      return decoded.cast<Map<String, dynamic>>();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> _writeIndex(List<Map<String, dynamic>> entries) async {
+    final File file = await _indexFile();
+    await file.writeAsString(jsonEncode(entries));
+  }
+
+  Future<void> _recordGenerated(String path) async {
+    final entries = await _readIndex();
+    entries.add({'path': path, 'createdAt': DateTime.now().toIso8601String()});
+    await _writeIndex(entries);
+  }
+
+  @override
+  Future<List<HistoryFile>> listGeneratedFiles() async {
+    final entries = await _readIndex();
+    final List<HistoryFile> files = [];
+    final List<Map<String, dynamic>> stillValid = [];
+
+    for (final entry in entries) {
+      final String path = entry['path'] as String;
+      final File file = File(path);
+      if (!file.existsSync()) continue; // dropped: deleted outside the app
+      stillValid.add(entry);
+      final FileStat stat = await file.stat();
+      final DateTime createdAt =
+          DateTime.tryParse(entry['createdAt'] as String? ?? '') ??
+          stat.modified;
+      files.add(
+        HistoryFile(
+          path: path,
+          name: path.split('/').last,
+          sizeBytes: stat.size,
+          createdAt: createdAt,
+        ),
+      );
+    }
+
+    if (stillValid.length != entries.length) {
+      await _writeIndex(stillValid); // self-heal
+    }
+
+    files.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return files;
+  }
+
+  @override
+  Future<bool> deleteFile(String path) async {
+    final File file = File(path);
+    final bool existed = file.existsSync();
+    if (existed) await file.delete();
+
+    final entries = await _readIndex();
+    entries.removeWhere((e) => e['path'] == path);
+    await _writeIndex(entries);
+    return existed;
+  }
+
+  @override
+  Future<String> renameFile(String path, String newName) async {
+    final File file = File(path);
+    final String newPath = '${file.parent.path}/$newName';
+    final File renamed = await file.rename(newPath);
+
+    final entries = await _readIndex();
+    for (final entry in entries) {
+      if (entry['path'] == path) {
+        entry['path'] = renamed.path;
+      }
+    }
+    await _writeIndex(entries);
+    return renamed.path;
   }
 }

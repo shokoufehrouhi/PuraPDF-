@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'features/compress/compress_screen.dart';
+import 'features/history/history_screen.dart';
 import 'features/image_pdf/image_pdf_screen.dart';
 import 'features/merge/merge_screen.dart';
 import 'features/split/split_screen.dart';
@@ -13,7 +14,17 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('PuraPDF')),
+      appBar: AppBar(
+        title: const Text('PuraPDF'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: 'History',
+            onPressed: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -46,6 +57,13 @@ class HomeScreen extends StatelessWidget {
             onTap: () => Navigator.of(
               context,
             ).push(MaterialPageRoute(builder: (_) => const ImagePdfScreen())),
+          ),
+          _FeatureTile(
+            icon: Icons.history,
+            title: 'History',
+            subtitle: 'All files PuraPDF has generated on this device',
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
           ),
         ],
       ),

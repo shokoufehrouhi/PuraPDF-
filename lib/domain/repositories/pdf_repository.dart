@@ -1,5 +1,6 @@
 import '../entities/compress_result.dart';
 import '../entities/compression_level.dart';
+import '../entities/history_file.dart';
 import '../entities/image_output_format.dart';
 import '../entities/page_range.dart';
 
@@ -35,4 +36,14 @@ abstract class PdfRepository {
     String inputPath, {
     required ImageOutputFormat format,
   });
+
+  /// Lists every file PuraPDF has generated on-device, most recent first.
+  Future<List<HistoryFile>> listGeneratedFiles();
+
+  /// Deletes the file at [path]. Returns false if it did not exist.
+  Future<bool> deleteFile(String path);
+
+  /// Renames the file at [path] to [newName] (same directory) and returns
+  /// the new path.
+  Future<String> renameFile(String path, String newName);
 }
