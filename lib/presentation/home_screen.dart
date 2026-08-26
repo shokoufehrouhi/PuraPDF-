@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'features/compress/compress_screen.dart';
 import 'features/merge/merge_screen.dart';
 import 'features/split/split_screen.dart';
 
@@ -29,6 +30,14 @@ class HomeScreen extends StatelessWidget {
             subtitle: 'Break a PDF into page ranges or single pages',
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const SplitScreen()),
+            ),
+          ),
+          _FeatureTile(
+            icon: Icons.compress,
+            title: 'Compress PDF',
+            subtitle: 'Shrink a PDF at low/medium/high strength',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const CompressScreen()),
             ),
           ),
         ],

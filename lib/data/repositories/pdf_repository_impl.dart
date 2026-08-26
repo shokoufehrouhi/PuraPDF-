@@ -6,6 +6,8 @@ import 'package:archive/archive_io.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../../domain/entities/compress_result.dart';
+import '../../domain/entities/compression_level.dart';
 import '../../domain/entities/page_range.dart';
 import '../../domain/repositories/pdf_repository.dart';
 
@@ -16,6 +18,49 @@ import '../../domain/repositories/pdf_repository.dart';
 /// a single-call "merge"/"split" API, since that keeps output page sizes
 /// faithful to each source page.
 class PdfRepositoryImpl implements PdfRepository {
+  @override
+  Future<CompressResult> compressPdf(
+    String inputPath,
+    CompressionLevel level,
+  ) async {
+    final File inputFile = File(inputPath);
+    final int originalSize = await inputFile.length();
+
+    final PdfDocument doc = await _loadDocument(inputPath);
+    doc.compressionLevel = _mapCompressionLevel(level);
+    final List<int> outBytes = await doc.save();
+    doc.dispose();
+
+    final Directory dir = await getApplicationDocumentsDirectory();
+    final String outPath =
+        '${dir.path}/purapdf_compressed_${DateTime.now().millisecondsSinceEpoch}.pdf';
+    await File(outPath).writeAsBytes(outBytes, flush: true);
+
+    return CompressResult(
+      outputPath: outPath,
+      originalSizeBytes: originalSize,
+      compressedSizeBytes: outBytes.length,
+    );
+  }
+
+  /// NOTE: this compresses the PDF's internal streams (fonts, text, vector
+  /// content) via zlib deflate — a real, lossless reduction, but it does
+  /// **not** re-encode embedded images at a lower quality. Syncfusion's
+  /// Flutter PDF API (this version) does not expose image extraction/
+  /// re-encoding, so photo-heavy PDFs (already JPEG-compressed) will shrink
+  /// little or not at all. True image requantization is tracked as a
+  /// follow-up (see roadmap Phase 1 notes) and would need either a lower-
+  /// level PDF stream editor or a native/platform image pipeline.
+  PdfCompressionLevel _mapCompressionLevel(CompressionLevel level) {
+    switch (level) {
+      case CompressionLevel.low:
+        return PdfCompressionLevel.belowNormal;
+      case CompressionLevel.medium:
+        return PdfCompressionLevel.aboveNormal;
+      case CompressionLevel.high:
+        return PdfCompressionLevel.best;
+    }
+  }
   @override
   Future<String> mergePdfs(List<String> inputPaths) async {
     final PdfDocument output = PdfDocument();

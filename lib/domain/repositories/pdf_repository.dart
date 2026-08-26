@@ -1,3 +1,5 @@
+import '../entities/compress_result.dart';
+import '../entities/compression_level.dart';
 import '../entities/page_range.dart';
 
 /// Abstract contract for PDF operations. Implementations live in the data
@@ -7,6 +9,10 @@ abstract class PdfRepository {
   /// Merges [inputPaths] (in the given order) into a single PDF file and
   /// returns the path of the generated file.
   Future<String> mergePdfs(List<String> inputPaths);
+
+  /// Re-saves the PDF at [inputPath] with stream compression at [level] and
+  /// returns the before/after sizes.
+  Future<CompressResult> compressPdf(String inputPath, CompressionLevel level);
 
   /// Returns the page count of the PDF at [path].
   Future<int> getPageCount(String path);
