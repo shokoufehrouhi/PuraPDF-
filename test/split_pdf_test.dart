@@ -85,10 +85,7 @@ void main() {
     final source = await _writeDummyPdf('${tempDir.path}/source.pdf', 2);
     final useCase = SplitPdfUseCase(PdfRepositoryImpl());
 
-    expect(
-      () => useCase(source, [const PageRange(1, 5)]),
-      throwsArgumentError,
-    );
+    expect(() => useCase(source, [const PageRange(1, 5)]), throwsArgumentError);
   });
 
   test('parsePageRanges parses mixed single pages and ranges', () {

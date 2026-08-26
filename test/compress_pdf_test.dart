@@ -80,13 +80,19 @@ void main() {
     reopened.dispose();
   });
 
-  test('higher compression level shrinks at least as much as a lower one', () async {
-    final source = await _writeTextHeavyPdf('${tempDir.path}/source.pdf');
-    final useCase = CompressPdfUseCase(PdfRepositoryImpl());
+  test(
+    'higher compression level shrinks at least as much as a lower one',
+    () async {
+      final source = await _writeTextHeavyPdf('${tempDir.path}/source.pdf');
+      final useCase = CompressPdfUseCase(PdfRepositoryImpl());
 
-    final low = await useCase(source, CompressionLevel.low);
-    final high = await useCase(source, CompressionLevel.high);
+      final low = await useCase(source, CompressionLevel.low);
+      final high = await useCase(source, CompressionLevel.high);
 
-    expect(high.compressedSizeBytes, lessThanOrEqualTo(low.compressedSizeBytes));
-  });
+      expect(
+        high.compressedSizeBytes,
+        lessThanOrEqualTo(low.compressedSizeBytes),
+      );
+    },
+  );
 }

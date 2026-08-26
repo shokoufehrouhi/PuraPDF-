@@ -1,5 +1,6 @@
 import '../entities/compress_result.dart';
 import '../entities/compression_level.dart';
+import '../entities/image_output_format.dart';
 import '../entities/page_range.dart';
 
 /// Abstract contract for PDF operations. Implementations live in the data
@@ -23,4 +24,15 @@ abstract class PdfRepository {
 
   /// Bundles [filePaths] into a single ZIP file and returns its path.
   Future<String> zipFiles(List<String> filePaths, String zipName);
+
+  /// Combines [imagePaths] (any format the platform can decode — JPEG, PNG,
+  /// ...) into a single PDF, one image per page, in the given order.
+  Future<String> imagesToPdf(List<String> imagePaths);
+
+  /// Renders every page of the PDF at [inputPath] as a raster image in
+  /// [format] and returns one output path per page, in page order.
+  Future<List<String>> pdfToImages(
+    String inputPath, {
+    required ImageOutputFormat format,
+  });
 }

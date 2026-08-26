@@ -71,10 +71,7 @@ class SplitScreen extends ConsumerWidget {
             ],
             if (state.error != null) ...[
               const SizedBox(height: 12),
-              Text(
-                state.error!,
-                style: const TextStyle(color: Colors.red),
-              ),
+              Text(state.error!, style: const TextStyle(color: Colors.red)),
             ],
             if (state.resultPaths.isNotEmpty) ...[
               const SizedBox(height: 20),

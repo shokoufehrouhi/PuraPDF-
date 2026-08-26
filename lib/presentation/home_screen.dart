@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'features/compress/compress_screen.dart';
+import 'features/image_pdf/image_pdf_screen.dart';
 import 'features/merge/merge_screen.dart';
 import 'features/split/split_screen.dart';
 
@@ -20,25 +21,31 @@ class HomeScreen extends StatelessWidget {
             icon: Icons.call_merge,
             title: 'Merge PDF',
             subtitle: 'Combine multiple PDFs into one',
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const MergeScreen()),
-            ),
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const MergeScreen())),
           ),
           _FeatureTile(
             icon: Icons.call_split,
             title: 'Split PDF',
             subtitle: 'Break a PDF into page ranges or single pages',
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const SplitScreen()),
-            ),
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const SplitScreen())),
           ),
           _FeatureTile(
             icon: Icons.compress,
             title: 'Compress PDF',
             subtitle: 'Shrink a PDF at low/medium/high strength',
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const CompressScreen()),
-            ),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const CompressScreen())),
+          ),
+          _FeatureTile(
+            icon: Icons.image,
+            title: 'Image ⇄ PDF',
+            subtitle: 'Images to PDF, or PDF pages to PNG/JPG',
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const ImagePdfScreen())),
           ),
         ],
       ),

@@ -3,11 +3,14 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:archive/archive_io.dart';
+import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
+import 'package:pdfrx/pdfrx.dart' as rx;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../domain/entities/compress_result.dart';
 import '../../domain/entities/compression_level.dart';
+import '../../domain/entities/image_output_format.dart';
 import '../../domain/entities/page_range.dart';
 import '../../domain/repositories/pdf_repository.dart';
 
@@ -61,6 +64,7 @@ class PdfRepositoryImpl implements PdfRepository {
         return PdfCompressionLevel.best;
     }
   }
+
   @override
   Future<String> mergePdfs(List<String> inputPaths) async {
     final PdfDocument output = PdfDocument();
@@ -139,6 +143,81 @@ class PdfRepositoryImpl implements PdfRepository {
     }
     await encoder.close();
     return zipPath;
+  }
+
+  @override
+  Future<String> imagesToPdf(List<String> imagePaths) async {
+    const double maxDimension = 842; // cap so huge camera photos stay sane
+    final PdfDocument output = PdfDocument();
+    output.pageSettings.margins.all = 0;
+
+    for (final imagePath in imagePaths) {
+      final Uint8List bytes = await File(imagePath).readAsBytes();
+      final PdfBitmap bitmap = PdfBitmap(bytes);
+
+      double w = bitmap.width.toDouble();
+      double h = bitmap.height.toDouble();
+      if (w > maxDimension || h > maxDimension) {
+        final double scale = maxDimension / (w > h ? w : h);
+        w *= scale;
+        h *= scale;
+      }
+
+      output.pageSettings.size = Size(w, h);
+      final PdfPage page = output.pages.add();
+      page.graphics.drawImage(bitmap, Rect.fromLTWH(0, 0, w, h));
+    }
+
+    return _writeOutput(
+      output,
+      'purapdf_images_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
+  }
+
+  @override
+  Future<List<String>> pdfToImages(
+    String inputPath, {
+    required ImageOutputFormat format,
+  }) async {
+    final rx.PdfDocument doc = await rx.PdfDocument.openFile(inputPath);
+    final Directory dir = await getApplicationDocumentsDirectory();
+    final int ts = DateTime.now().millisecondsSinceEpoch;
+    final List<String> outputPaths = [];
+
+    try {
+      for (int i = 0; i < doc.pages.length; i++) {
+        final rx.PdfPage page = doc.pages[i];
+        // Render at ~144dpi (2x the PDF's 72dpi base) for a usable image.
+        final int width = (page.width * 2).round();
+        final int height = (page.height * 2).round();
+        final rx.PdfImage? rendered = await page.render(
+          width: width,
+          height: height,
+        );
+        if (rendered == null) continue;
+
+        final img.Image image = img.Image.fromBytes(
+          width: rendered.width,
+          height: rendered.height,
+          bytes: rendered.pixels.buffer,
+          numChannels: 4,
+          order: img.ChannelOrder.bgra,
+        );
+        rendered.dispose();
+
+        final List<int> encoded = format == ImageOutputFormat.png
+            ? img.encodePng(image)
+            : img.encodeJpg(image, quality: 90);
+        final String outPath =
+            '${dir.path}/purapdf_page_${ts}_${i + 1}.${format.extension}';
+        await File(outPath).writeAsBytes(encoded, flush: true);
+        outputPaths.add(outPath);
+      }
+    } finally {
+      await doc.dispose();
+    }
+
+    return outputPaths;
   }
 
   /// Copies [sourcePage] onto a new page appended to [output], preserving

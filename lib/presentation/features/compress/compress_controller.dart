@@ -89,6 +89,4 @@ class CompressController extends Notifier<CompressState> {
 }
 
 final compressControllerProvider =
-    NotifierProvider<CompressController, CompressState>(
-      CompressController.new,
-    );
+    NotifierProvider<CompressController, CompressState>(CompressController.new);
