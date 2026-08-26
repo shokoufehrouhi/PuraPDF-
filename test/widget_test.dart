@@ -10,7 +10,7 @@ void main() {
   ) async {
     await tester.pumpWidget(const ProviderScope(child: PuraPdfApp()));
 
-    expect(find.text('PuraPDF'), findsWidgets);
+    expect(find.text('PuraPDF+'), findsWidgets);
     expect(find.text('Merge PDF'), findsOneWidget);
   });
 }

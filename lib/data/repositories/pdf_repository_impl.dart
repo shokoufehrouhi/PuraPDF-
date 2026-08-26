@@ -28,35 +28,38 @@ class PdfRepositoryImpl implements PdfRepository {
     String inputPath,
     CompressionLevel level,
   ) async {
-    final File inputFile = File(inputPath);
-    final int originalSize = await inputFile.length();
+    final int originalSize = await File(inputPath).length();
 
-    final PdfDocument doc = await _loadDocument(inputPath);
-    doc.compressionLevel = _mapCompressionLevel(level);
-    final List<int> outBytes = await doc.save();
-    doc.dispose();
+    // Low/Medium: lossless stream (font/text/vector) compression - keeps
+    // text selectable/searchable, but barely touches image-heavy PDFs.
+    // High: rasterize every page to a lower-DPI JPEG and rebuild the PDF
+    // from those images - a real size win on photo/scan-heavy PDFs, traded
+    // against losing selectable text on the compressed output. See
+    // _compressByRasterizing's doc comment.
+    final String outPath = level == CompressionLevel.high
+        ? await _compressByRasterizing(inputPath)
+        : await _compressByStream(inputPath, level);
 
-    final Directory dir = await getApplicationDocumentsDirectory();
-    final String outPath =
-        '${dir.path}/purapdf_compressed_${DateTime.now().millisecondsSinceEpoch}.pdf';
-    await File(outPath).writeAsBytes(outBytes, flush: true);
-    await _recordGenerated(outPath);
-
+    final int compressedSize = await File(outPath).length();
     return CompressResult(
       outputPath: outPath,
       originalSizeBytes: originalSize,
-      compressedSizeBytes: outBytes.length,
+      compressedSizeBytes: compressedSize,
     );
   }
 
-  /// NOTE: this compresses the PDF's internal streams (fonts, text, vector
-  /// content) via zlib deflate — a real, lossless reduction, but it does
-  /// **not** re-encode embedded images at a lower quality. Syncfusion's
-  /// Flutter PDF API (this version) does not expose image extraction/
-  /// re-encoding, so photo-heavy PDFs (already JPEG-compressed) will shrink
-  /// little or not at all. True image requantization is tracked as a
-  /// follow-up (see roadmap Phase 1 notes) and would need either a lower-
-  /// level PDF stream editor or a native/platform image pipeline.
+  Future<String> _compressByStream(
+    String inputPath,
+    CompressionLevel level,
+  ) async {
+    final PdfDocument doc = await _loadDocument(inputPath);
+    doc.compressionLevel = _mapCompressionLevel(level);
+    return _writeOutput(
+      doc,
+      'purapdf_compressed_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
+  }
+
   PdfCompressionLevel _mapCompressionLevel(CompressionLevel level) {
     switch (level) {
       case CompressionLevel.low:
@@ -66,6 +69,60 @@ class PdfRepositoryImpl implements PdfRepository {
       case CompressionLevel.high:
         return PdfCompressionLevel.best;
     }
+  }
+
+  /// Renders each page at a reduced scale (1.3x = ~94dpi, vs. ~144dpi for
+  /// the Image<->PDF feature) and re-encodes it as a JPEG at quality 40,
+  /// then rebuilds a PDF from those images (same [PdfBitmap] approach as
+  /// [imagesToPdf]). Uses pdfrx for rendering, since Syncfusion's Flutter
+  /// PDF API has no page-to-raster export (see [pdfToImages]).
+  ///
+  /// This genuinely shrinks image/scan-heavy PDFs, unlike the stream-only
+  /// compression above — but every page becomes a flat raster image, so the
+  /// output loses selectable/searchable text. That tradeoff is inherent to
+  /// rasterizing; it is not something a lower-level fix removes.
+  Future<String> _compressByRasterizing(String inputPath) async {
+    final rx.PdfDocument source = await rx.PdfDocument.openFile(inputPath);
+    final PdfDocument output = PdfDocument();
+    output.pageSettings.margins.all = 0;
+
+    try {
+      for (int i = 0; i < source.pages.length; i++) {
+        final rx.PdfPage page = source.pages[i];
+        final int width = (page.width * 1.3).round();
+        final int height = (page.height * 1.3).round();
+        final rx.PdfImage? rendered = await page.render(
+          width: width,
+          height: height,
+        );
+        if (rendered == null) continue;
+
+        final img.Image image = img.Image.fromBytes(
+          width: rendered.width,
+          height: rendered.height,
+          bytes: rendered.pixels.buffer,
+          numChannels: 4,
+          order: img.ChannelOrder.bgra,
+        );
+        rendered.dispose();
+        final List<int> jpegBytes = img.encodeJpg(image, quality: 40);
+
+        final PdfBitmap bitmap = PdfBitmap(jpegBytes);
+        output.pageSettings.size = Size(page.width, page.height);
+        final PdfPage newPage = output.pages.add();
+        newPage.graphics.drawImage(
+          bitmap,
+          Rect.fromLTWH(0, 0, page.width, page.height),
+        );
+      }
+    } finally {
+      await source.dispose();
+    }
+
+    return _writeOutput(
+      output,
+      'purapdf_compressed_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
   }
 
   @override

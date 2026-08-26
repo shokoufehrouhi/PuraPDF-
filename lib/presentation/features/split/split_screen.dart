@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../domain/entities/pdf_file.dart';
+import '../../shared_widgets/download_file.dart';
 import 'split_controller.dart';
 
 class SplitScreen extends ConsumerWidget {
@@ -81,26 +82,49 @@ class SplitScreen extends ConsumerWidget {
                 (p) => ListTile(
                   leading: const Icon(Icons.picture_as_pdf),
                   title: Text(p.split('/').last),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: () => SharePlus.instance.share(
-                      ShareParams(files: [XFile(p)]),
-                    ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.share),
+                        tooltip: 'Share',
+                        onPressed: () => SharePlus.instance.share(
+                          ShareParams(files: [XFile(p)]),
+                        ),
+                      ),
+                      DownloadIconButton(path: p),
+                    ],
                   ),
                 ),
               ),
               const SizedBox(height: 8),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.folder_zip),
-                label: const Text('Share all as ZIP'),
-                onPressed: () async {
-                  final zipPath = await controller.zipResults();
-                  if (context.mounted) {
-                    await SharePlus.instance.share(
-                      ShareParams(files: [XFile(zipPath)]),
-                    );
-                  }
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.folder_zip),
+                    label: const Text('Share ZIP'),
+                    onPressed: () async {
+                      final zipPath = await controller.zipResults();
+                      if (context.mounted) {
+                        await SharePlus.instance.share(
+                          ShareParams(files: [XFile(zipPath)]),
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.download),
+                    label: const Text('Download ZIP'),
+                    onPressed: () async {
+                      final zipPath = await controller.zipResults();
+                      if (context.mounted) {
+                        await downloadFile(context, zipPath);
+                      }
+                    },
+                  ),
+                ],
               ),
             ],
           ],

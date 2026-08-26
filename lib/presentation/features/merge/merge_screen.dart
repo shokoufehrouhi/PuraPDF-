@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../domain/entities/pdf_file.dart';
+import '../../shared_widgets/download_file.dart';
 import 'merge_controller.dart';
 
 class MergeScreen extends ConsumerWidget {
@@ -67,12 +68,24 @@ class MergeScreen extends ConsumerWidget {
                 children: [
                   const Text('Merge movaffagh bood ✅'),
                   const SizedBox(height: 8),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.share),
-                    label: const Text('Share'),
-                    onPressed: () => SharePlus.instance.share(
-                      ShareParams(files: [XFile(state.resultPath!)]),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.share),
+                        label: const Text('Share'),
+                        onPressed: () => SharePlus.instance.share(
+                          ShareParams(files: [XFile(state.resultPath!)]),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.download),
+                        label: const Text('Download'),
+                        onPressed: () =>
+                            downloadFile(context, state.resultPath!),
+                      ),
+                    ],
                   ),
                 ],
               ),

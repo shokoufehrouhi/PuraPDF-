@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../domain/entities/compression_level.dart';
 import '../../../domain/entities/pdf_file.dart';
+import '../../shared_widgets/download_file.dart';
 import 'compress_controller.dart';
 
 class CompressScreen extends ConsumerWidget {
@@ -68,6 +69,15 @@ class CompressScreen extends ConsumerWidget {
                 onSelectionChanged: (selection) =>
                     controller.setLevel(selection.first),
               ),
+              if (state.level == CompressionLevel.high) ...[
+                const SizedBox(height: 8),
+                const Text(
+                  'High rebuilds every page as an image — best size '
+                  'reduction for scans/photos, but the result loses '
+                  'selectable/searchable text.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 icon: state.isCompressing
@@ -96,12 +106,24 @@ class CompressScreen extends ConsumerWidget {
                 '${state.result!.reductionPercent.toStringAsFixed(1)}% smaller',
               ),
               const SizedBox(height: 8),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.share),
-                label: const Text('Share'),
-                onPressed: () => SharePlus.instance.share(
-                  ShareParams(files: [XFile(state.result!.outputPath)]),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.share),
+                    label: const Text('Share'),
+                    onPressed: () => SharePlus.instance.share(
+                      ShareParams(files: [XFile(state.result!.outputPath)]),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.download),
+                    label: const Text('Download'),
+                    onPressed: () =>
+                        downloadFile(context, state.result!.outputPath),
+                  ),
+                ],
               ),
             ],
           ],

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../domain/entities/history_file.dart';
+import '../../shared_widgets/download_file.dart';
 import 'history_controller.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
@@ -139,6 +140,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                                   ShareParams(files: [XFile(f.path)]),
                                 );
                                 break;
+                              case 'download':
+                                downloadFile(context, f.path);
+                                break;
                               case 'rename':
                                 _renameDialog(f.path, f.name);
                                 break;
@@ -149,6 +153,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                           },
                           itemBuilder: (context) => const [
                             PopupMenuItem(value: 'share', child: Text('Share')),
+                            PopupMenuItem(
+                              value: 'download',
+                              child: Text('Download'),
+                            ),
                             PopupMenuItem(
                               value: 'rename',
                               child: Text('Rename'),

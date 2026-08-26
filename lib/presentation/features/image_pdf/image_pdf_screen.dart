@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../domain/entities/image_output_format.dart';
 import '../../../domain/entities/pdf_file.dart';
+import '../../shared_widgets/download_file.dart';
 import 'image_pdf_controller.dart';
 
 class ImagePdfScreen extends ConsumerWidget {
@@ -130,12 +131,24 @@ class _ImagesToPdfPane extends StatelessWidget {
               children: [
                 const Text('PDF sakhte shod ✅'),
                 const SizedBox(height: 8),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.share),
-                  label: const Text('Share'),
-                  onPressed: () => SharePlus.instance.share(
-                    ShareParams(files: [XFile(state.resultPdfPath!)]),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.share),
+                      label: const Text('Share'),
+                      onPressed: () => SharePlus.instance.share(
+                        ShareParams(files: [XFile(state.resultPdfPath!)]),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.download),
+                      label: const Text('Download'),
+                      onPressed: () =>
+                          downloadFile(context, state.resultPdfPath!),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -228,10 +241,18 @@ class _PdfToImagesPane extends StatelessWidget {
               (p) => ListTile(
                 leading: const Icon(Icons.image),
                 title: Text(p.split('/').last),
-                trailing: IconButton(
-                  icon: const Icon(Icons.share),
-                  onPressed: () =>
-                      SharePlus.instance.share(ShareParams(files: [XFile(p)])),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      tooltip: 'Share',
+                      onPressed: () => SharePlus.instance.share(
+                        ShareParams(files: [XFile(p)]),
+                      ),
+                    ),
+                    DownloadIconButton(path: p),
+                  ],
                 ),
               ),
             ),

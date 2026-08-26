@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PuraPDF'),
+        title: const Text('PuraPDF+'),
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
@@ -62,7 +62,7 @@ class HomeScreen extends StatelessWidget {
           _FeatureTile(
             icon: Icons.history,
             title: 'History',
-            subtitle: 'All files PuraPDF has generated on this device',
+            subtitle: 'All files PuraPDF+ has generated on this device',
             onTap: () => Navigator.of(context)
                 .push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
           ),

@@ -1,7 +1,8 @@
-// Functional test for the Compress PDF use case. Builds a text-heavy PDF
-// (repetitive content compresses well under deflate, unlike random bytes)
-// and checks that compression actually shrinks it and that a higher level
-// compresses at least as much as a lower one.
+// Functional test for the Compress PDF use case — covers the Low/Medium
+// (stream/deflate) levels, which run headless. The High level rasterizes
+// pages via pdfrx, which needs native PDFium bindings unavailable in the
+// headless `flutter test` VM — that's covered instead by
+// integration_test/compress_high_test.dart, run against a real engine.
 import 'dart:io';
 import 'dart:ui';
 
@@ -56,43 +57,43 @@ void main() {
     }
   });
 
-  test('CompressPdfUseCase produces a valid PDF and reports sizes', () async {
-    final source = await _writeTextHeavyPdf('${tempDir.path}/source.pdf');
-    final useCase = CompressPdfUseCase(PdfRepositoryImpl());
-
-    final result = await useCase(source, CompressionLevel.high);
-
-    expect(File(result.outputPath).existsSync(), isTrue);
-    expect(result.originalSizeBytes, greaterThan(0));
-    expect(result.compressedSizeBytes, greaterThan(0));
-    // NOTE: source PDFs saved by this same engine already default to
-    // PdfCompressionLevel.normal, so re-saving at 'high' does not
-    // guarantee a smaller file than the as-authored original (reserializing
-    // the document — rebuilt xref table, font subsets, etc. — carries its
-    // own overhead that can offset the deflate gain on small files). The
-    // level that *is* guaranteed to help is relative, see the next test.
-
-    // Output must still be a valid, readable PDF with the same page count.
-    final reopened = PdfDocument(
-      inputBytes: File(result.outputPath).readAsBytesSync(),
-    );
-    expect(reopened.pages.count, 20);
-    reopened.dispose();
-  });
-
   test(
-    'higher compression level shrinks at least as much as a lower one',
+    'CompressPdfUseCase (stream levels) produces a valid PDF and reports sizes',
     () async {
       final source = await _writeTextHeavyPdf('${tempDir.path}/source.pdf');
       final useCase = CompressPdfUseCase(PdfRepositoryImpl());
 
-      final low = await useCase(source, CompressionLevel.low);
-      final high = await useCase(source, CompressionLevel.high);
+      final result = await useCase(source, CompressionLevel.medium);
 
-      expect(
-        high.compressedSizeBytes,
-        lessThanOrEqualTo(low.compressedSizeBytes),
+      expect(File(result.outputPath).existsSync(), isTrue);
+      expect(result.originalSizeBytes, greaterThan(0));
+      expect(result.compressedSizeBytes, greaterThan(0));
+      // NOTE: source PDFs saved by this same engine already default to
+      // PdfCompressionLevel.normal, so re-saving at a higher stream level
+      // doesn't guarantee a smaller file than the as-authored original
+      // (reserializing — rebuilt xref table, font subsets, etc. — carries
+      // its own overhead that can offset the deflate gain on small files).
+      // The level that *is* guaranteed to help is relative, see below.
+
+      // Output must still be a valid, readable PDF with the same page count.
+      final reopened = PdfDocument(
+        inputBytes: File(result.outputPath).readAsBytesSync(),
       );
+      expect(reopened.pages.count, 20);
+      reopened.dispose();
     },
   );
+
+  test('medium stream level shrinks at least as much as low', () async {
+    final source = await _writeTextHeavyPdf('${tempDir.path}/source.pdf');
+    final useCase = CompressPdfUseCase(PdfRepositoryImpl());
+
+    final low = await useCase(source, CompressionLevel.low);
+    final medium = await useCase(source, CompressionLevel.medium);
+
+    expect(
+      medium.compressedSizeBytes,
+      lessThanOrEqualTo(low.compressedSizeBytes),
+    );
+  });
 }
