@@ -44,6 +44,8 @@ dependencies:
   archive: ^4.2.0
   pdfrx: ^2.4.8
   image: ^4.9.2
+  google_mobile_ads: ^9.1.0
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:

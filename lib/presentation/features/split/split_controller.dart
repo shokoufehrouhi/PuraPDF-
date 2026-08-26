@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/ads/ads_service.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/page_range.dart';
 import '../../../domain/entities/pdf_file.dart';
@@ -130,6 +133,7 @@ class SplitController extends Notifier<SplitState> {
       final useCase = ref.read(splitPdfUseCaseProvider);
       final paths = await useCase(file.path, ranges);
       state = state.copyWith(isSplitting: false, resultPaths: paths);
+      unawaited(AdsService.instance.interstitial.recordOperationAndMaybeShow());
     } catch (e) {
       state = state.copyWith(isSplitting: false, error: e.toString());
     }

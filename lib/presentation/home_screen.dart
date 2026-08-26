@@ -5,6 +5,7 @@ import 'features/history/history_screen.dart';
 import 'features/image_pdf/image_pdf_screen.dart';
 import 'features/merge/merge_screen.dart';
 import 'features/split/split_screen.dart';
+import 'shared_widgets/banner_ad_widget.dart';
 
 /// Landing screen — feature hub. Grows one tile per Phase-1 feature as each
 /// lands (merge/split/compress/...).
@@ -67,6 +68,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
+      bottomNavigationBar: const BannerAdWidget(),
     );
   }
 }

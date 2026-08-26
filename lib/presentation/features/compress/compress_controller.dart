@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/ads/ads_service.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/compress_result.dart';
 import '../../../domain/entities/compression_level.dart';
@@ -78,6 +80,7 @@ class CompressController extends Notifier<CompressState> {
       final useCase = ref.read(compressPdfUseCaseProvider);
       final result = await useCase(file.path, state.level);
       state = state.copyWith(isCompressing: false, result: result);
+      unawaited(AdsService.instance.interstitial.recordOperationAndMaybeShow());
     } catch (e) {
       state = state.copyWith(isCompressing: false, error: e.toString());
     }

@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/ads/ads_service.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/pdf_file.dart';
 import '../../../domain/usecases/merge_pdfs_usecase.dart';
@@ -79,6 +82,7 @@ class MergeController extends Notifier<MergeState> {
       final useCase = ref.read(mergePdfsUseCaseProvider);
       final path = await useCase(state.files.map((f) => f.path).toList());
       state = state.copyWith(isMerging: false, resultPath: path);
+      unawaited(AdsService.instance.interstitial.recordOperationAndMaybeShow());
     } catch (e) {
       state = state.copyWith(isMerging: false, error: e.toString());
     }

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/ads/ads_service.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/home_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AdsService.instance.init();
   runApp(const ProviderScope(child: PuraPdfApp()));
 }
 
