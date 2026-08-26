@@ -1,13 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/repositories/pdf_repository_impl.dart';
+import '../../../core/providers.dart';
 import '../../../domain/entities/pdf_file.dart';
-import '../../../domain/repositories/pdf_repository.dart';
 import '../../../domain/usecases/merge_pdfs_usecase.dart';
-
-final pdfRepositoryProvider = Provider<PdfRepository>(
-  (ref) => PdfRepositoryImpl(),
-);
 
 final mergePdfsUseCaseProvider = Provider(
   (ref) => MergePdfsUseCase(ref.watch(pdfRepositoryProvider)),

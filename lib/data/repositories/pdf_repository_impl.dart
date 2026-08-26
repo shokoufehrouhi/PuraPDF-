@@ -2,17 +2,19 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:archive/archive_io.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../../domain/entities/page_range.dart';
 import '../../domain/repositories/pdf_repository.dart';
 
 /// Syncfusion-backed implementation of [PdfRepository].
 ///
-/// Merge is done by rendering each source page onto a fresh page in the
-/// output document (via [PdfPage.createTemplate]) rather than relying on a
-/// single-call "merge" API, since that keeps output page sizes faithful to
-/// each source page.
+/// Page copies are done by rendering each source page onto a fresh page in
+/// the output document (via [PdfPage.createTemplate]) rather than relying on
+/// a single-call "merge"/"split" API, since that keeps output page sizes
+/// faithful to each source page.
 class PdfRepositoryImpl implements PdfRepository {
   @override
   Future<String> mergePdfs(List<String> inputPaths) async {
@@ -20,31 +22,104 @@ class PdfRepositoryImpl implements PdfRepository {
     output.pageSettings.margins.all = 0;
 
     for (final inputPath in inputPaths) {
-      final Uint8List bytes = await File(inputPath).readAsBytes();
-      final PdfDocument source = PdfDocument(inputBytes: bytes);
-
+      final PdfDocument source = await _loadDocument(inputPath);
       for (int i = 0; i < source.pages.count; i++) {
-        final PdfPage sourcePage = source.pages[i];
-        final PdfTemplate template = sourcePage.createTemplate();
-        // Switching pageSettings.size before each add() starts a fresh
-        // section whenever the size changes, so mixed page sizes across
-        // source documents are preserved (see PdfPageCollection.addPage,
-        // which clones document.pageSettings into a new section on change).
-        output.pageSettings.size = sourcePage.size;
-        final PdfPage newPage = output.pages.add();
-        newPage.graphics.drawPdfTemplate(template, Offset.zero);
+        _copyPage(source.pages[i], output);
       }
       source.dispose();
     }
 
+    final outPath = await _writeOutput(
+      output,
+      'purapdf_merged_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
+    return outPath;
+  }
+
+  @override
+  Future<int> getPageCount(String path) async {
+    final PdfDocument doc = await _loadDocument(path);
+    final int count = doc.pages.count;
+    doc.dispose();
+    return count;
+  }
+
+  @override
+  Future<List<String>> splitPdf(
+    String inputPath,
+    List<PageRange> ranges,
+  ) async {
+    final PdfDocument source = await _loadDocument(inputPath);
+    final int pageCount = source.pages.count;
+    for (final range in ranges) {
+      if (range.end > pageCount) {
+        source.dispose();
+        throw ArgumentError(
+          'Range $range exceeds document page count ($pageCount).',
+        );
+      }
+    }
+
+    final int ts = DateTime.now().millisecondsSinceEpoch;
+    final List<String> outputPaths = [];
+
+    for (int idx = 0; idx < ranges.length; idx++) {
+      final range = ranges[idx];
+      final PdfDocument output = PdfDocument();
+      output.pageSettings.margins.all = 0;
+
+      for (int p = range.start; p <= range.end; p++) {
+        _copyPage(source.pages[p - 1], output);
+      }
+
+      final outPath = await _writeOutput(
+        output,
+        'purapdf_split_${ts}_part${idx + 1}.pdf',
+      );
+      outputPaths.add(outPath);
+    }
+
+    source.dispose();
+    return outputPaths;
+  }
+
+  @override
+  Future<String> zipFiles(List<String> filePaths, String zipName) async {
+    final Directory dir = await getApplicationDocumentsDirectory();
+    final String zipPath = '${dir.path}/$zipName';
+    final encoder = ZipFileEncoder();
+    encoder.create(zipPath);
+    for (final path in filePaths) {
+      await encoder.addFile(File(path));
+    }
+    await encoder.close();
+    return zipPath;
+  }
+
+  /// Copies [sourcePage] onto a new page appended to [output], preserving
+  /// the source page's size (switching `pageSettings.size` before each
+  /// `add()` starts a fresh section whenever the size changes — see
+  /// `PdfPageCollection.addPage`, which clones `document.pageSettings` into
+  /// a new section on change).
+  void _copyPage(PdfPage sourcePage, PdfDocument output) {
+    final PdfTemplate template = sourcePage.createTemplate();
+    output.pageSettings.size = sourcePage.size;
+    final PdfPage newPage = output.pages.add();
+    newPage.graphics.drawPdfTemplate(template, Offset.zero);
+  }
+
+  Future<PdfDocument> _loadDocument(String path) async {
+    final Uint8List bytes = await File(path).readAsBytes();
+    return PdfDocument(inputBytes: bytes);
+  }
+
+  Future<String> _writeOutput(PdfDocument output, String fileName) async {
     final List<int> bytes = await output.save();
     output.dispose();
 
     final Directory dir = await getApplicationDocumentsDirectory();
-    final String outPath =
-        '${dir.path}/purapdf_merged_${DateTime.now().millisecondsSinceEpoch}.pdf';
-    final File outFile = File(outPath);
-    await outFile.writeAsBytes(bytes, flush: true);
+    final String outPath = '${dir.path}/$fileName';
+    await File(outPath).writeAsBytes(bytes, flush: true);
     return outPath;
   }
 }

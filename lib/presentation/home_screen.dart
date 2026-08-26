@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'features/merge/merge_screen.dart';
+import 'features/split/split_screen.dart';
 
 /// Landing screen — feature hub. Grows one tile per Phase-1 feature as each
 /// lands (merge/split/compress/...).
@@ -20,6 +21,14 @@ class HomeScreen extends StatelessWidget {
             subtitle: 'Combine multiple PDFs into one',
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const MergeScreen()),
+            ),
+          ),
+          _FeatureTile(
+            icon: Icons.call_split,
+            title: 'Split PDF',
+            subtitle: 'Break a PDF into page ranges or single pages',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const SplitScreen()),
             ),
           ),
         ],
