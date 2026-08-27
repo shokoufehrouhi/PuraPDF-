@@ -284,9 +284,9 @@ class _ToolsTab extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: columns,
-                mainAxisExtent: 108,
-                mainAxisSpacing: 14,
-                crossAxisSpacing: 14,
+                mainAxisExtent: 78,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
               ),
               children: [
                 _FeatureRowCard(
@@ -433,19 +433,22 @@ class _FeatureRowCard extends StatelessWidget {
                   child: CustomPaint(painter: _DiagonalSheenPainter()),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   child: Row(
                     children: [
                       Container(
-                        width: 48,
-                        height: 48,
+                        width: 38,
+                        height: 38,
                         decoration: BoxDecoration(
                           color: badgeColor,
-                          borderRadius: BorderRadius.circular(13),
+                          borderRadius: BorderRadius.circular(11),
                         ),
-                        child: Icon(icon, color: badgeIconColor, size: 25),
+                        child: Icon(icon, color: badgeIconColor, size: 20),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: 11),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -456,19 +459,19 @@ class _FeatureRowCard extends StatelessWidget {
                               style: TextStyle(
                                 color: textColor,
                                 fontWeight: FontWeight.w700,
-                                fontSize: 17,
+                                fontSize: 14.5,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 2),
+                            const SizedBox(height: 1),
                             Text(
                               subtitle,
                               style: TextStyle(
                                 color: textColor.withValues(
                                   alpha: isDark ? 0.82 : 0.72,
                                 ),
-                                fontSize: 13,
+                                fontSize: 11.5,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -478,6 +481,7 @@ class _FeatureRowCard extends StatelessWidget {
                       ),
                       Icon(
                         Icons.chevron_right,
+                        size: 20,
                         color: textColor.withValues(alpha: isDark ? 0.7 : 0.55),
                       ),
                     ],
