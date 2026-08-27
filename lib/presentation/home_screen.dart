@@ -380,13 +380,15 @@ class _FeatureRowCard extends StatelessWidget {
     // would lose contrast on a pale card). Dark mode: the pastel would
     // wash out against a dark scaffold, so the card gradient is instead
     // derived from the feature's own saturated iconColor blended toward
-    // black, with white text/icon and a plain black shadow (a colored
-    // glow reads oddly on a dark background).
+    // a neutral dark grey (muted, not the fully-saturated iconColor) —
+    // with white text/icon and a plain black shadow (a colored glow reads
+    // oddly on a dark background).
+    const Color darkMuted = Color(0xFF2A2A30);
     final Color cardTop = isDark
-        ? Color.lerp(iconColor, Colors.black, 0.35)!
+        ? Color.lerp(iconColor, darkMuted, 0.55)!
         : color;
     final Color cardBottom = isDark
-        ? Color.lerp(iconColor, Colors.black, 0.58)!
+        ? Color.lerp(iconColor, darkMuted, 0.72)!
         : colorDark;
     final Color textColor = isDark ? Colors.white : const Color(0xFF1F2937);
     final Color badgeColor = isDark
@@ -395,15 +397,14 @@ class _FeatureRowCard extends StatelessWidget {
     final Color badgeIconColor = isDark ? Colors.white : iconColor;
     final BoxShadow shadow = isDark
         ? BoxShadow(
-            color: Colors.black.withValues(alpha: 0.45),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           )
         : BoxShadow(
-            color: iconColor.withValues(alpha: 0.45),
-            blurRadius: 22,
-            spreadRadius: 1,
-            offset: const Offset(0, 8),
+            color: iconColor.withValues(alpha: 0.22),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
           );
 
     return Material(
