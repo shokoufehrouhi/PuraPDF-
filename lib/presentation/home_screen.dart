@@ -374,10 +374,37 @@ class _FeatureRowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Dark, near-black text/icons on purpose — the card itself is now a
-    // light pastel, so white text (fine on the old vivid/dark gradient)
-    // would lose contrast here.
-    const Color textColor = Color(0xFF1F2937);
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Light mode: light pastel card + dark near-black text (white text
+    // would lose contrast on a pale card). Dark mode: the pastel would
+    // wash out against a dark scaffold, so the card gradient is instead
+    // derived from the feature's own saturated iconColor blended toward
+    // black, with white text/icon and a plain black shadow (a colored
+    // glow reads oddly on a dark background).
+    final Color cardTop = isDark
+        ? Color.lerp(iconColor, Colors.black, 0.35)!
+        : color;
+    final Color cardBottom = isDark
+        ? Color.lerp(iconColor, Colors.black, 0.58)!
+        : colorDark;
+    final Color textColor = isDark ? Colors.white : const Color(0xFF1F2937);
+    final Color badgeColor = isDark
+        ? iconColor
+        : Colors.white.withValues(alpha: 0.85);
+    final Color badgeIconColor = isDark ? Colors.white : iconColor;
+    final BoxShadow shadow = isDark
+        ? BoxShadow(
+            color: Colors.black.withValues(alpha: 0.45),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          )
+        : BoxShadow(
+            color: iconColor.withValues(alpha: 0.45),
+            blurRadius: 22,
+            spreadRadius: 1,
+            offset: const Offset(0, 8),
+          );
 
     return Material(
       color: Colors.transparent,
@@ -391,16 +418,9 @@ class _FeatureRowCard extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [color, colorDark],
+              colors: [cardTop, cardBottom],
             ),
-            boxShadow: [
-              BoxShadow(
-                color: iconColor.withValues(alpha: 0.45),
-                blurRadius: 22,
-                spreadRadius: 1,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            boxShadow: [shadow],
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
@@ -419,10 +439,10 @@ class _FeatureRowCard extends StatelessWidget {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.85),
+                          color: badgeColor,
                           borderRadius: BorderRadius.circular(13),
                         ),
-                        child: Icon(icon, color: iconColor, size: 25),
+                        child: Icon(icon, color: badgeIconColor, size: 25),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -432,7 +452,7 @@ class _FeatureRowCard extends StatelessWidget {
                           children: [
                             Text(
                               title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: textColor,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 17,
@@ -444,7 +464,9 @@ class _FeatureRowCard extends StatelessWidget {
                             Text(
                               subtitle,
                               style: TextStyle(
-                                color: textColor.withValues(alpha: 0.72),
+                                color: textColor.withValues(
+                                  alpha: isDark ? 0.82 : 0.72,
+                                ),
                                 fontSize: 13,
                               ),
                               maxLines: 1,
@@ -455,7 +477,7 @@ class _FeatureRowCard extends StatelessWidget {
                       ),
                       Icon(
                         Icons.chevron_right,
-                        color: textColor.withValues(alpha: 0.55),
+                        color: textColor.withValues(alpha: isDark ? 0.7 : 0.55),
                       ),
                     ],
                   ),
