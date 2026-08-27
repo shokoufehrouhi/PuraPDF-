@@ -25,24 +25,24 @@ import 'shared_widgets/download_file.dart';
 class _FeatureColors {
   _FeatureColors._();
 
-  static const Color merge = Color(0xFFAED9FB);
-  static const Color mergeDark = Color(0xFF8CC4F7);
+  static const Color merge = Color(0xFFC7E3FC);
+  static const Color mergeDark = Color(0xFFACD3FA);
   static const Color mergeIcon = Color(0xFF3B82F6);
 
-  static const Color split = Color(0xFFDAC6F2);
-  static const Color splitDark = Color(0xFFC6A8E9);
+  static const Color split = Color(0xFFE4D7F5);
+  static const Color splitDark = Color(0xFFD3BEEC);
   static const Color splitIcon = Color(0xFF8B5CF6);
 
-  static const Color compress = Color(0xFFFFD5AC);
-  static const Color compressDark = Color(0xFFFFBF88);
+  static const Color compress = Color(0xFFFFE3C4);
+  static const Color compressDark = Color(0xFFFFD1A0);
   static const Color compressIcon = Color(0xFFF97316);
 
-  static const Color imagePdf = Color(0xFFBCE8C0);
-  static const Color imagePdfDark = Color(0xFFA0DDA8);
+  static const Color imagePdf = Color(0xFFCDEDD0);
+  static const Color imagePdfDark = Color(0xFFB8E4BC);
   static const Color imagePdfIcon = Color(0xFF22C55E);
 
-  static const Color history = Color(0xFFB2ECE2);
-  static const Color historyDark = Color(0xFF93E1D3);
+  static const Color history = Color(0xFFC9F1E9);
+  static const Color historyDark = Color(0xFFABE8DD);
   static const Color historyIcon = Color(0xFF14B8A6);
 }
 
