@@ -11,6 +11,8 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: PuraPdfApp()));
 
     expect(find.text('PuraPDF+'), findsWidgets);
-    expect(find.text('Merge PDF'), findsOneWidget);
+    expect(find.text('Merge'), findsOneWidget);
+    expect(find.text('Split'), findsOneWidget);
+    expect(find.text('Compress'), findsOneWidget);
   });
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/ads/ads_service.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_mode_controller.dart';
 import 'presentation/home_screen.dart';
 
 Future<void> main() async {
@@ -11,17 +12,18 @@ Future<void> main() async {
   runApp(const ProviderScope(child: PuraPdfApp()));
 }
 
-class PuraPdfApp extends StatelessWidget {
+class PuraPdfApp extends ConsumerWidget {
   const PuraPdfApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ThemeMode themeMode = ref.watch(themeModeControllerProvider);
     return MaterialApp(
       title: 'PuraPDF+',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       home: const HomeScreen(),
     );
   }

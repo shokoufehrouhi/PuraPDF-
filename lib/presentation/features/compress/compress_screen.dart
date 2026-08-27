@@ -71,13 +71,16 @@ class CompressScreen extends ConsumerWidget {
               ),
               if (state.level == CompressionLevel.high) ...[
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'High rebuilds every page as an image — best size '
                   'reduction for scans/photos, but the result loses '
                   'selectable/searchable text. On text-heavy PDFs where '
                   'that would backfire, it automatically falls back so '
                   'the result is never bigger than the original.',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
               const SizedBox(height: 16),
@@ -95,7 +98,10 @@ class CompressScreen extends ConsumerWidget {
             ],
             if (state.error != null) ...[
               const SizedBox(height: 12),
-              Text(state.error!, style: const TextStyle(color: Colors.red)),
+              Text(
+                state.error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
             ],
             if (state.result != null) ...[
               const SizedBox(height: 20),

@@ -121,7 +121,7 @@ class _ImagesToPdfPane extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Text(
               state.error!,
-              style: const TextStyle(color: Colors.red),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
         if (state.resultPdfPath != null)
@@ -231,7 +231,10 @@ class _PdfToImagesPane extends StatelessWidget {
           ),
           if (state.error != null) ...[
             const SizedBox(height: 12),
-            Text(state.error!, style: const TextStyle(color: Colors.red)),
+            Text(
+              state.error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ],
           if (state.resultImagePaths.isNotEmpty) ...[
             const SizedBox(height: 20),
