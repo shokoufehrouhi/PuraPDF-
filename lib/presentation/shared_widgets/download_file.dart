@@ -45,7 +45,7 @@ class DownloadIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.download),
+      icon: const Icon(Icons.download_outlined),
       tooltip: 'Download',
       onPressed: () => downloadFile(context, path),
     );

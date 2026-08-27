@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../core/theme/app_theme.dart';
+import '../core/theme/feature_colors.dart';
 import '../core/theme/theme_mode_controller.dart';
 import '../domain/entities/history_file.dart';
 import 'features/compress/compress_screen.dart';
@@ -12,35 +13,6 @@ import 'features/merge/merge_screen.dart';
 import 'features/split/split_screen.dart';
 import 'shared_widgets/banner_ad_widget.dart';
 import 'shared_widgets/download_file.dart';
-
-/// Per-feature accent colors — deliberately distinct from the app's red
-/// brand color (reserved for the logo/CTAs) so each tool reads as its own
-/// "app icon" at a glance, the way a tool suite gives every module its own
-/// hue instead of one flat brand tint everywhere.
-///
-/// Each feature has: a light/lighter pair for the card's own soft pastel
-/// gradient (glossy, not matte — a subtle sheen, not a flat muted fill),
-/// plus a separate saturated [icon] color so the icon reads clearly
-/// against its white badge instead of matching the pale card behind it.
-class _FeatureColors {
-  _FeatureColors._();
-
-  static const Color merge = Color(0xFFC7E3FC);
-  static const Color mergeDark = Color(0xFFACD3FA);
-  static const Color mergeIcon = Color(0xFF3B82F6);
-
-  static const Color split = Color(0xFFE4D7F5);
-  static const Color splitDark = Color(0xFFD3BEEC);
-  static const Color splitIcon = Color(0xFF8B5CF6);
-
-  static const Color compress = Color(0xFFFFE3C4);
-  static const Color compressDark = Color(0xFFFFD1A0);
-  static const Color compressIcon = Color(0xFFF97316);
-
-  static const Color imagePdf = Color(0xFFCDEDD0);
-  static const Color imagePdfDark = Color(0xFFB8E4BC);
-  static const Color imagePdfIcon = Color(0xFF22C55E);
-}
 
 /// Landing screen — feature hub. Grows one tile per Phase-1 feature as each
 /// lands (merge/split/compress/...).
@@ -106,7 +78,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: _tabIndex == 0 ? const _ToolsTab() : const _RecentsTab(),
+              child: _tabIndex == 0
+                  ? const _ToolsTab()
+                  : _RecentsTab(
+                      onBrowseTools: () => setState(() => _tabIndex = 0),
+                    ),
             ),
           ],
         ),
@@ -287,9 +263,9 @@ class _ToolsTab extends StatelessWidget {
               children: [
                 _FeatureRowCard(
                   icon: Icons.call_merge,
-                  color: _FeatureColors.merge,
-                  colorDark: _FeatureColors.mergeDark,
-                  iconColor: _FeatureColors.mergeIcon,
+                  color: FeatureColors.merge,
+                  colorDark: FeatureColors.mergeDark,
+                  iconColor: FeatureColors.mergeIcon,
                   title: 'Merge PDFs',
                   subtitle: 'Combine multiple documents',
                   onTap: () => Navigator.of(context).push(
@@ -298,9 +274,9 @@ class _ToolsTab extends StatelessWidget {
                 ),
                 _FeatureRowCard(
                   icon: Icons.call_split,
-                  color: _FeatureColors.split,
-                  colorDark: _FeatureColors.splitDark,
-                  iconColor: _FeatureColors.splitIcon,
+                  color: FeatureColors.split,
+                  colorDark: FeatureColors.splitDark,
+                  iconColor: FeatureColors.splitIcon,
                   title: 'Split PDF',
                   subtitle: 'Separate into pages or sections',
                   onTap: () => Navigator.of(context).push(
@@ -309,9 +285,9 @@ class _ToolsTab extends StatelessWidget {
                 ),
                 _FeatureRowCard(
                   icon: Icons.compress,
-                  color: _FeatureColors.compress,
-                  colorDark: _FeatureColors.compressDark,
-                  iconColor: _FeatureColors.compressIcon,
+                  color: FeatureColors.compress,
+                  colorDark: FeatureColors.compressDark,
+                  iconColor: FeatureColors.compressIcon,
                   title: 'Compress PDF',
                   subtitle: 'Optimize file size for sharing',
                   onTap: () => Navigator.of(context).push(
@@ -320,9 +296,9 @@ class _ToolsTab extends StatelessWidget {
                 ),
                 _FeatureRowCard(
                   icon: Icons.image_outlined,
-                  color: _FeatureColors.imagePdf,
-                  colorDark: _FeatureColors.imagePdfDark,
-                  iconColor: _FeatureColors.imagePdfIcon,
+                  color: FeatureColors.imagePdf,
+                  colorDark: FeatureColors.imagePdfDark,
+                  iconColor: FeatureColors.imagePdfIcon,
                   title: 'Image ⇄ PDF',
                   subtitle: 'Convert between formats',
                   onTap: () => Navigator.of(context).push(
@@ -539,35 +515,35 @@ _OperationInfo _operationFor(String fileName) {
   if (fileName.startsWith('purapdf_merged_')) {
     return const _OperationInfo(
       Icons.call_merge,
-      _FeatureColors.mergeIcon,
+      FeatureColors.mergeIcon,
       'Merge',
     );
   }
   if (fileName.startsWith('purapdf_split_')) {
     return const _OperationInfo(
       Icons.call_split,
-      _FeatureColors.splitIcon,
+      FeatureColors.splitIcon,
       'Split',
     );
   }
   if (fileName.startsWith('purapdf_compressed_')) {
     return const _OperationInfo(
       Icons.compress,
-      _FeatureColors.compressIcon,
+      FeatureColors.compressIcon,
       'Compress',
     );
   }
   if (fileName.startsWith('purapdf_images_')) {
     return const _OperationInfo(
       Icons.image_outlined,
-      _FeatureColors.imagePdfIcon,
+      FeatureColors.imagePdfIcon,
       'Image → PDF',
     );
   }
   if (fileName.startsWith('purapdf_page_')) {
     return const _OperationInfo(
       Icons.image_outlined,
-      _FeatureColors.imagePdfIcon,
+      FeatureColors.imagePdfIcon,
       'PDF → Image',
     );
   }
@@ -602,7 +578,9 @@ String _formatDateTime(DateTime dt) {
 /// screen was removed; every generated file lives here, one row per
 /// operation: type, date/time, file name, download, share).
 class _RecentsTab extends ConsumerStatefulWidget {
-  const _RecentsTab();
+  final VoidCallback onBrowseTools;
+
+  const _RecentsTab({required this.onBrowseTools});
 
   @override
   ConsumerState<_RecentsTab> createState() => _RecentsTabState();
@@ -626,15 +604,59 @@ class _RecentsTabState extends ConsumerState<_RecentsTab> {
     }
 
     if (state.files.isEmpty) {
+      final ColorScheme scheme = Theme.of(context).colorScheme;
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(
-            'No files yet — use a tool above to create your first one.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 88,
+                height: 88,
+                decoration: BoxDecoration(
+                  color: AppTheme.seedColor.withValues(alpha: 0.10),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.folder_open_rounded,
+                  size: 38,
+                  color: AppTheme.seedColor,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'No files yet',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: scheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Files you create with Merge, Split, Compress, or '
+                'Image ⇄ PDF will show up here.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.4,
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 22),
+              OutlinedButton.icon(
+                onPressed: widget.onBrowseTools,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.seedColor,
+                  side: BorderSide(
+                    color: AppTheme.seedColor.withValues(alpha: 0.5),
+                  ),
+                ),
+                icon: const Icon(Icons.grid_view_rounded, size: 18),
+                label: const Text('Browse tools'),
+              ),
+            ],
           ),
         ),
       );

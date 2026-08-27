@@ -3,10 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/image_output_format.dart';
 import '../../../domain/entities/pdf_file.dart';
 import '../../shared_widgets/download_file.dart';
+import '../../shared_widgets/feature_screen_header.dart';
+import '../../shared_widgets/picker_card.dart';
 import 'image_pdf_controller.dart';
+
+const Color _color = FeatureColors.imagePdfIcon;
 
 class ImagePdfScreen extends ConsumerWidget {
   const ImagePdfScreen({super.key});
@@ -41,41 +46,63 @@ class ImagePdfScreen extends ConsumerWidget {
     final isImagesToPdf = state.direction == ConversionDirection.imagesToPdf;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Image ⇄ PDF')),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SegmentedButton<ConversionDirection>(
-              segments: const [
-                ButtonSegment(
-                  value: ConversionDirection.imagesToPdf,
-                  label: Text('Images → PDF'),
-                ),
-                ButtonSegment(
-                  value: ConversionDirection.pdfToImages,
-                  label: Text('PDF → Images'),
-                ),
-              ],
-              selected: {state.direction},
-              onSelectionChanged: (s) => controller.setDirection(s.first),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            FeatureScreenHeader(
+              icon: Icons.image_outlined,
+              color: _color,
+              title: 'Image ⇄ PDF',
+              description: isImagesToPdf
+                  ? 'Turn one or more photos into a single PDF document.'
+                  : 'Export every page of a PDF as a separate image file.',
+              steps: isImagesToPdf
+                  ? const ['Add images', 'Convert', 'Save']
+                  : const ['Select PDF', 'Pick format', 'Convert', 'Save'],
             ),
-          ),
-          Expanded(
-            child: isImagesToPdf
-                ? _ImagesToPdfPane(
-                    state: state,
-                    controller: controller,
-                    ref: ref,
-                    pickImages: () => _pickImages(ref),
-                  )
-                : _PdfToImagesPane(
-                    state: state,
-                    controller: controller,
-                    pickPdf: () => _pickPdf(ref),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+              child: SegmentedButton<ConversionDirection>(
+                style: SegmentedButton.styleFrom(
+                  selectedBackgroundColor: _color.withValues(alpha: 0.18),
+                  selectedForegroundColor: _color,
+                ),
+                segments: const [
+                  ButtonSegment(
+                    value: ConversionDirection.imagesToPdf,
+                    label: Text('Images → PDF'),
                   ),
-          ),
-        ],
+                  ButtonSegment(
+                    value: ConversionDirection.pdfToImages,
+                    label: Text('PDF → Images'),
+                  ),
+                ],
+                selected: {state.direction},
+                onSelectionChanged: (s) => controller.setDirection(s.first),
+              ),
+            ),
+            Expanded(
+              child: isImagesToPdf
+                  ? _ImagesToPdfPane(
+                      state: state,
+                      controller: controller,
+                      ref: ref,
+                      pickImages: () => _pickImages(ref),
+                    )
+                  : _PdfToImagesPane(
+                      state: state,
+                      controller: controller,
+                      pickPdf: () => _pickPdf(ref),
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -96,87 +123,195 @@ class _ImagesToPdfPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Expanded(
           child: state.images.isEmpty
-              ? const Center(child: Text('Hich aksi entekhab nashode.'))
-              : ListView.builder(
-                  itemCount: state.images.length,
-                  itemBuilder: (context, index) {
-                    final f = state.images[index];
-                    return ListTile(
-                      leading: const Icon(Icons.image),
-                      title: Text(f.name),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => controller.removeImageAt(index),
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: PickerCard(
+                      icon: Icons.add_photo_alternate,
+                      color: _color,
+                      label: 'Add images',
+                      hint: 'You can select multiple photos at once',
+                      onTap: pickImages,
+                    ),
+                  ),
+                )
+              : Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${state.images.length} image'
+                              '${state.images.length == 1 ? '' : 's'} '
+                              'selected',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          TextButton.icon(
+                            onPressed: pickImages,
+                            icon: const Icon(Icons.add, size: 18),
+                            label: const Text('Add more'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: _color,
+                              padding: EdgeInsets.zero,
+                              minimumSize: const Size(0, 0),
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: state.images.length,
+                        itemBuilder: (context, index) {
+                          final f = state.images[index];
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            child: ListTile(
+                              leading: Container(
+                                width: 32,
+                                height: 32,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: _color.withValues(alpha: 0.18),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  '${index + 1}',
+                                  style: const TextStyle(
+                                    color: _color,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                              title: Text(
+                                f.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () =>
+                                    controller.removeImageAt(index),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
         ),
         if (state.error != null)
           Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              state.error!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+            child: Text(state.error!, style: TextStyle(color: scheme.error)),
           ),
         if (state.resultPdfPath != null)
           Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              children: [
-                const Text('PDF sakhte shod ✅'),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.share),
-                      label: const Text('Share'),
-                      onPressed: () => SharePlus.instance.share(
-                        ShareParams(files: [XFile(state.resultPdfPath!)]),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: _color.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.check_circle, color: _color),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'PDF created successfully',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.download),
-                      label: const Text('Download'),
-                      onPressed: () =>
-                          downloadFile(context, state.resultPdfPath!),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _color,
+                            foregroundColor: Colors.white,
+                          ),
+                          icon: const Icon(Icons.ios_share),
+                          label: const Text('Share'),
+                          onPressed: () => SharePlus.instance.share(
+                            ShareParams(files: [XFile(state.resultPdfPath!)]),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: _color,
+                            side: BorderSide(
+                              color: _color.withValues(alpha: 0.5),
+                            ),
+                          ),
+                          icon: const Icon(Icons.download_outlined),
+                          label: const Text('Download'),
+                          onPressed: () =>
+                              downloadFile(context, state.resultPdfPath!),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         SafeArea(
           top: false,
           child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.add_photo_alternate),
-                  label: const Text('Add images'),
-                  onPressed: pickImages,
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _color,
+                  foregroundColor: Colors.white,
                 ),
-                ElevatedButton.icon(
-                  icon: state.isProcessing
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.picture_as_pdf),
-                  label: const Text('Convert'),
-                  onPressed: state.isProcessing ? null : controller.convert,
+                icon: state.isProcessing
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.picture_as_pdf),
+                label: Text(
+                  state.images.isEmpty
+                      ? 'Add images to convert'
+                      : 'Convert ${state.images.length} image'
+                            '${state.images.length == 1 ? '' : 's'}',
                 ),
-              ],
+                onPressed: state.isProcessing || state.images.isEmpty
+                    ? null
+                    : controller.convert,
+              ),
             ),
           ),
         ),
@@ -198,18 +333,28 @@ class _PdfToImagesPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          OutlinedButton.icon(
-            icon: const Icon(Icons.upload_file),
-            label: Text(state.sourcePdf?.name ?? 'Select a PDF'),
-            onPressed: pickPdf,
+          PickerCard(
+            icon: Icons.upload_file,
+            color: _color,
+            label: state.sourcePdf?.name ?? 'Select a PDF',
+            hint: state.sourcePdf == null
+                ? 'Tap to browse your files'
+                : 'Tap to change file',
+            onTap: pickPdf,
           ),
           const SizedBox(height: 16),
           SegmentedButton<ImageOutputFormat>(
+            style: SegmentedButton.styleFrom(
+              selectedBackgroundColor: _color.withValues(alpha: 0.18),
+              selectedForegroundColor: _color,
+            ),
             segments: const [
               ButtonSegment(value: ImageOutputFormat.jpg, label: Text('JPG')),
               ButtonSegment(value: ImageOutputFormat.png, label: Text('PNG')),
@@ -219,11 +364,18 @@ class _PdfToImagesPane extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _color,
+              foregroundColor: Colors.white,
+            ),
             icon: state.isProcessing
                 ? const SizedBox(
                     width: 16,
                     height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
                   )
                 : const Icon(Icons.image),
             label: const Text('Convert'),
@@ -231,32 +383,58 @@ class _PdfToImagesPane extends StatelessWidget {
           ),
           if (state.error != null) ...[
             const SizedBox(height: 12),
-            Text(
-              state.error!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
+            Text(state.error!, style: TextStyle(color: scheme.error)),
           ],
           if (state.resultImagePaths.isNotEmpty) ...[
             const SizedBox(height: 20),
-            Text('${state.resultImagePaths.length} image(s) created ✅'),
-            const SizedBox(height: 8),
-            ...state.resultImagePaths.map(
-              (p) => ListTile(
-                leading: const Icon(Icons.image),
-                title: Text(p.split('/').last),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.share),
-                      tooltip: 'Share',
-                      onPressed: () => SharePlus.instance.share(
-                        ShareParams(files: [XFile(p)]),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: _color.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.check_circle, color: _color),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${state.resultImagePaths.length} image(s) created',
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ...state.resultImagePaths.map(
+                    (p) => Card(
+                      margin: const EdgeInsets.only(top: 4),
+                      child: ListTile(
+                        leading: const Icon(Icons.image),
+                        title: Text(
+                          p.split('/').last,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.ios_share),
+                              tooltip: 'Share',
+                              onPressed: () => SharePlus.instance.share(
+                                ShareParams(files: [XFile(p)]),
+                              ),
+                            ),
+                            DownloadIconButton(path: p),
+                          ],
+                        ),
                       ),
                     ),
-                    DownloadIconButton(path: p),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
