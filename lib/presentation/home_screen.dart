@@ -96,7 +96,7 @@ class HomeScreen extends ConsumerWidget {
                     children: [
                       _FeatureCard(
                         icon: Icons.call_merge,
-                        color: scheme.primary,
+                        color: _FeatureColors.merge,
                         title: 'Merge',
                         subtitle: 'Combine PDFs',
                         onTap: () => Navigator.of(context).push(
@@ -107,7 +107,7 @@ class HomeScreen extends ConsumerWidget {
                       ),
                       _FeatureCard(
                         icon: Icons.call_split,
-                        color: scheme.tertiary,
+                        color: _FeatureColors.split,
                         title: 'Split',
                         subtitle: 'Break into pages',
                         onTap: () => Navigator.of(context).push(
@@ -118,7 +118,7 @@ class HomeScreen extends ConsumerWidget {
                       ),
                       _FeatureCard(
                         icon: Icons.compress,
-                        color: scheme.secondary,
+                        color: _FeatureColors.compress,
                         title: 'Compress',
                         subtitle: 'Shrink file size',
                         onTap: () => Navigator.of(context).push(
@@ -129,7 +129,7 @@ class HomeScreen extends ConsumerWidget {
                       ),
                       _FeatureCard(
                         icon: Icons.image_outlined,
-                        color: scheme.primary,
+                        color: _FeatureColors.imagePdf,
                         title: 'Image ⇄ PDF',
                         subtitle: 'Convert both ways',
                         onTap: () => Navigator.of(context).push(
@@ -140,7 +140,7 @@ class HomeScreen extends ConsumerWidget {
                       ),
                       _FeatureCard(
                         icon: Icons.history,
-                        color: scheme.tertiary,
+                        color: _FeatureColors.history,
                         title: 'History',
                         subtitle: 'Your generated files',
                         onTap: () => Navigator.of(context).push(
@@ -162,6 +162,20 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
+/// Per-feature accent colors — deliberately distinct from the app's red
+/// brand color (reserved for buttons/CTAs) so each tool reads as its own
+/// "app icon" at a glance, the way a tool suite (Notion, Things, ...)
+/// gives every module its own hue instead of one flat brand tint everywhere.
+class _FeatureColors {
+  _FeatureColors._();
+
+  static const Color merge = Color(0xFF3B82F6); // blue
+  static const Color split = Color(0xFF8B5CF6); // violet
+  static const Color compress = Color(0xFFF59E0B); // amber
+  static const Color imagePdf = Color(0xFF14B8A6); // teal
+  static const Color history = Color(0xFF64748B); // slate
+}
+
 class _FeatureCard extends StatelessWidget {
   final IconData icon;
   final Color color;
@@ -179,9 +193,21 @@ class _FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color background = Color.alphaBlend(
+      color.withValues(alpha: isDark ? 0.20 : 0.10),
+      Theme.of(context).colorScheme.surface,
+    );
+
     return Card(
+      color: background,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: color.withValues(alpha: 0.28)),
+      ),
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -192,10 +218,17 @@ class _FeatureCard extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.14),
+                  color: color,
                   borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.35),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
-                child: Icon(icon, color: color, size: 20),
+                child: Icon(icon, color: Colors.white, size: 20),
               ),
               const SizedBox(height: 10),
               Text(
