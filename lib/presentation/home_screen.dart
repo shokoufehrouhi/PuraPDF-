@@ -4,9 +4,9 @@ import 'package:share_plus/share_plus.dart';
 
 import '../core/theme/app_theme.dart';
 import '../core/theme/theme_mode_controller.dart';
+import '../domain/entities/history_file.dart';
 import 'features/compress/compress_screen.dart';
 import 'features/history/history_controller.dart';
-import 'features/history/history_screen.dart';
 import 'features/image_pdf/image_pdf_screen.dart';
 import 'features/merge/merge_screen.dart';
 import 'features/split/split_screen.dart';
@@ -40,10 +40,6 @@ class _FeatureColors {
   static const Color imagePdf = Color(0xFFCDEDD0);
   static const Color imagePdfDark = Color(0xFFB8E4BC);
   static const Color imagePdfIcon = Color(0xFF22C55E);
-
-  static const Color history = Color(0xFFC9F1E9);
-  static const Color historyDark = Color(0xFFABE8DD);
-  static const Color historyIcon = Color(0xFF14B8A6);
 }
 
 /// Landing screen — feature hub. Grows one tile per Phase-1 feature as each
@@ -333,17 +329,6 @@ class _ToolsTab extends StatelessWidget {
                     MaterialPageRoute(builder: (_) => const ImagePdfScreen()),
                   ),
                 ),
-                _FeatureRowCard(
-                  icon: Icons.history,
-                  color: _FeatureColors.history,
-                  colorDark: _FeatureColors.historyDark,
-                  iconColor: _FeatureColors.historyIcon,
-                  title: 'View History',
-                  subtitle: 'Access previously processed files',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const HistoryScreen()),
-                  ),
-                ),
               ],
             ),
           ),
@@ -532,6 +517,90 @@ class _DiagonalSheenPainter extends CustomPainter {
       oldDelegate.opacity != opacity;
 }
 
+/// What kind of tool produced a generated file — derived from the output
+/// filename's `purapdf_<op>_...` prefix (see `_writeOutput`/`_recordGenerated`
+/// in [PdfRepositoryImpl]) rather than a stored field, so it stays correct
+/// even for files written before this existed.
+class _OperationInfo {
+  final IconData icon;
+  final Color color;
+  final String label;
+
+  const _OperationInfo(this.icon, this.color, this.label);
+}
+
+const _OperationInfo _unknownOperation = _OperationInfo(
+  Icons.insert_drive_file,
+  Color(0xFF9CA3AF),
+  'File',
+);
+
+_OperationInfo _operationFor(String fileName) {
+  if (fileName.startsWith('purapdf_merged_')) {
+    return const _OperationInfo(
+      Icons.call_merge,
+      _FeatureColors.mergeIcon,
+      'Merge',
+    );
+  }
+  if (fileName.startsWith('purapdf_split_')) {
+    return const _OperationInfo(
+      Icons.call_split,
+      _FeatureColors.splitIcon,
+      'Split',
+    );
+  }
+  if (fileName.startsWith('purapdf_compressed_')) {
+    return const _OperationInfo(
+      Icons.compress,
+      _FeatureColors.compressIcon,
+      'Compress',
+    );
+  }
+  if (fileName.startsWith('purapdf_images_')) {
+    return const _OperationInfo(
+      Icons.image_outlined,
+      _FeatureColors.imagePdfIcon,
+      'Image → PDF',
+    );
+  }
+  if (fileName.startsWith('purapdf_page_')) {
+    return const _OperationInfo(
+      Icons.image_outlined,
+      _FeatureColors.imagePdfIcon,
+      'PDF → Image',
+    );
+  }
+  return _unknownOperation;
+}
+
+const List<String> _monthAbbrevs = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+String _formatDateTime(DateTime dt) {
+  final DateTime local = dt.toLocal();
+  final String month = _monthAbbrevs[local.month - 1];
+  final int hour12 = local.hour % 12 == 0 ? 12 : local.hour % 12;
+  final String ampm = local.hour < 12 ? 'AM' : 'PM';
+  final String minute = local.minute.toString().padLeft(2, '0');
+  return '$month ${local.day}, $hour12:$minute $ampm';
+}
+
+/// Recents tab — the app's only history surface (the dedicated History
+/// screen was removed; every generated file lives here, one row per
+/// operation: type, date/time, file name, download, share).
 class _RecentsTab extends ConsumerStatefulWidget {
   const _RecentsTab();
 
@@ -548,22 +617,15 @@ class _RecentsTabState extends ConsumerState<_RecentsTab> {
     );
   }
 
-  String _formatSize(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(historyControllerProvider);
-    final recent = state.files.take(8).toList();
 
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (recent.isEmpty) {
+    if (state.files.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -578,41 +640,100 @@ class _RecentsTabState extends ConsumerState<_RecentsTab> {
       );
     }
 
-    return ListView(
+    return ListView.separated(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-      children: [
-        ...recent.map(
-          (f) => Card(
-            child: ListTile(
-              leading: Icon(
-                f.name.endsWith('.pdf')
-                    ? Icons.picture_as_pdf
-                    : f.name.endsWith('.zip')
-                    ? Icons.folder_zip
-                    : Icons.image,
-              ),
-              title: Text(f.name, maxLines: 1, overflow: TextOverflow.ellipsis),
-              subtitle: Text(_formatSize(f.sizeBytes)),
-              trailing: IconButton(
-                icon: const Icon(Icons.share),
-                tooltip: 'Share',
-                onPressed: () => SharePlus.instance.share(
-                  ShareParams(files: [XFile(f.path)]),
+      itemCount: state.files.length,
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
+      itemBuilder: (context, index) =>
+          _RecentRecordRow(file: state.files[index]),
+    );
+  }
+}
+
+class _RecentRecordRow extends StatelessWidget {
+  final HistoryFile file;
+
+  const _RecentRecordRow({required this.file});
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    final _OperationInfo op = _operationFor(file.name);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(10, 8, 4, 8),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          // Operation-type column: colored badge doubles as the type
+          // indicator, with the label spelled out beside it.
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: op.color.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(op.icon, color: op.color, size: 18),
+          ),
+          const SizedBox(width: 10),
+          // File name + date-time column.
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  file.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13.5,
+                    color: scheme.onSurface,
+                  ),
                 ),
-              ),
-              onTap: () => downloadFile(context, f.path),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Text(
+                      op.label,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: op.color,
+                      ),
+                    ),
+                    Text(
+                      '  •  ${_formatDateTime(file.createdAt)}',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Center(
-          child: TextButton(
-            onPressed: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => const HistoryScreen())),
-            child: const Text('View all in History'),
+          // Download / share columns.
+          IconButton(
+            icon: const Icon(Icons.download_outlined),
+            tooltip: 'Download',
+            onPressed: () => downloadFile(context, file.path),
           ),
-        ),
-      ],
+          IconButton(
+            icon: const Icon(Icons.ios_share),
+            tooltip: 'Share',
+            onPressed: () => SharePlus.instance.share(
+              ShareParams(files: [XFile(file.path)]),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
