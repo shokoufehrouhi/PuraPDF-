@@ -502,11 +502,11 @@ class _DiagonalSheenPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.10)
+      ..color = Colors.white.withValues(alpha: 0.045)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 16;
+      ..strokeWidth = 14;
 
-    const double spacing = 30;
+    const double spacing = 34;
     final double span = size.width + size.height;
     for (double x = -size.height; x < span; x += spacing) {
       canvas.drawLine(
