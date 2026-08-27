@@ -61,64 +61,100 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final int columns = constraints.maxWidth >= 640 ? 3 : 2;
-            return GridView.count(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-              crossAxisCount: columns,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 1.05,
-              children: [
-                _FeatureCard(
-                  icon: Icons.call_merge,
-                  color: scheme.primary,
-                  title: 'Merge',
-                  subtitle: 'Combine PDFs',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const MergeScreen()),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Your PDF toolkit — merge, split, compress, and convert, '
+                  'all on-device.',
+                  style: Theme.of(context).textTheme.bodyMedium
+                      ?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
+                  child: GridView(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    shrinkWrap: true,
+                    // A max tile width (not a fixed column count) keeps each
+                    // card a sensible, phone-sized tile — more columns
+                    // appear as the window widens instead of the same 2
+                    // tiles stretching huge.
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 152,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.92,
+                        ),
+                    children: [
+                      _FeatureCard(
+                        icon: Icons.call_merge,
+                        color: scheme.primary,
+                        title: 'Merge',
+                        subtitle: 'Combine PDFs',
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const MergeScreen(),
+                          ),
+                        ),
+                      ),
+                      _FeatureCard(
+                        icon: Icons.call_split,
+                        color: scheme.tertiary,
+                        title: 'Split',
+                        subtitle: 'Break into pages',
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const SplitScreen(),
+                          ),
+                        ),
+                      ),
+                      _FeatureCard(
+                        icon: Icons.compress,
+                        color: scheme.secondary,
+                        title: 'Compress',
+                        subtitle: 'Shrink file size',
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const CompressScreen(),
+                          ),
+                        ),
+                      ),
+                      _FeatureCard(
+                        icon: Icons.image_outlined,
+                        color: scheme.primary,
+                        title: 'Image ⇄ PDF',
+                        subtitle: 'Convert both ways',
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ImagePdfScreen(),
+                          ),
+                        ),
+                      ),
+                      _FeatureCard(
+                        icon: Icons.history,
+                        color: scheme.tertiary,
+                        title: 'History',
+                        subtitle: 'Your generated files',
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const HistoryScreen(),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                _FeatureCard(
-                  icon: Icons.call_split,
-                  color: scheme.tertiary,
-                  title: 'Split',
-                  subtitle: 'Break into pages',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const SplitScreen()),
-                  ),
-                ),
-                _FeatureCard(
-                  icon: Icons.compress,
-                  color: scheme.secondary,
-                  title: 'Compress',
-                  subtitle: 'Shrink file size',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const CompressScreen()),
-                  ),
-                ),
-                _FeatureCard(
-                  icon: Icons.image_outlined,
-                  color: scheme.primary,
-                  title: 'Image ⇄ PDF',
-                  subtitle: 'Convert both ways',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ImagePdfScreen()),
-                  ),
-                ),
-                _FeatureCard(
-                  icon: Icons.history,
-                  color: scheme.tertiary,
-                  title: 'History',
-                  subtitle: 'Your generated files',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const HistoryScreen()),
-                  ),
-                ),
-              ],
-            );
-          },
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: const BannerAdWidget(),
@@ -147,38 +183,37 @@ class _FeatureCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, color: color, size: 24),
+                child: Icon(icon, color: color, size: 20),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+              const SizedBox(height: 10),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleSmall
+                    ?.copyWith(fontWeight: FontWeight.w700),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 11,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
