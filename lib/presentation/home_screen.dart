@@ -26,27 +26,12 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _tabIndex = 0;
 
-  IconData _themeIcon(ThemeMode mode) {
-    switch (mode) {
-      case ThemeMode.light:
-        return Icons.light_mode_outlined;
-      case ThemeMode.dark:
-        return Icons.dark_mode_outlined;
-      case ThemeMode.system:
-        return Icons.brightness_auto_outlined;
-    }
-  }
+  IconData _themeIcon(ThemeMode mode) => mode == ThemeMode.dark
+      ? Icons.dark_mode_outlined
+      : Icons.light_mode_outlined;
 
-  String _themeLabel(ThemeMode mode) {
-    switch (mode) {
-      case ThemeMode.light:
-        return 'Light theme';
-      case ThemeMode.dark:
-        return 'Dark theme';
-      case ThemeMode.system:
-        return 'System theme';
-    }
-  }
+  String _themeLabel(ThemeMode mode) =>
+      mode == ThemeMode.dark ? 'Dark theme' : 'Light theme';
 
   @override
   Widget build(BuildContext context) {
