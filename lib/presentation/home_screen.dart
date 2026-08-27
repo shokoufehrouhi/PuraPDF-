@@ -397,9 +397,9 @@ class _FeatureRowCard extends StatelessWidget {
     final Color badgeIconColor = isDark ? Colors.white : iconColor;
     final BoxShadow shadow = isDark
         ? BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
           )
         : BoxShadow(
             color: iconColor.withValues(alpha: 0.22),
