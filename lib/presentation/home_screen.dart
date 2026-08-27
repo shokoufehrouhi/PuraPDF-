@@ -426,6 +426,7 @@ class _FeatureRowCard extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: Stack(
+              alignment: Alignment.center,
               children: [
                 // The reference mockup's glossy sheen — soft diagonal
                 // light streaks over the flat gradient.
@@ -433,10 +434,7 @@ class _FeatureRowCard extends StatelessWidget {
                   child: CustomPaint(painter: _DiagonalSheenPainter()),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Row(
                     children: [
                       Container(
