@@ -380,32 +380,32 @@ class _FeatureRowCard extends StatelessWidget {
     // would lose contrast on a pale card). Dark mode: the pastel would
     // wash out against a dark scaffold, so the card gradient is instead
     // derived from the feature's own saturated iconColor blended toward
-    // a neutral dark grey (muted, not the fully-saturated iconColor) —
-    // with white text/icon and a plain black shadow (a colored glow reads
-    // oddly on a dark background).
+    // a neutral dark grey — kept close together (0.5/0.62, was 0.55/0.72)
+    // so the card reads as evenly colored instead of fading to a heavy
+    // dark corner that reads as a shadow. No box shadow at all in dark
+    // mode (a glow or a plain black one both looked wrong against a dark
+    // scaffold); light mode keeps its colored shadow for lift.
     const Color darkMuted = Color(0xFF2A2A30);
     final Color cardTop = isDark
-        ? Color.lerp(iconColor, darkMuted, 0.55)!
+        ? Color.lerp(iconColor, darkMuted, 0.50)!
         : color;
     final Color cardBottom = isDark
-        ? Color.lerp(iconColor, darkMuted, 0.72)!
+        ? Color.lerp(iconColor, darkMuted, 0.62)!
         : colorDark;
     final Color textColor = isDark ? Colors.white : const Color(0xFF1F2937);
     final Color badgeColor = isDark
         ? iconColor
         : Colors.white.withValues(alpha: 0.85);
     final Color badgeIconColor = isDark ? Colors.white : iconColor;
-    final BoxShadow shadow = isDark
-        ? BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          )
-        : BoxShadow(
-            color: iconColor.withValues(alpha: 0.22),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          );
+    final List<BoxShadow> shadow = isDark
+        ? const []
+        : [
+            BoxShadow(
+              color: iconColor.withValues(alpha: 0.22),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ];
 
     return Material(
       color: Colors.transparent,
@@ -421,7 +421,7 @@ class _FeatureRowCard extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [cardTop, cardBottom],
             ),
-            boxShadow: [shadow],
+            boxShadow: shadow,
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
