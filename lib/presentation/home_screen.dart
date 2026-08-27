@@ -431,7 +431,11 @@ class _FeatureRowCard extends StatelessWidget {
                 // The reference mockup's glossy sheen — soft diagonal
                 // light streaks over the flat gradient.
                 Positioned.fill(
-                  child: CustomPaint(painter: _DiagonalSheenPainter()),
+                  child: CustomPaint(
+                    painter: _DiagonalSheenPainter(
+                      opacity: isDark ? 0.045 : 0.16,
+                    ),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -496,11 +500,19 @@ class _FeatureRowCard extends StatelessWidget {
 
 /// Paints soft, evenly-spaced diagonal white streaks — the glossy sheen
 /// look from the reference mockup, layered under the card's content.
+///
+/// [opacity] is theme-specific: the same white stripe reads very
+/// differently against a light pastel card vs. a dark muted one, so this
+/// isn't one fixed value — see the two call sites in _FeatureRowCard.
 class _DiagonalSheenPainter extends CustomPainter {
+  final double opacity;
+
+  const _DiagonalSheenPainter({required this.opacity});
+
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.045)
+      ..color = Colors.white.withValues(alpha: opacity)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 14;
 
@@ -516,7 +528,8 @@ class _DiagonalSheenPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _DiagonalSheenPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _DiagonalSheenPainter oldDelegate) =>
+      oldDelegate.opacity != opacity;
 }
 
 class _RecentsTab extends ConsumerStatefulWidget {
