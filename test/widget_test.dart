@@ -10,9 +10,11 @@ void main() {
   ) async {
     await tester.pumpWidget(const ProviderScope(child: PuraPdfApp()));
 
-    expect(find.text('PuraPDF+'), findsWidgets);
-    expect(find.text('Merge'), findsOneWidget);
-    expect(find.text('Split'), findsOneWidget);
-    expect(find.text('Compress'), findsOneWidget);
+    // The header renders "PuraPDF" + "+" as separate spans of one
+    // Text.rich, so this needs findRichText to match the combined text.
+    expect(find.text('PuraPDF+', findRichText: true), findsWidgets);
+    expect(find.text('Merge PDFs'), findsOneWidget);
+    expect(find.text('Split PDF'), findsOneWidget);
+    expect(find.text('Compress PDF'), findsOneWidget);
   });
 }
