@@ -395,63 +395,103 @@ class _FeatureRowCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: iconColor.withValues(alpha: 0.28),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
+                color: iconColor.withValues(alpha: 0.45),
+                blurRadius: 22,
+                spreadRadius: 1,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.85),
-                  borderRadius: BorderRadius.circular(13),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Stack(
+              children: [
+                // The reference mockup's glossy sheen — soft diagonal
+                // light streaks over the flat gradient.
+                Positioned.fill(
+                  child: CustomPaint(painter: _DiagonalSheenPainter()),
                 ),
-                child: Icon(icon, color: iconColor, size: 25),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: textColor,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 17,
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.85),
+                          borderRadius: BorderRadius.circular(13),
+                        ),
+                        child: Icon(icon, color: iconColor, size: 25),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: textColor.withValues(alpha: 0.72),
-                        fontSize: 13,
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                color: textColor,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 17,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              subtitle,
+                              style: TextStyle(
+                                color: textColor.withValues(alpha: 0.72),
+                                fontSize: 13,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                      Icon(
+                        Icons.chevron_right,
+                        color: textColor.withValues(alpha: 0.55),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: textColor.withValues(alpha: 0.55),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+/// Paints soft, evenly-spaced diagonal white streaks — the glossy sheen
+/// look from the reference mockup, layered under the card's content.
+class _DiagonalSheenPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.10)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 16;
+
+    const double spacing = 30;
+    final double span = size.width + size.height;
+    for (double x = -size.height; x < span; x += spacing) {
+      canvas.drawLine(
+        Offset(x, 0),
+        Offset(x + size.height, size.height),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DiagonalSheenPainter oldDelegate) => false;
 }
 
 class _RecentsTab extends ConsumerStatefulWidget {
