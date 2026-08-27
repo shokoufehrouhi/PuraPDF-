@@ -59,6 +59,30 @@ Future<String> _writeImageHeavyPdf(String path) async {
   return path;
 }
 
+/// A page of dense, sharp-edged text — the pathological case for High:
+/// rasterizing lots of small text as JPEG is often *larger* than the
+/// original's efficient text-operator encoding (real bug report: "high
+/// bishtar shod be jaye kam shodan" on a merged multi-page document).
+Future<String> _writeTextHeavyPdf(String path, int pageCount) async {
+  final doc = PdfDocument();
+  final font = PdfStandardFont(PdfFontFamily.helvetica, 10);
+  final line = List.filled(12, 'Lorem ipsum dolor sit amet. ').join();
+  for (int p = 0; p < pageCount; p++) {
+    final page = doc.pages.add();
+    for (int l = 0; l < 40; l++) {
+      page.graphics.drawString(
+        line,
+        font,
+        bounds: Rect.fromLTWH(20, 20.0 + l * 14, 550, 14),
+      );
+    }
+  }
+  final bytes = await doc.save();
+  doc.dispose();
+  await File(path).writeAsBytes(bytes, flush: true);
+  return path;
+}
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -87,4 +111,28 @@ void main() {
       reopened.dispose();
     },
   );
+
+  test('High level never returns a file bigger than the original, even on '
+      'text-heavy PDFs where rasterizing backfires', () async {
+    final dir = await getApplicationDocumentsDirectory();
+    final source = await _writeTextHeavyPdf(
+      '${dir.path}/text_heavy_source.pdf',
+      20,
+    );
+    final useCase = CompressPdfUseCase(PdfRepositoryImpl());
+
+    final high = await useCase(source, CompressionLevel.high);
+
+    expect(high.compressedSizeBytes, lessThanOrEqualTo(high.originalSizeBytes));
+    expect(high.reductionPercent, greaterThanOrEqualTo(0));
+
+    // Output must still be a valid, readable PDF with the same page count
+    // (whichever fallback tier kicked in - rasterized, stream-compressed,
+    // or a plain copy - must not have dropped/corrupted pages).
+    final reopened = PdfDocument(
+      inputBytes: File(high.outputPath).readAsBytesSync(),
+    );
+    expect(reopened.pages.count, 20);
+    reopened.dispose();
+  });
 }

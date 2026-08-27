@@ -74,7 +74,9 @@ class CompressScreen extends ConsumerWidget {
                 const Text(
                   'High rebuilds every page as an image — best size '
                   'reduction for scans/photos, but the result loses '
-                  'selectable/searchable text.',
+                  'selectable/searchable text. On text-heavy PDFs where '
+                  'that would backfire, it automatically falls back so '
+                  'the result is never bigger than the original.',
                   style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],

@@ -36,11 +36,40 @@ class PdfRepositoryImpl implements PdfRepository {
     // from those images - a real size win on photo/scan-heavy PDFs, traded
     // against losing selectable text on the compressed output. See
     // _compressByRasterizing's doc comment.
-    final String outPath = level == CompressionLevel.high
+    String outPath = level == CompressionLevel.high
         ? await _compressByRasterizing(inputPath)
         : await _compressByStream(inputPath, level);
+    int compressedSize = await File(outPath).length();
 
-    final int compressedSize = await File(outPath).length();
+    // Rasterizing a text/vector-heavy page (sharp edges, lots of small
+    // detail) as JPEG is often *larger* than the original's efficient
+    // vector/text encoding - the opposite of "compress". Never ship a
+    // result bigger than the input: fall back to stream compression, and
+    // as a last resort a plain copy of the original (0% smaller, never
+    // negative), rather than silently returning a bloated "compressed" file.
+    if (compressedSize >= originalSize) {
+      if (level == CompressionLevel.high) {
+        final String streamPath = await _compressByStream(
+          inputPath,
+          CompressionLevel.high,
+        );
+        final int streamSize = await File(streamPath).length();
+        if (streamSize < compressedSize) {
+          outPath = streamPath;
+          compressedSize = streamSize;
+        }
+      }
+      if (compressedSize >= originalSize) {
+        final Directory dir = await getApplicationDocumentsDirectory();
+        final String copyPath =
+            '${dir.path}/purapdf_compressed_${DateTime.now().millisecondsSinceEpoch}.pdf';
+        await File(inputPath).copy(copyPath);
+        await _recordGenerated(copyPath);
+        outPath = copyPath;
+        compressedSize = originalSize;
+      }
+    }
+
     return CompressResult(
       outputPath: outPath,
       originalSizeBytes: originalSize,
