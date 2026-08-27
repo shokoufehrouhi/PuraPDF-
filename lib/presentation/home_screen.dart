@@ -16,22 +16,34 @@ import 'shared_widgets/download_file.dart';
 /// Per-feature accent colors — deliberately distinct from the app's red
 /// brand color (reserved for the logo/CTAs) so each tool reads as its own
 /// "app icon" at a glance, the way a tool suite gives every module its own
-/// hue instead of one flat brand tint everywhere. Each has a darker partner
-/// for the card's gradient. Muted/dusty tones on purpose (a matte look),
-/// not the vivid Tailwind-style versions this started as.
+/// hue instead of one flat brand tint everywhere.
+///
+/// Each feature has: a light/lighter pair for the card's own soft pastel
+/// gradient (glossy, not matte — a subtle sheen, not a flat muted fill),
+/// plus a separate saturated [icon] color so the icon reads clearly
+/// against its white badge instead of matching the pale card behind it.
 class _FeatureColors {
   _FeatureColors._();
 
-  static const Color merge = Color(0xFF6E93B8);
-  static const Color mergeDark = Color(0xFF547699);
-  static const Color split = Color(0xFF9585BD);
-  static const Color splitDark = Color(0xFF7A6AA0);
-  static const Color compress = Color(0xFFC98D63);
-  static const Color compressDark = Color(0xFFA9724A);
-  static const Color imagePdf = Color(0xFF7FA88A);
-  static const Color imagePdfDark = Color(0xFF638C6E);
-  static const Color history = Color(0xFF6FA3A0);
-  static const Color historyDark = Color(0xFF548684);
+  static const Color merge = Color(0xFFAED9FB);
+  static const Color mergeDark = Color(0xFF8CC4F7);
+  static const Color mergeIcon = Color(0xFF3B82F6);
+
+  static const Color split = Color(0xFFDAC6F2);
+  static const Color splitDark = Color(0xFFC6A8E9);
+  static const Color splitIcon = Color(0xFF8B5CF6);
+
+  static const Color compress = Color(0xFFFFD5AC);
+  static const Color compressDark = Color(0xFFFFBF88);
+  static const Color compressIcon = Color(0xFFF97316);
+
+  static const Color imagePdf = Color(0xFFBCE8C0);
+  static const Color imagePdfDark = Color(0xFFA0DDA8);
+  static const Color imagePdfIcon = Color(0xFF22C55E);
+
+  static const Color history = Color(0xFFB2ECE2);
+  static const Color historyDark = Color(0xFF93E1D3);
+  static const Color historyIcon = Color(0xFF14B8A6);
 }
 
 /// Landing screen — feature hub. Grows one tile per Phase-1 feature as each
@@ -281,6 +293,7 @@ class _ToolsTab extends StatelessWidget {
                   icon: Icons.call_merge,
                   color: _FeatureColors.merge,
                   colorDark: _FeatureColors.mergeDark,
+                  iconColor: _FeatureColors.mergeIcon,
                   title: 'Merge PDFs',
                   subtitle: 'Combine multiple documents',
                   onTap: () => Navigator.of(context).push(
@@ -291,6 +304,7 @@ class _ToolsTab extends StatelessWidget {
                   icon: Icons.call_split,
                   color: _FeatureColors.split,
                   colorDark: _FeatureColors.splitDark,
+                  iconColor: _FeatureColors.splitIcon,
                   title: 'Split PDF',
                   subtitle: 'Separate into pages or sections',
                   onTap: () => Navigator.of(context).push(
@@ -301,6 +315,7 @@ class _ToolsTab extends StatelessWidget {
                   icon: Icons.compress,
                   color: _FeatureColors.compress,
                   colorDark: _FeatureColors.compressDark,
+                  iconColor: _FeatureColors.compressIcon,
                   title: 'Compress PDF',
                   subtitle: 'Optimize file size for sharing',
                   onTap: () => Navigator.of(context).push(
@@ -311,6 +326,7 @@ class _ToolsTab extends StatelessWidget {
                   icon: Icons.image_outlined,
                   color: _FeatureColors.imagePdf,
                   colorDark: _FeatureColors.imagePdfDark,
+                  iconColor: _FeatureColors.imagePdfIcon,
                   title: 'Image ⇄ PDF',
                   subtitle: 'Convert between formats',
                   onTap: () => Navigator.of(context).push(
@@ -321,6 +337,7 @@ class _ToolsTab extends StatelessWidget {
                   icon: Icons.history,
                   color: _FeatureColors.history,
                   colorDark: _FeatureColors.historyDark,
+                  iconColor: _FeatureColors.historyIcon,
                   title: 'View History',
                   subtitle: 'Access previously processed files',
                   onTap: () => Navigator.of(context).push(
@@ -340,6 +357,7 @@ class _FeatureRowCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final Color colorDark;
+  final Color iconColor;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
@@ -348,6 +366,7 @@ class _FeatureRowCard extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.colorDark,
+    required this.iconColor,
     required this.title,
     required this.subtitle,
     required this.onTap,
@@ -355,6 +374,11 @@ class _FeatureRowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dark, near-black text/icons on purpose — the card itself is now a
+    // light pastel, so white text (fine on the old vivid/dark gradient)
+    // would lose contrast here.
+    const Color textColor = Color(0xFF1F2937);
+
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(20),
@@ -369,6 +393,13 @@ class _FeatureRowCard extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [color, colorDark],
             ),
+            boxShadow: [
+              BoxShadow(
+                color: iconColor.withValues(alpha: 0.28),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -377,10 +408,10 @@ class _FeatureRowCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.92),
+                  color: Colors.white.withValues(alpha: 0.85),
                   borderRadius: BorderRadius.circular(13),
                 ),
-                child: Icon(icon, color: colorDark, size: 25),
+                child: Icon(icon, color: iconColor, size: 25),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -391,7 +422,7 @@ class _FeatureRowCard extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: textColor,
                         fontWeight: FontWeight.w700,
                         fontSize: 17,
                       ),
@@ -402,7 +433,7 @@ class _FeatureRowCard extends StatelessWidget {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.88),
+                        color: textColor.withValues(alpha: 0.72),
                         fontSize: 13,
                       ),
                       maxLines: 1,
@@ -413,7 +444,7 @@ class _FeatureRowCard extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right,
-                color: Colors.white.withValues(alpha: 0.85),
+                color: textColor.withValues(alpha: 0.55),
               ),
             ],
           ),
