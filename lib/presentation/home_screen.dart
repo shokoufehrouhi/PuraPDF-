@@ -17,20 +17,21 @@ import 'shared_widgets/download_file.dart';
 /// brand color (reserved for the logo/CTAs) so each tool reads as its own
 /// "app icon" at a glance, the way a tool suite gives every module its own
 /// hue instead of one flat brand tint everywhere. Each has a darker partner
-/// for the card's gradient.
+/// for the card's gradient. Muted/dusty tones on purpose (a matte look),
+/// not the vivid Tailwind-style versions this started as.
 class _FeatureColors {
   _FeatureColors._();
 
-  static const Color merge = Color(0xFF60A5FA);
-  static const Color mergeDark = Color(0xFF2563EB);
-  static const Color split = Color(0xFFA78BFA);
-  static const Color splitDark = Color(0xFF7C3AED);
-  static const Color compress = Color(0xFFFB923C);
-  static const Color compressDark = Color(0xFFEA580C);
-  static const Color imagePdf = Color(0xFF4ADE80);
-  static const Color imagePdfDark = Color(0xFF16A34A);
-  static const Color history = Color(0xFF5EEAD4);
-  static const Color historyDark = Color(0xFF0D9488);
+  static const Color merge = Color(0xFF6E93B8);
+  static const Color mergeDark = Color(0xFF547699);
+  static const Color split = Color(0xFF9585BD);
+  static const Color splitDark = Color(0xFF7A6AA0);
+  static const Color compress = Color(0xFFC98D63);
+  static const Color compressDark = Color(0xFFA9724A);
+  static const Color imagePdf = Color(0xFF7FA88A);
+  static const Color imagePdfDark = Color(0xFF638C6E);
+  static const Color history = Color(0xFF6FA3A0);
+  static const Color historyDark = Color(0xFF548684);
 }
 
 /// Landing screen — feature hub. Grows one tile per Phase-1 feature as each
