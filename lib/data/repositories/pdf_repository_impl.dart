@@ -264,7 +264,7 @@ class PdfRepositoryImpl implements PdfRepository {
 
     for (final imagePath in imagePaths) {
       final Uint8List bytes = await File(imagePath).readAsBytes();
-      final PdfBitmap bitmap = PdfBitmap(bytes);
+      final PdfBitmap bitmap = PdfBitmap(_normalizeImageBytes(bytes));
 
       double w = bitmap.width.toDouble();
       double h = bitmap.height.toDouble();
@@ -680,7 +680,7 @@ class PdfRepositoryImpl implements PdfRepository {
             );
           }
         case PdfImageInsert e:
-          final PdfBitmap bitmap = PdfBitmap(e.imageBytes);
+          final PdfBitmap bitmap = PdfBitmap(_normalizeImageBytes(e.imageBytes));
           page.graphics.drawImage(
             bitmap,
             Rect.fromLTWH(e.left, e.top, e.width, e.height),
@@ -692,6 +692,22 @@ class PdfRepositoryImpl implements PdfRepository {
       doc,
       'purapdf_content_${DateTime.now().millisecondsSinceEpoch}.pdf',
     );
+  }
+
+  /// Re-encodes arbitrary image bytes as PNG via `package:image` (which
+  /// recognizes a much wider format range — WebP, GIF, BMP, TIFF, odd PNG
+  /// variants, ... — than Syncfusion's own sniffing) before handing them to
+  /// [PdfBitmap]. Without this, [PdfBitmap] throws `UnsupportedError:
+  /// Invalid/Unsupported image stream` on anything its narrower decoder
+  /// doesn't recognize — hit in practice with an image picked from Photos.
+  Uint8List _normalizeImageBytes(Uint8List bytes) {
+    final img.Image? decoded = img.decodeImage(bytes);
+    if (decoded == null) {
+      throw ArgumentError(
+        'This image format isn\'t supported. Try a JPEG or PNG instead.',
+      );
+    }
+    return Uint8List.fromList(img.encodePng(decoded));
   }
 
   /// Best-effort match from an extracted font name to one of the PDF
