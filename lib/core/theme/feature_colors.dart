@@ -46,4 +46,8 @@ class FeatureColors {
   static const Color watermark = Color(0xFFCFF3F9);
   static const Color watermarkDark = Color(0xFFAEE9F3);
   static const Color watermarkIcon = Color(0xFF06B6D4);
+
+  static const Color signature = Color(0xFFE2E6EC);
+  static const Color signatureDark = Color(0xFFCDD3DC);
+  static const Color signatureIcon = Color(0xFF64748B);
 }

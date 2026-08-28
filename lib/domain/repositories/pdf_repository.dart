@@ -94,4 +94,9 @@ abstract class PdfRepository {
   /// Stamps [options]'s text diagonally across every page of the PDF at
   /// [inputPath] and returns the new file's path.
   Future<String> watermarkPdf(String inputPath, WatermarkOptions options);
+
+  /// Bakes [signature] (a drawn or typed signature image, already
+  /// positioned via its [PdfImageInsert] fields) onto one page of the PDF
+  /// at [inputPath] and returns the new file's path.
+  Future<String> signPdf(String inputPath, PdfImageInsert signature);
 }

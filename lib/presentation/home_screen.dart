@@ -15,6 +15,7 @@ import 'features/image_pdf/image_pdf_screen.dart';
 import 'features/merge/merge_screen.dart';
 import 'features/page_edit/page_edit_screen.dart';
 import 'features/scanner/scanner_screen.dart';
+import 'features/signature/signature_screen.dart';
 import 'features/split/split_screen.dart';
 import 'features/watermark/watermark_screen.dart';
 import 'shared_widgets/banner_ad_widget.dart';
@@ -350,6 +351,17 @@ class _ToolsTab extends StatelessWidget {
                     MaterialPageRoute(builder: (_) => const WatermarkScreen()),
                   ),
                 ),
+                _FeatureRowCard(
+                  icon: Icons.draw_outlined,
+                  color: FeatureColors.signature,
+                  colorDark: FeatureColors.signatureDark,
+                  iconColor: FeatureColors.signatureIcon,
+                  title: 'Digital Signature',
+                  subtitle: 'Draw or type a signature, place it, save',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SignatureScreen()),
+                  ),
+                ),
               ],
             ),
           ),
@@ -632,6 +644,13 @@ _OperationInfo _operationFor(String fileName) {
       Icons.branding_watermark_outlined,
       FeatureColors.watermarkIcon,
       'Watermark',
+    );
+  }
+  if (fileName.startsWith('purapdf_signed_')) {
+    return const _OperationInfo(
+      Icons.draw_outlined,
+      FeatureColors.signatureIcon,
+      'Signed',
     );
   }
   return _unknownOperation;

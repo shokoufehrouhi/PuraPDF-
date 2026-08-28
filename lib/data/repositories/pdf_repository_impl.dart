@@ -803,6 +803,37 @@ class PdfRepositoryImpl implements PdfRepository {
     );
   }
 
+  @override
+  Future<String> signPdf(String inputPath, PdfImageInsert signature) async {
+    final PdfDocument doc = await _loadDocument(inputPath);
+    final int pageCount = doc.pages.count;
+    if (signature.pageIndex < 0 || signature.pageIndex >= pageCount) {
+      doc.dispose();
+      throw ArgumentError(
+        'Page index ${signature.pageIndex} out of range (0-${pageCount - 1}).',
+      );
+    }
+
+    final PdfPage page = doc.pages[signature.pageIndex];
+    final PdfBitmap bitmap = PdfBitmap(
+      _normalizeImageBytes(signature.imageBytes),
+    );
+    page.graphics.drawImage(
+      bitmap,
+      Rect.fromLTWH(
+        signature.left,
+        signature.top,
+        signature.width,
+        signature.height,
+      ),
+    );
+
+    return _writeOutput(
+      doc,
+      'purapdf_signed_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
+  }
+
   /// Best-effort match from an extracted font name to one of the PDF
   /// standard fonts — Syncfusion's [PdfStandardFont] can't reproduce an
   /// arbitrary embedded font, so replacement text won't pixel-match the
