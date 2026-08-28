@@ -75,6 +75,7 @@ class HistoryController extends Notifier<HistoryState> {
       await ref.read(deleteHistoryFileUseCaseProvider)(path);
       state = state.copyWith(
         files: state.files.where((f) => f.path != path).toList(),
+        clearError: true,
       );
     } catch (e) {
       state = state.copyWith(error: friendlyErrorMessage(e));
@@ -83,20 +84,27 @@ class HistoryController extends Notifier<HistoryState> {
 
   /// Deletes every file currently listed. Keeps whatever was already there
   /// on a partial failure (mid-loop error) rather than guessing at which
-  /// ones actually got removed — a follow-up [refresh] will resync either
-  /// way.
+  /// ones actually got removed — resyncs from disk either way, but (unlike
+  /// calling the public [refresh]) without its `clearError: true` erasing
+  /// the error this just set before the UI ever gets a frame to show it.
   Future<void> clearAll() async {
     if (state.files.isEmpty) return;
     final deleteFile = ref.read(deleteHistoryFileUseCaseProvider);
+    bool hadError = false;
     try {
       for (final file in state.files) {
         await deleteFile(file.path);
       }
-      state = state.copyWith(files: const []);
     } catch (e) {
+      hadError = true;
       state = state.copyWith(error: friendlyErrorMessage(e));
-    } finally {
-      await refresh();
+    }
+    try {
+      final files = await ref.read(listHistoryUseCaseProvider)();
+      state = state.copyWith(files: files, clearError: !hadError);
+    } catch (_) {
+      // The resync itself failed too - leave state.files/error as they are,
+      // there's nothing more useful to report here.
     }
   }
 
@@ -118,7 +126,7 @@ class HistoryController extends Notifier<HistoryState> {
                 : f,
           )
           .toList();
-      state = state.copyWith(files: updated);
+      state = state.copyWith(files: updated, clearError: true);
     } catch (e) {
       state = state.copyWith(error: friendlyErrorMessage(e));
     }

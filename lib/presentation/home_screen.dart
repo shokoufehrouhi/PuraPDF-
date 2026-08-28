@@ -755,6 +755,19 @@ class _RecentsTabState extends ConsumerState<_RecentsTab> {
   Widget build(BuildContext context) {
     final state = ref.watch(historyControllerProvider);
 
+    // delete/rename/clearAll fail silently otherwise — they don't have a
+    // persistent inline error box like the single-flow feature screens do,
+    // since this is a list of independent row actions, not one form.
+    ref.listen(historyControllerProvider.select((s) => s.error), (
+      _,
+      String? error,
+    ) {
+      if (error == null) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(error)));
+    });
+
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
