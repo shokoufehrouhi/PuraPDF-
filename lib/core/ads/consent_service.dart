@@ -17,12 +17,25 @@ class ConsentService {
   /// whether ads can be requested this session. Never throws — a failed
   /// consent-info update (e.g. no network) falls back to whatever
   /// [ConsentInformation.canRequestAds] already knows from a prior session.
-  Future<bool> gatherConsent() async {
+  ///
+  /// `main.dart` awaits this *before `runApp()`* (so a required consent
+  /// form is never raced by ad init), which means a stall here — no
+  /// network on a first-ever launch, a plugin channel hiccup, any native
+  /// callback in the chain below just never firing — would keep the whole
+  /// app on a blank screen forever. [timeout] is the hard ceiling on that:
+  /// past it, assume no consent info and let `AdsService` decide from
+  /// there rather than block app startup indefinitely for something the
+  /// user isn't even looking at yet.
+  Future<bool> gatherConsent({
+    Duration timeout = const Duration(seconds: 8),
+  }) async {
     final Completer<bool> completer = Completer<bool>();
 
     void resolveFromCurrentStatus() {
       if (completer.isCompleted) return;
-      ConsentInformation.instance.canRequestAds().then(completer.complete);
+      ConsentInformation.instance.canRequestAds().then((canRequest) {
+        if (!completer.isCompleted) completer.complete(canRequest);
+      });
     }
 
     ConsentInformation.instance.requestConsentInfoUpdate(
@@ -37,6 +50,6 @@ class ConsentService {
       (_) => resolveFromCurrentStatus(),
     );
 
-    return completer.future;
+    return completer.future.timeout(timeout, onTimeout: () => false);
   }
 }

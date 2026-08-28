@@ -10,11 +10,26 @@ import 'presentation/home_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await AdsService.instance.init();
   runApp(const ProviderScope(child: PuraPdfApp()));
-  // Fire-and-forget: shows the app-open ad once it's ready (or gives up
-  // after a short timeout) without delaying the home screen's first frame.
-  unawaited(AdsService.instance.appOpen.showIfReady());
+  // Fire-and-forget: ad setup (GDPR/UK consent, the iOS tracking prompt,
+  // then the Mobile Ads SDK itself) runs in the background instead of
+  // gating the home screen's first frame on it. None of PuraPDF+'s actual
+  // PDF features depend on ads being ready - a merge/split/etc. started
+  // before this finishes just doesn't get an interstitial that one time
+  // (InterstitialAdManager already handles "nothing preloaded yet"
+  // gracefully). Previously this was awaited before runApp(), which meant
+  // a stalled consent/tracking flow (no network on a first-ever launch,
+  // a slow-to-respond ATT prompt, ...) held the entire app on a blank
+  // launch screen.
+  // Chained, not two separate unawaited calls: init() is what calls
+  // appOpen.preload() (right at its end), so showIfReady() has to run
+  // after init() actually gets there, or it'd find nothing preloaded yet
+  // and skip the app-open ad for this launch every time.
+  unawaited(
+    AdsService.instance.init().then(
+      (_) => AdsService.instance.appOpen.showIfReady(),
+    ),
+  );
 }
 
 class PuraPdfApp extends ConsumerWidget {
