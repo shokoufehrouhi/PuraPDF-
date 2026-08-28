@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
+import '../../../core/error_message.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/pdf_file.dart';
 import '../../../domain/entities/pdf_page_edit.dart';
@@ -89,7 +90,10 @@ class PageEditController extends Notifier<PageEditState> {
         ],
       );
     } catch (e) {
-      state = state.copyWith(isLoadingPages: false, error: e.toString());
+      state = state.copyWith(
+        isLoadingPages: false,
+        error: friendlyErrorMessage(e),
+      );
     }
   }
 
@@ -136,7 +140,7 @@ class PageEditController extends Notifier<PageEditState> {
       ]);
       state = state.copyWith(isSaving: false, resultPath: path);
     } catch (e) {
-      state = state.copyWith(isSaving: false, error: e.toString());
+      state = state.copyWith(isSaving: false, error: friendlyErrorMessage(e));
     }
   }
 

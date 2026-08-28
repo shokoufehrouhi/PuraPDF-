@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
+import '../../../core/error_message.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/pdf_file.dart';
 import '../../../domain/entities/watermark_options.dart';
@@ -140,7 +141,7 @@ class WatermarkController extends Notifier<WatermarkState> {
       );
       state = state.copyWith(isProcessing: false, resultPath: path);
     } catch (e) {
-      state = state.copyWith(isProcessing: false, error: e.toString());
+      state = state.copyWith(isProcessing: false, error: friendlyErrorMessage(e));
     }
   }
 

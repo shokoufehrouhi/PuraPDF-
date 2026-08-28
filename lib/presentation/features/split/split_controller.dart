@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
+import '../../../core/error_message.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/page_range.dart';
 import '../../../domain/entities/pdf_file.dart';
@@ -90,7 +91,7 @@ class SplitController extends Notifier<SplitState> {
       final count = await repo.getPageCount(file.path);
       state = state.copyWith(pageCount: count);
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = state.copyWith(error: friendlyErrorMessage(e));
     }
   }
 
@@ -133,7 +134,7 @@ class SplitController extends Notifier<SplitState> {
       final paths = await useCase(file.path, ranges);
       state = state.copyWith(isSplitting: false, resultPaths: paths);
     } catch (e) {
-      state = state.copyWith(isSplitting: false, error: e.toString());
+      state = state.copyWith(isSplitting: false, error: friendlyErrorMessage(e));
     }
   }
 

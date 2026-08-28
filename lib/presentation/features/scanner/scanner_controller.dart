@@ -2,6 +2,7 @@ import 'package:doclens/doclens.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
+import '../../../core/error_message.dart';
 import '../../../core/providers.dart';
 import '../../../domain/usecases/scan_documents_usecase.dart';
 
@@ -66,7 +67,7 @@ class ScannerController extends Notifier<ScannerState> {
         pages: scanned == null ? state.pages : [...state.pages, ...scanned],
       );
     } catch (e) {
-      state = state.copyWith(isScanning: false, error: e.toString());
+      state = state.copyWith(isScanning: false, error: friendlyErrorMessage(e));
     }
   }
 
@@ -100,7 +101,10 @@ class ScannerController extends Notifier<ScannerState> {
       final path = await useCase(state.pages);
       state = state.copyWith(isCreatingPdf: false, resultPath: path);
     } catch (e) {
-      state = state.copyWith(isCreatingPdf: false, error: e.toString());
+      state = state.copyWith(
+        isCreatingPdf: false,
+        error: friendlyErrorMessage(e),
+      );
     }
   }
 

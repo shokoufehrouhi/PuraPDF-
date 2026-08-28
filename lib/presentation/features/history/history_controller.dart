@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/error_message.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/history_file.dart';
 import '../../../domain/usecases/delete_history_file_usecase.dart';
@@ -61,7 +62,7 @@ class HistoryController extends Notifier<HistoryState> {
       final files = await ref.read(listHistoryUseCaseProvider)();
       state = state.copyWith(isLoading: false, files: files);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(isLoading: false, error: friendlyErrorMessage(e));
     }
   }
 
@@ -76,7 +77,7 @@ class HistoryController extends Notifier<HistoryState> {
         files: state.files.where((f) => f.path != path).toList(),
       );
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = state.copyWith(error: friendlyErrorMessage(e));
     }
   }
 
@@ -93,7 +94,7 @@ class HistoryController extends Notifier<HistoryState> {
       }
       state = state.copyWith(files: const []);
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = state.copyWith(error: friendlyErrorMessage(e));
     } finally {
       await refresh();
     }
@@ -119,7 +120,7 @@ class HistoryController extends Notifier<HistoryState> {
           .toList();
       state = state.copyWith(files: updated);
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = state.copyWith(error: friendlyErrorMessage(e));
     }
   }
 }

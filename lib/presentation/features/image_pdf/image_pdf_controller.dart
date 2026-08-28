@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
+import '../../../core/error_message.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/image_output_format.dart';
 import '../../../domain/entities/pdf_file.dart';
@@ -134,7 +135,7 @@ class ImagePdfController extends Notifier<ImagePdfState> {
         state = state.copyWith(isProcessing: false, resultImagePaths: paths);
       }
     } catch (e) {
-      state = state.copyWith(isProcessing: false, error: e.toString());
+      state = state.copyWith(isProcessing: false, error: friendlyErrorMessage(e));
     }
   }
 

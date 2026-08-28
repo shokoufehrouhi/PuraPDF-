@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
+import '../../../core/error_message.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/pdf_content_edit.dart';
 import '../../../domain/entities/pdf_file.dart';
@@ -121,7 +122,7 @@ class ContentEditController extends Notifier<ContentEditState> {
         currentPageIndex: 0,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(isLoading: false, error: friendlyErrorMessage(e));
     }
   }
 
@@ -225,7 +226,7 @@ class ContentEditController extends Notifier<ContentEditState> {
       final path = await useCase(file.path, edits);
       state = state.copyWith(isSaving: false, resultPath: path);
     } catch (e) {
-      state = state.copyWith(isSaving: false, error: e.toString());
+      state = state.copyWith(isSaving: false, error: friendlyErrorMessage(e));
     }
   }
 

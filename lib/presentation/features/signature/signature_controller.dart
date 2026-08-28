@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
+import '../../../core/error_message.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/pdf_content_edit.dart';
 import '../../../domain/entities/pdf_file.dart';
@@ -92,7 +93,10 @@ class SignatureController extends Notifier<SignatureState> {
       final pages = await repo.renderPageImages(file.path);
       state = state.copyWith(isLoadingPages: false, pages: pages);
     } catch (e) {
-      state = state.copyWith(isLoadingPages: false, error: e.toString());
+      state = state.copyWith(
+        isLoadingPages: false,
+        error: friendlyErrorMessage(e),
+      );
     }
   }
 
@@ -156,7 +160,7 @@ class SignatureController extends Notifier<SignatureState> {
       );
       state = state.copyWith(isProcessing: false, resultPath: path);
     } catch (e) {
-      state = state.copyWith(isProcessing: false, error: e.toString());
+      state = state.copyWith(isProcessing: false, error: friendlyErrorMessage(e));
     }
   }
 

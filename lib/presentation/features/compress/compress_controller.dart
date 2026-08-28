@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
+import '../../../core/error_message.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/compress_result.dart';
 import '../../../domain/entities/compression_level.dart';
@@ -81,7 +82,10 @@ class CompressController extends Notifier<CompressState> {
       final result = await useCase(file.path, state.level);
       state = state.copyWith(isCompressing: false, result: result);
     } catch (e) {
-      state = state.copyWith(isCompressing: false, error: e.toString());
+      state = state.copyWith(
+        isCompressing: false,
+        error: friendlyErrorMessage(e),
+      );
     }
   }
 
