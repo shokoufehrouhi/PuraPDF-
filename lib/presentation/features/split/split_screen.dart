@@ -162,24 +162,76 @@ class SplitScreen extends ConsumerWidget {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.ios_share),
-                                        tooltip: 'Share',
-                                        onPressed: () =>
-                                            SharePlus.instance.share(
-                                              ShareParams(files: [XFile(p)]),
+                                  // With a single result, Share/Download
+                                  // move below as full-width buttons instead
+                                  // of icons crowding the file row.
+                                  trailing: state.resultPaths.length > 1
+                                      ? Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.ios_share,
+                                              ),
+                                              tooltip: 'Share',
+                                              onPressed: () =>
+                                                  SharePlus.instance.share(
+                                                    ShareParams(
+                                                      files: [XFile(p)],
+                                                    ),
+                                                  ),
                                             ),
-                                      ),
-                                      DownloadIconButton(path: p),
-                                    ],
-                                  ),
+                                            DownloadIconButton(path: p),
+                                          ],
+                                        )
+                                      : null,
                                 ),
                               ),
                             ),
-                            if (state.resultPaths.length > 1) ...[
+                            if (state.resultPaths.length == 1) ...[
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: _color,
+                                        side: BorderSide(
+                                          color: _color.withValues(alpha: 0.5),
+                                        ),
+                                      ),
+                                      icon: const Icon(Icons.ios_share),
+                                      label: const Text('Share'),
+                                      onPressed: () => SharePlus.instance
+                                          .share(
+                                            ShareParams(
+                                              files: [
+                                                XFile(state.resultPaths.first),
+                                              ],
+                                            ),
+                                          ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: _color,
+                                        side: BorderSide(
+                                          color: _color.withValues(alpha: 0.5),
+                                        ),
+                                      ),
+                                      icon: const Icon(Icons.download_outlined),
+                                      label: const Text('Download'),
+                                      onPressed: () => downloadFile(
+                                        context,
+                                        state.resultPaths.first,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ] else if (state.resultPaths.length > 1) ...[
                               const SizedBox(height: 10),
                               Row(
                                 children: [
