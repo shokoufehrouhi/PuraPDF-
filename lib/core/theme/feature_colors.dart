@@ -38,4 +38,8 @@ class FeatureColors {
   static const Color contentEdit = Color(0xFFD6D9FB);
   static const Color contentEditDark = Color(0xFFC1C6F7);
   static const Color contentEditIcon = Color(0xFF6366F1);
+
+  static const Color encrypt = Color(0xFFFFD2D2);
+  static const Color encryptDark = Color(0xFFFFB8B8);
+  static const Color encryptIcon = Color(0xFFEF4444);
 }

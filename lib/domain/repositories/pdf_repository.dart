@@ -80,4 +80,13 @@ abstract class PdfRepository {
   /// Applies [edits] (see [PdfContentEdit]) directly onto the existing
   /// pages of the PDF at [inputPath] and returns the new file's path.
   Future<String> editPdfContent(String inputPath, List<PdfContentEdit> edits);
+
+  /// Password-protects the PDF at [inputPath] with [password] (used as both
+  /// the open and permissions password) and returns the new file's path.
+  Future<String> encryptPdf(String inputPath, String password);
+
+  /// Removes password protection from the PDF at [inputPath], given the
+  /// correct [password], and returns the new file's path. Throws if the
+  /// password is wrong.
+  Future<String> decryptPdf(String inputPath, String password);
 }

@@ -9,6 +9,7 @@ import '../domain/entities/history_file.dart';
 import '../core/scanner_support.dart';
 import 'features/compress/compress_screen.dart';
 import 'features/content_edit/content_edit_screen.dart';
+import 'features/encrypt/encrypt_screen.dart';
 import 'features/history/history_controller.dart';
 import 'features/image_pdf/image_pdf_screen.dart';
 import 'features/merge/merge_screen.dart';
@@ -330,6 +331,17 @@ class _ToolsTab extends StatelessWidget {
                     ),
                   ),
                 ),
+                _FeatureRowCard(
+                  icon: Icons.lock_outline,
+                  color: FeatureColors.encrypt,
+                  colorDark: FeatureColors.encryptDark,
+                  iconColor: FeatureColors.encryptIcon,
+                  title: 'Password Protect',
+                  subtitle: 'Add or remove a PDF password',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const EncryptScreen()),
+                  ),
+                ),
               ],
             ),
           ),
@@ -591,6 +603,20 @@ _OperationInfo _operationFor(String fileName) {
       Icons.text_fields,
       FeatureColors.contentEditIcon,
       'Edit PDF',
+    );
+  }
+  if (fileName.startsWith('purapdf_locked_')) {
+    return const _OperationInfo(
+      Icons.lock_outline,
+      FeatureColors.encryptIcon,
+      'Locked',
+    );
+  }
+  if (fileName.startsWith('purapdf_unlocked_')) {
+    return const _OperationInfo(
+      Icons.lock_open_outlined,
+      FeatureColors.encryptIcon,
+      'Unlocked',
     );
   }
   return _unknownOperation;

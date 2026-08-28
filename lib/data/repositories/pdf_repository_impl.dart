@@ -379,9 +379,9 @@ class PdfRepositoryImpl implements PdfRepository {
     }
   }
 
-  Future<PdfDocument> _loadDocument(String path) async {
+  Future<PdfDocument> _loadDocument(String path, {String? password}) async {
     final Uint8List bytes = await File(path).readAsBytes();
-    return PdfDocument(inputBytes: bytes);
+    return PdfDocument(inputBytes: bytes, password: password);
   }
 
   Future<String> _writeOutput(PdfDocument output, String fileName) async {
@@ -708,6 +708,39 @@ class PdfRepositoryImpl implements PdfRepository {
       );
     }
     return Uint8List.fromList(img.encodePng(decoded));
+  }
+
+  @override
+  Future<String> encryptPdf(String inputPath, String password) async {
+    final PdfDocument doc = await _loadDocument(inputPath);
+    doc.security.userPassword = password;
+    doc.security.ownerPassword = password;
+    return _writeOutput(
+      doc,
+      'purapdf_locked_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
+  }
+
+  @override
+  Future<String> decryptPdf(String inputPath, String password) async {
+    final PdfDocument doc;
+    try {
+      doc = await _loadDocument(inputPath, password: password);
+    } catch (_) {
+      throw ArgumentError(
+        'Wrong password, or this PDF isn\'t password-protected.',
+      );
+    }
+    // Empty passwords are how Syncfusion drops encryption on save — see
+    // pdf_repository_impl's test coverage: re-saving a loaded encrypted
+    // document without touching security at all preserves the original
+    // encryption (it round-trips), so this is the one that actually works.
+    doc.security.userPassword = '';
+    doc.security.ownerPassword = '';
+    return _writeOutput(
+      doc,
+      'purapdf_unlocked_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
   }
 
   /// Best-effort match from an extracted font name to one of the PDF
