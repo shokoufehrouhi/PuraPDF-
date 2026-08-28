@@ -1,23 +1,27 @@
 import 'package:flutter/foundation.dart';
 
-/// Ad unit IDs. These are Google's published TEST IDs — safe to ship in
-/// debug builds, but MUST be swapped for real IDs (from the AdMob console,
-/// after registering this app there) before a production release. See also
-/// the AdMob App IDs in android/app/src/main/AndroidManifest.xml and
-/// ios/Runner/Info.plist, which need the same swap.
+/// Real AdMob ad unit IDs (account ca-app-pub-6967597025156397), set
+/// 2026-08-28. The AdMob App IDs (a different ID, one per platform) live in
+/// android/app/src/main/AndroidManifest.xml and ios/Runner/Info.plist.
+///
+/// IMPORTANT — do not tap/interact with ads shown while testing on a real
+/// device now that these are live IDs: AdMob policy treats clicks on your
+/// own real ads as invalid traffic and can suspend the account. Register
+/// this device as a test device instead — see AdsService.init's
+/// RequestConfiguration comment for how.
 class AdIds {
   AdIds._();
 
   static String get banner => defaultTargetPlatform == TargetPlatform.android
-      ? 'ca-app-pub-3940256099942544/6300978111'
-      : 'ca-app-pub-3940256099942544/2934735716';
+      ? 'ca-app-pub-6967597025156397/2783679619'
+      : 'ca-app-pub-6967597025156397/5381922798';
 
   static String get interstitial =>
       defaultTargetPlatform == TargetPlatform.android
-      ? 'ca-app-pub-3940256099942544/1033173712'
-      : 'ca-app-pub-3940256099942544/4411468910';
+      ? 'ca-app-pub-6967597025156397/2275201708'
+      : 'ca-app-pub-6967597025156397/9540659657';
 
   static String get appOpen => defaultTargetPlatform == TargetPlatform.android
-      ? 'ca-app-pub-3940256099942544/9257395921'
-      : 'ca-app-pub-3940256099942544/5575463023';
+      ? 'ca-app-pub-6967597025156397/8728929411'
+      : 'ca-app-pub-6967597025156397/4068841124';
 }

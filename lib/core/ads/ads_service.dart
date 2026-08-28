@@ -19,6 +19,16 @@ class AdsService {
     if (!adsSupported || _initialized) return;
     _initialized = true;
     await MobileAds.instance.initialize();
+    // Ad unit IDs are real (see AdIds) — tapping/interacting with ads shown
+    // on your own device now counts as invalid traffic under AdMob policy
+    // and risks account suspension. To keep getting clearly-labeled TEST
+    // ads on a specific device while developing, add its test device ID
+    // below: run the app once, check the Xcode/logcat console for a line
+    // like "... to get test ads on this device" quoting the ID, then add
+    // it here.
+    await MobileAds.instance.updateRequestConfiguration(
+      RequestConfiguration(testDeviceIds: const []),
+    );
     interstitial.preload();
     appOpen.preload();
   }
