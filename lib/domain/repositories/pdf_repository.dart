@@ -9,6 +9,7 @@ import '../entities/pdf_content_edit.dart';
 import '../entities/pdf_page_edit.dart';
 import '../entities/pdf_page_image.dart';
 import '../entities/pdf_text_line.dart';
+import '../entities/watermark_options.dart';
 
 /// Abstract contract for PDF operations. Implementations live in the data
 /// layer so the domain/presentation layers never depend on a specific PDF
@@ -89,4 +90,8 @@ abstract class PdfRepository {
   /// correct [password], and returns the new file's path. Throws if the
   /// password is wrong.
   Future<String> decryptPdf(String inputPath, String password);
+
+  /// Stamps [options]'s text diagonally across every page of the PDF at
+  /// [inputPath] and returns the new file's path.
+  Future<String> watermarkPdf(String inputPath, WatermarkOptions options);
 }

@@ -16,6 +16,7 @@ import 'features/merge/merge_screen.dart';
 import 'features/page_edit/page_edit_screen.dart';
 import 'features/scanner/scanner_screen.dart';
 import 'features/split/split_screen.dart';
+import 'features/watermark/watermark_screen.dart';
 import 'shared_widgets/banner_ad_widget.dart';
 import 'shared_widgets/download_file.dart';
 
@@ -338,6 +339,17 @@ class _ToolsTab extends StatelessWidget {
                     MaterialPageRoute(builder: (_) => const EncryptScreen()),
                   ),
                 ),
+                _FeatureRowCard(
+                  icon: Icons.branding_watermark_outlined,
+                  color: FeatureColors.watermark,
+                  colorDark: FeatureColors.watermarkDark,
+                  iconColor: FeatureColors.watermarkIcon,
+                  title: 'Watermark',
+                  subtitle: 'Stamp text across every page',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const WatermarkScreen()),
+                  ),
+                ),
               ],
             ),
           ),
@@ -613,6 +625,13 @@ _OperationInfo _operationFor(String fileName) {
       Icons.lock_open_outlined,
       FeatureColors.encryptIcon,
       'Unlocked',
+    );
+  }
+  if (fileName.startsWith('purapdf_watermark_')) {
+    return const _OperationInfo(
+      Icons.branding_watermark_outlined,
+      FeatureColors.watermarkIcon,
+      'Watermark',
     );
   }
   return _unknownOperation;

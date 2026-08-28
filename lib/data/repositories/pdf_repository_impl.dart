@@ -19,6 +19,7 @@ import '../../domain/entities/pdf_content_edit.dart';
 import '../../domain/entities/pdf_page_edit.dart';
 import '../../domain/entities/pdf_page_image.dart';
 import '../../domain/entities/pdf_text_line.dart';
+import '../../domain/entities/watermark_options.dart';
 import '../../domain/repositories/pdf_repository.dart';
 
 /// Syncfusion-backed implementation of [PdfRepository].
@@ -740,6 +741,61 @@ class PdfRepositoryImpl implements PdfRepository {
     return _writeOutput(
       doc,
       'purapdf_unlocked_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
+  }
+
+  @override
+  Future<String> watermarkPdf(
+    String inputPath,
+    WatermarkOptions options,
+  ) async {
+    final PdfDocument doc = await _loadDocument(inputPath);
+
+    final PdfColor color = PdfColor(
+      options.colorR,
+      options.colorG,
+      options.colorB,
+      (options.opacity.clamp(0, 1) * 255).round(),
+    );
+    final PdfFont font = PdfStandardFont(
+      PdfFontFamily.helvetica,
+      options.fontSize,
+      style: PdfFontStyle.bold,
+    );
+    final PdfBrush brush = PdfSolidBrush(color);
+    final PdfStringFormat format = PdfStringFormat(
+      alignment: PdfTextAlignment.center,
+      lineAlignment: PdfVerticalAlignment.middle,
+    );
+
+    for (int i = 0; i < doc.pages.count; i++) {
+      final PdfPage page = doc.pages[i];
+      final Size size = page.size;
+      final PdfGraphics g = page.graphics;
+      g.save();
+      // Rotate around the page's center and draw the text in a wide box
+      // straddling that center — a diagonal stamp, same convention as
+      // "CONFIDENTIAL"/"DRAFT" watermarks (bottom-left to top-right).
+      g.translateTransform(size.width / 2, size.height / 2);
+      g.rotateTransform(-45);
+      g.drawString(
+        options.text,
+        font,
+        brush: brush,
+        bounds: Rect.fromLTWH(
+          -size.width,
+          -options.fontSize,
+          size.width * 2,
+          options.fontSize * 2,
+        ),
+        format: format,
+      );
+      g.restore();
+    }
+
+    return _writeOutput(
+      doc,
+      'purapdf_watermark_${DateTime.now().millisecondsSinceEpoch}.pdf',
     );
   }
 

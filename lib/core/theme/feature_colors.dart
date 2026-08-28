@@ -42,4 +42,8 @@ class FeatureColors {
   static const Color encrypt = Color(0xFFFFD2D2);
   static const Color encryptDark = Color(0xFFFFB8B8);
   static const Color encryptIcon = Color(0xFFEF4444);
+
+  static const Color watermark = Color(0xFFCFF3F9);
+  static const Color watermarkDark = Color(0xFFAEE9F3);
+  static const Color watermarkIcon = Color(0xFF06B6D4);
 }
