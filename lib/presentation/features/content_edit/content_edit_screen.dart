@@ -11,6 +11,7 @@ import '../../../domain/entities/pdf_text_line.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
+import '../../shared_widgets/start_over_button.dart';
 import 'content_edit_controller.dart';
 
 const Color _color = FeatureColors.contentEditIcon;
@@ -215,33 +216,38 @@ class ContentEditScreen extends ConsumerWidget {
                 top: false,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _color,
-                        foregroundColor: Colors.white,
-                      ),
-                      icon: state.isSaving
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.save_outlined),
-                      label: Text(
-                        state.hasEdits
-                            ? 'Save changes'
-                            : 'Make a change to save',
-                      ),
-                      onPressed: state.isSaving || !state.hasEdits
-                          ? null
-                          : controller.save,
-                    ),
-                  ),
+                  child: state.resultPath != null
+                      ? StartOverButton(
+                          color: _color,
+                          onPressed: controller.reset,
+                        )
+                      : SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _color,
+                              foregroundColor: Colors.white,
+                            ),
+                            icon: state.isSaving
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.save_outlined),
+                            label: Text(
+                              state.hasEdits
+                                  ? 'Save changes'
+                                  : 'Make a change to save',
+                            ),
+                            onPressed: state.isSaving || !state.hasEdits
+                                ? null
+                                : controller.save,
+                          ),
+                        ),
                 ),
               ),
           ],

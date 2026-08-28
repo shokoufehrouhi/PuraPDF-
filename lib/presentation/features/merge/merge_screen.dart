@@ -8,6 +8,7 @@ import '../../../domain/entities/pdf_file.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
+import '../../shared_widgets/start_over_button.dart';
 import 'merge_controller.dart';
 
 const Color _color = FeatureColors.mergeIcon;
@@ -171,33 +172,35 @@ class MergeScreen extends ConsumerWidget {
               top: false,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _color,
-                      foregroundColor: Colors.white,
-                    ),
-                    icon: state.isMerging
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Icon(Icons.call_merge),
-                    label: Text(
-                      state.files.length < 2
-                          ? 'Add at least 2 files to merge'
-                          : 'Merge ${state.files.length} files',
-                    ),
-                    onPressed: state.isMerging || state.files.length < 2
-                        ? null
-                        : controller.merge,
-                  ),
-                ),
+                child: state.resultPath != null
+                    ? StartOverButton(color: _color, onPressed: controller.reset)
+                    : SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _color,
+                            foregroundColor: Colors.white,
+                          ),
+                          icon: state.isMerging
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.call_merge),
+                          label: Text(
+                            state.files.length < 2
+                                ? 'Add at least 2 files to merge'
+                                : 'Merge ${state.files.length} files',
+                          ),
+                          onPressed: state.isMerging || state.files.length < 2
+                              ? null
+                              : controller.merge,
+                        ),
+                      ),
               ),
             ),
           ],

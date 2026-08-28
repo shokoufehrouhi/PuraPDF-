@@ -9,6 +9,7 @@ import '../../../domain/entities/pdf_file.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
+import '../../shared_widgets/start_over_button.dart';
 import 'image_pdf_controller.dart';
 
 const Color _color = FeatureColors.imagePdfIcon;
@@ -285,34 +286,36 @@ class _ImagesToPdfPane extends StatelessWidget {
           top: false,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _color,
-                  foregroundColor: Colors.white,
-                ),
-                icon: state.isProcessing
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Icon(Icons.picture_as_pdf),
-                label: Text(
-                  state.images.isEmpty
-                      ? 'Add images to convert'
-                      : 'Convert ${state.images.length} image'
-                            '${state.images.length == 1 ? '' : 's'}',
-                ),
-                onPressed: state.isProcessing || state.images.isEmpty
-                    ? null
-                    : controller.convert,
-              ),
-            ),
+            child: state.resultPdfPath != null
+                ? StartOverButton(color: _color, onPressed: controller.reset)
+                : SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _color,
+                        foregroundColor: Colors.white,
+                      ),
+                      icon: state.isProcessing
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.picture_as_pdf),
+                      label: Text(
+                        state.images.isEmpty
+                            ? 'Add images to convert'
+                            : 'Convert ${state.images.length} image'
+                                  '${state.images.length == 1 ? '' : 's'}',
+                      ),
+                      onPressed: state.isProcessing || state.images.isEmpty
+                          ? null
+                          : controller.convert,
+                    ),
+                  ),
           ),
         ),
       ],
@@ -363,24 +366,27 @@ class _PdfToImagesPane extends StatelessWidget {
             onSelectionChanged: (s) => controller.setOutputFormat(s.first),
           ),
           const SizedBox(height: 16),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _color,
-              foregroundColor: Colors.white,
+          if (state.resultImagePaths.isNotEmpty)
+            StartOverButton(color: _color, onPressed: controller.reset)
+          else
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _color,
+                foregroundColor: Colors.white,
+              ),
+              icon: state.isProcessing
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.image),
+              label: const Text('Convert'),
+              onPressed: state.isProcessing ? null : controller.convert,
             ),
-            icon: state.isProcessing
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Icon(Icons.image),
-            label: const Text('Convert'),
-            onPressed: state.isProcessing ? null : controller.convert,
-          ),
           if (state.error != null) ...[
             const SizedBox(height: 12),
             Text(state.error!, style: TextStyle(color: scheme.error)),

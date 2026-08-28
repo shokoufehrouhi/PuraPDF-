@@ -8,6 +8,7 @@ import '../../../domain/entities/pdf_file.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
+import '../../shared_widgets/start_over_button.dart';
 import 'split_controller.dart';
 
 const Color _color = FeatureColors.splitIcon;
@@ -94,24 +95,32 @@ class SplitScreen extends ConsumerWidget {
                         ),
                       ],
                       const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _color,
-                          foregroundColor: Colors.white,
+                      if (state.resultPaths.isNotEmpty)
+                        StartOverButton(
+                          color: _color,
+                          onPressed: controller.reset,
+                        )
+                      else
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _color,
+                            foregroundColor: Colors.white,
+                          ),
+                          icon: state.isSplitting
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.call_split),
+                          label: const Text('Split'),
+                          onPressed: state.isSplitting
+                              ? null
+                              : controller.split,
                         ),
-                        icon: state.isSplitting
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Icon(Icons.call_split),
-                        label: const Text('Split'),
-                        onPressed: state.isSplitting ? null : controller.split,
-                      ),
                     ],
                     if (state.error != null) ...[
                       const SizedBox(height: 12),

@@ -8,6 +8,7 @@ import '../../../core/theme/feature_colors.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
+import '../../shared_widgets/start_over_button.dart';
 import 'scanner_controller.dart';
 
 const Color _color = FeatureColors.scannerIcon;
@@ -181,34 +182,36 @@ class ScannerScreen extends ConsumerWidget {
               top: false,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _color,
-                      foregroundColor: Colors.white,
-                    ),
-                    icon: state.isCreatingPdf
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Icon(Icons.picture_as_pdf),
-                    label: Text(
-                      state.pages.isEmpty
-                          ? 'Scan at least one page'
-                          : 'Create PDF from ${state.pages.length} page'
-                                '${state.pages.length == 1 ? '' : 's'}',
-                    ),
-                    onPressed: state.isCreatingPdf || state.pages.isEmpty
-                        ? null
-                        : controller.createPdf,
-                  ),
-                ),
+                child: state.resultPath != null
+                    ? StartOverButton(color: _color, onPressed: controller.reset)
+                    : SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _color,
+                            foregroundColor: Colors.white,
+                          ),
+                          icon: state.isCreatingPdf
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.picture_as_pdf),
+                          label: Text(
+                            state.pages.isEmpty
+                                ? 'Scan at least one page'
+                                : 'Create PDF from ${state.pages.length} page'
+                                      '${state.pages.length == 1 ? '' : 's'}',
+                          ),
+                          onPressed: state.isCreatingPdf || state.pages.isEmpty
+                              ? null
+                              : controller.createPdf,
+                        ),
+                      ),
               ),
             ),
           ],

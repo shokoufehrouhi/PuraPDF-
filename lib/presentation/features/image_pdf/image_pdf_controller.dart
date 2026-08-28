@@ -143,6 +143,12 @@ class ImagePdfController extends Notifier<ImagePdfState> {
       state = state.copyWith(isProcessing: false, error: e.toString());
     }
   }
+
+  /// Clears everything except which direction (Images→PDF / PDF→Images)
+  /// was selected — that's a mode choice, not data from the last run.
+  void reset() {
+    state = ImagePdfState(direction: state.direction);
+  }
 }
 
 final imagePdfControllerProvider =
