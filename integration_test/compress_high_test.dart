@@ -114,17 +114,27 @@ void main() {
 
   test('High level never returns a file bigger than the original, even on '
       'text-heavy PDFs where rasterizing backfires', () async {
+    final repo = PdfRepositoryImpl();
     final dir = await getApplicationDocumentsDirectory();
     final source = await _writeTextHeavyPdf(
       '${dir.path}/text_heavy_source.pdf',
       20,
     );
-    final useCase = CompressPdfUseCase(PdfRepositoryImpl());
+    final useCase = CompressPdfUseCase(repo);
 
+    final beforeCount = (await repo.listGeneratedFiles()).length;
     final high = await useCase(source, CompressionLevel.high);
+    final afterFiles = await repo.listGeneratedFiles();
 
     expect(high.compressedSizeBytes, lessThanOrEqualTo(high.originalSizeBytes));
     expect(high.reductionPercent, greaterThanOrEqualTo(0));
+
+    // Regression check: on this exact fallback path (rasterizing backfires,
+    // so compressPdf retries with stream compression and/or a plain copy),
+    // every superseded attempt used to stay on disk *and* indexed as its
+    // own separate Recents entry - only the actual result should be new.
+    expect(afterFiles.length, beforeCount + 1);
+    expect(afterFiles.first.path, high.outputPath);
 
     // Output must still be a valid, readable PDF with the same page count
     // (whichever fallback tier kicked in - rasterized, stream-compressed,

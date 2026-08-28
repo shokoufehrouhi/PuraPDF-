@@ -53,6 +53,13 @@ class PdfRepositoryImpl implements PdfRepository {
     // result bigger than the input: fall back to stream compression, and
     // as a last resort a plain copy of the original (0% smaller, never
     // negative), rather than silently returning a bloated "compressed" file.
+    //
+    // Every attempt below is a real file already written+indexed by
+    // _writeOutput (via _compressByRasterizing/_compressByStream) - a
+    // superseded attempt has to be explicitly discarded (deleteFile, which
+    // also drops its history-index entry) or it would sit on disk forever
+    // *and* show up in Recents as an extra, wrong "Compress" result the
+    // user never actually got.
     if (compressedSize >= originalSize) {
       if (level == CompressionLevel.high) {
         final String streamPath = await _compressByStream(
@@ -61,8 +68,11 @@ class PdfRepositoryImpl implements PdfRepository {
         );
         final int streamSize = await File(streamPath).length();
         if (streamSize < compressedSize) {
+          await deleteFile(outPath); // discard the losing rasterized attempt
           outPath = streamPath;
           compressedSize = streamSize;
+        } else {
+          await deleteFile(streamPath); // discard the losing stream retry
         }
       }
       if (compressedSize >= originalSize) {
@@ -70,6 +80,7 @@ class PdfRepositoryImpl implements PdfRepository {
         final String copyPath =
             '${dir.path}/purapdf_compressed_${DateTime.now().millisecondsSinceEpoch}.pdf';
         await File(inputPath).copy(copyPath);
+        await deleteFile(outPath); // discard whichever attempt this replaces
         await _recordGenerated(copyPath);
         outPath = copyPath;
         compressedSize = originalSize;
