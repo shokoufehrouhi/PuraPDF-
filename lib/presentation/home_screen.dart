@@ -193,6 +193,29 @@ class _ToolsTabState extends State<_ToolsTab> {
         final int columns = constraints.maxWidth >= 600 ? 2 : 1;
 
         final List<Widget> organizeCards = [
+          if (scannerSupported)
+            _FeatureRowCard(
+              icon: Icons.document_scanner_outlined,
+              color: FeatureColors.scanner,
+              colorDark: FeatureColors.scannerDark,
+              iconColor: FeatureColors.scannerIcon,
+              title: 'Scan Document',
+              subtitle: 'Capture paper documents with your camera',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const ScannerScreen()),
+              ),
+            ),
+          _FeatureRowCard(
+            icon: Icons.image_outlined,
+            color: FeatureColors.imagePdf,
+            colorDark: FeatureColors.imagePdfDark,
+            iconColor: FeatureColors.imagePdfIcon,
+            title: 'Image ⇄ PDF',
+            subtitle: 'Convert between formats',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ImagePdfScreen()),
+            ),
+          ),
           _FeatureRowCard(
             icon: Icons.call_merge,
             color: FeatureColors.merge,
@@ -226,43 +249,9 @@ class _ToolsTabState extends State<_ToolsTab> {
               MaterialPageRoute(builder: (_) => const CompressScreen()),
             ),
           ),
-          _FeatureRowCard(
-            icon: Icons.image_outlined,
-            color: FeatureColors.imagePdf,
-            colorDark: FeatureColors.imagePdfDark,
-            iconColor: FeatureColors.imagePdfIcon,
-            title: 'Image ⇄ PDF',
-            subtitle: 'Convert between formats',
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ImagePdfScreen()),
-            ),
-          ),
-          if (scannerSupported)
-            _FeatureRowCard(
-              icon: Icons.document_scanner_outlined,
-              color: FeatureColors.scanner,
-              colorDark: FeatureColors.scannerDark,
-              iconColor: FeatureColors.scannerIcon,
-              title: 'Scan Document',
-              subtitle: 'Capture paper documents with your camera',
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const ScannerScreen()),
-              ),
-            ),
         ];
 
         final List<Widget> editCards = [
-          _FeatureRowCard(
-            icon: Icons.crop_rotate,
-            color: FeatureColors.pageEdit,
-            colorDark: FeatureColors.pageEditDark,
-            iconColor: FeatureColors.pageEditIcon,
-            title: 'Edit Pages',
-            subtitle: 'Rotate, reorder, or remove pages',
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const PageEditScreen()),
-            ),
-          ),
           _FeatureRowCard(
             icon: Icons.text_fields,
             color: FeatureColors.contentEdit,
@@ -272,6 +261,17 @@ class _ToolsTabState extends State<_ToolsTab> {
             subtitle: 'Fix text, remove a line, add an image',
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ContentEditScreen()),
+            ),
+          ),
+          _FeatureRowCard(
+            icon: Icons.crop_rotate,
+            color: FeatureColors.pageEdit,
+            colorDark: FeatureColors.pageEditDark,
+            iconColor: FeatureColors.pageEditIcon,
+            title: 'Edit Pages',
+            subtitle: 'Rotate, reorder, or remove pages',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const PageEditScreen()),
             ),
           ),
           _FeatureRowCard(
