@@ -24,6 +24,7 @@ class EncryptState {
   final String password;
   final String confirmPassword;
   final bool obscurePassword;
+  final bool obscureConfirmPassword;
   final bool isProcessing;
   final String? resultPath;
   final String? error;
@@ -34,6 +35,7 @@ class EncryptState {
     this.password = '',
     this.confirmPassword = '',
     this.obscurePassword = true,
+    this.obscureConfirmPassword = true,
     this.isProcessing = false,
     this.resultPath,
     this.error,
@@ -45,6 +47,7 @@ class EncryptState {
     String? password,
     String? confirmPassword,
     bool? obscurePassword,
+    bool? obscureConfirmPassword,
     bool? isProcessing,
     String? resultPath,
     String? error,
@@ -57,6 +60,8 @@ class EncryptState {
       password: password ?? this.password,
       confirmPassword: confirmPassword ?? this.confirmPassword,
       obscurePassword: obscurePassword ?? this.obscurePassword,
+      obscureConfirmPassword:
+          obscureConfirmPassword ?? this.obscureConfirmPassword,
       isProcessing: isProcessing ?? this.isProcessing,
       resultPath: clearResult ? null : (resultPath ?? this.resultPath),
       error: clearError ? null : (error ?? this.error),
@@ -88,9 +93,17 @@ class EncryptController extends Notifier<EncryptState> {
     state = state.copyWith(confirmPassword: value, clearError: true);
   }
 
-  void toggleObscure() {
+  void toggleObscurePassword() {
     state = state.copyWith(obscurePassword: !state.obscurePassword);
   }
+
+  void toggleObscureConfirmPassword() {
+    state = state.copyWith(
+      obscureConfirmPassword: !state.obscureConfirmPassword,
+    );
+  }
+
+  static const int minPasswordLength = 4;
 
   Future<void> submit() async {
     final file = state.sourceFile;
@@ -100,6 +113,15 @@ class EncryptController extends Notifier<EncryptState> {
     }
     if (state.password.isEmpty) {
       state = state.copyWith(error: 'Enter a password.');
+      return;
+    }
+    // Only enforced when setting a new password — removing one must accept
+    // whatever password the PDF already has, short or not.
+    if (state.action == PasswordAction.add &&
+        state.password.length < minPasswordLength) {
+      state = state.copyWith(
+        error: 'Password must be at least $minPasswordLength characters.',
+      );
       return;
     }
     if (state.action == PasswordAction.add &&

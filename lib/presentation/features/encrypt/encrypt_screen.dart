@@ -100,23 +100,36 @@ class EncryptScreen extends ConsumerWidget {
                         onChanged: controller.setPassword,
                         decoration: InputDecoration(
                           labelText: isAdd ? 'Password' : 'Current password',
+                          helperText: isAdd
+                              ? 'At least '
+                                    '${EncryptController.minPasswordLength} '
+                                    'characters'
+                              : null,
                           suffixIcon: IconButton(
                             icon: Icon(
                               state.obscurePassword
                                   ? Icons.visibility_outlined
                                   : Icons.visibility_off_outlined,
                             ),
-                            onPressed: controller.toggleObscure,
+                            onPressed: controller.toggleObscurePassword,
                           ),
                         ),
                       ),
                       if (isAdd) ...[
                         const SizedBox(height: 12),
                         TextField(
-                          obscureText: state.obscurePassword,
+                          obscureText: state.obscureConfirmPassword,
                           onChanged: controller.setConfirmPassword,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Confirm password',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                state.obscureConfirmPassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                              ),
+                              onPressed: controller.toggleObscureConfirmPassword,
+                            ),
                           ),
                         ),
                       ],
