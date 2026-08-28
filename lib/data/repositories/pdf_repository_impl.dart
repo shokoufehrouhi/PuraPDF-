@@ -14,6 +14,7 @@ import '../../domain/entities/compression_level.dart';
 import '../../domain/entities/history_file.dart';
 import '../../domain/entities/image_output_format.dart';
 import '../../domain/entities/page_range.dart';
+import '../../domain/entities/pdf_page_edit.dart';
 import '../../domain/repositories/pdf_repository.dart';
 
 /// Syncfusion-backed implementation of [PdfRepository].
@@ -333,15 +334,45 @@ class PdfRepositoryImpl implements PdfRepository {
   }
 
   /// Copies [sourcePage] onto a new page appended to [output], preserving
-  /// the source page's size (switching `pageSettings.size` before each
-  /// `add()` starts a fresh section whenever the size changes — see
-  /// `PdfPageCollection.addPage`, which clones `document.pageSettings` into
-  /// a new section on change).
-  void _copyPage(PdfPage sourcePage, PdfDocument output) {
+  /// the source page's size.
+  ///
+  /// Every call starts its own fresh [PdfSection] (`output.sections!.add()`)
+  /// rather than reusing `output.pages`/`output.pageSettings` — a section's
+  /// `pageSettings` only takes effect for pages added *after* it's set and
+  /// *before* the next size/rotate change lands, so sharing one section
+  /// across calls with different rotations silently applies the wrong
+  /// (usually just the first) rotation to later pages. A dedicated section
+  /// per page sidesteps that entirely, matching this class's plain "copy
+  /// pages one at a time" style over relying on any single merge/split call.
+  ///
+  /// [rotationDegrees] (0/90/180/270, clockwise) is written as the new
+  /// page's native `/Rotate` entry via `pageSettings.rotate` rather than
+  /// transforming the drawn content, so rotated pages stay vector/text (no
+  /// rasterizing needed).
+  void _copyPage(
+    PdfPage sourcePage,
+    PdfDocument output, {
+    int rotationDegrees = 0,
+  }) {
     final PdfTemplate template = sourcePage.createTemplate();
-    output.pageSettings.size = sourcePage.size;
-    final PdfPage newPage = output.pages.add();
+    final PdfSection section = output.sections!.add();
+    section.pageSettings.size = sourcePage.size;
+    section.pageSettings.rotate = _rotateAngleFor(rotationDegrees);
+    final PdfPage newPage = section.pages.add();
     newPage.graphics.drawPdfTemplate(template, Offset.zero);
+  }
+
+  PdfPageRotateAngle _rotateAngleFor(int degrees) {
+    switch (((degrees % 360) + 360) % 360) {
+      case 90:
+        return PdfPageRotateAngle.rotateAngle90;
+      case 180:
+        return PdfPageRotateAngle.rotateAngle180;
+      case 270:
+        return PdfPageRotateAngle.rotateAngle270;
+      default:
+        return PdfPageRotateAngle.rotateAngle0;
+    }
   }
 
   Future<PdfDocument> _loadDocument(String path) async {
@@ -455,5 +486,76 @@ class PdfRepositoryImpl implements PdfRepository {
     }
     await _writeIndex(entries);
     return renamed.path;
+  }
+
+  @override
+  Future<List<Uint8List>> renderPageThumbnails(String path) async {
+    final rx.PdfDocument doc = await rx.PdfDocument.openFile(path);
+    final List<Uint8List> thumbnails = [];
+
+    try {
+      for (int i = 0; i < doc.pages.length; i++) {
+        final rx.PdfPage page = doc.pages[i];
+        // Preview-only scale (~0.5x, well below the 1.3x/2x used for
+        // exported images/compression) — this is a small on-screen thumb,
+        // never written to disk. fullWidth/fullHeight, not width/height —
+        // see the render() doc comment on pdfToImages above.
+        final int width = (page.width * 0.5).round();
+        final int height = (page.height * 0.5).round();
+        final rx.PdfImage? rendered = await page.render(
+          fullWidth: width.toDouble(),
+          fullHeight: height.toDouble(),
+        );
+        if (rendered == null) continue;
+
+        final img.Image image = img.Image.fromBytes(
+          width: rendered.width,
+          height: rendered.height,
+          bytes: rendered.pixels.buffer,
+          numChannels: 4,
+          order: img.ChannelOrder.bgra,
+        );
+        rendered.dispose();
+        thumbnails.add(Uint8List.fromList(img.encodeJpg(image, quality: 70)));
+      }
+    } finally {
+      await doc.dispose();
+    }
+
+    return thumbnails;
+  }
+
+  @override
+  Future<String> editPdfPages(
+    String inputPath,
+    List<PdfPageEdit> edits,
+  ) async {
+    final PdfDocument source = await _loadDocument(inputPath);
+    final int pageCount = source.pages.count;
+    for (final edit in edits) {
+      if (edit.originalIndex < 0 || edit.originalIndex >= pageCount) {
+        source.dispose();
+        throw ArgumentError(
+          'Page index ${edit.originalIndex} out of range '
+          '(0-${pageCount - 1}).',
+        );
+      }
+    }
+
+    final PdfDocument output = PdfDocument();
+    output.pageSettings.margins.all = 0;
+    for (final edit in edits) {
+      _copyPage(
+        source.pages[edit.originalIndex],
+        output,
+        rotationDegrees: edit.rotationDegrees,
+      );
+    }
+    source.dispose();
+
+    return _writeOutput(
+      output,
+      'purapdf_pages_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
   }
 }

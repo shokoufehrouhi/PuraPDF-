@@ -11,6 +11,7 @@ import 'features/compress/compress_screen.dart';
 import 'features/history/history_controller.dart';
 import 'features/image_pdf/image_pdf_screen.dart';
 import 'features/merge/merge_screen.dart';
+import 'features/page_edit/page_edit_screen.dart';
 import 'features/scanner/scanner_screen.dart';
 import 'features/split/split_screen.dart';
 import 'shared_widgets/banner_ad_widget.dart';
@@ -304,6 +305,17 @@ class _ToolsTab extends StatelessWidget {
                       MaterialPageRoute(builder: (_) => const ScannerScreen()),
                     ),
                   ),
+                _FeatureRowCard(
+                  icon: Icons.crop_rotate,
+                  color: FeatureColors.pageEdit,
+                  colorDark: FeatureColors.pageEditDark,
+                  iconColor: FeatureColors.pageEditIcon,
+                  title: 'Edit Pages',
+                  subtitle: 'Rotate, reorder, or remove pages',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const PageEditScreen()),
+                  ),
+                ),
               ],
             ),
           ),
@@ -551,6 +563,13 @@ _OperationInfo _operationFor(String fileName) {
       Icons.document_scanner_outlined,
       FeatureColors.scannerIcon,
       'Scan',
+    );
+  }
+  if (fileName.startsWith('purapdf_pages_')) {
+    return const _OperationInfo(
+      Icons.crop_rotate,
+      FeatureColors.pageEditIcon,
+      'Edit Pages',
     );
   }
   return _unknownOperation;

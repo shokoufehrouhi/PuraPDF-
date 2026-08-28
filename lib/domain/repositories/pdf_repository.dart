@@ -1,8 +1,11 @@
+import 'dart:typed_data';
+
 import '../entities/compress_result.dart';
 import '../entities/compression_level.dart';
 import '../entities/history_file.dart';
 import '../entities/image_output_format.dart';
 import '../entities/page_range.dart';
+import '../entities/pdf_page_edit.dart';
 
 /// Abstract contract for PDF operations. Implementations live in the data
 /// layer so the domain/presentation layers never depend on a specific PDF
@@ -50,4 +53,13 @@ abstract class PdfRepository {
   /// Renames the file at [path] to [newName] (same directory) and returns
   /// the new path.
   Future<String> renameFile(String path, String newName);
+
+  /// Renders every page of the PDF at [path] as a small in-memory JPEG
+  /// thumbnail, in page order. Purely for on-screen preview while editing —
+  /// not written to disk and not recorded in history.
+  Future<List<Uint8List>> renderPageThumbnails(String path);
+
+  /// Rebuilds the PDF at [inputPath] keeping/reordering/rotating pages per
+  /// [edits] (see [PdfPageEdit]) and returns the new file's path.
+  Future<String> editPdfPages(String inputPath, List<PdfPageEdit> edits);
 }

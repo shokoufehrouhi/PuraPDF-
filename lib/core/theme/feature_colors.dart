@@ -30,4 +30,8 @@ class FeatureColors {
   static const Color scanner = Color(0xFFC9F1E9);
   static const Color scannerDark = Color(0xFFABE8DD);
   static const Color scannerIcon = Color(0xFF14B8A6);
+
+  static const Color pageEdit = Color(0xFFFBD3E4);
+  static const Color pageEditDark = Color(0xFFF6BBD5);
+  static const Color pageEditIcon = Color(0xFFEC4899);
 }
