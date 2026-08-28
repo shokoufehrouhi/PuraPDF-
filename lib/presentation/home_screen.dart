@@ -8,6 +8,7 @@ import '../core/theme/theme_mode_controller.dart';
 import '../domain/entities/history_file.dart';
 import '../core/scanner_support.dart';
 import 'features/compress/compress_screen.dart';
+import 'features/content_edit/content_edit_screen.dart';
 import 'features/history/history_controller.dart';
 import 'features/image_pdf/image_pdf_screen.dart';
 import 'features/merge/merge_screen.dart';
@@ -316,6 +317,19 @@ class _ToolsTab extends StatelessWidget {
                     MaterialPageRoute(builder: (_) => const PageEditScreen()),
                   ),
                 ),
+                _FeatureRowCard(
+                  icon: Icons.text_fields,
+                  color: FeatureColors.contentEdit,
+                  colorDark: FeatureColors.contentEditDark,
+                  iconColor: FeatureColors.contentEditIcon,
+                  title: 'Edit PDF',
+                  subtitle: 'Fix text, remove a line, add an image',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const ContentEditScreen(),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -570,6 +584,13 @@ _OperationInfo _operationFor(String fileName) {
       Icons.crop_rotate,
       FeatureColors.pageEditIcon,
       'Edit Pages',
+    );
+  }
+  if (fileName.startsWith('purapdf_content_')) {
+    return const _OperationInfo(
+      Icons.text_fields,
+      FeatureColors.contentEditIcon,
+      'Edit PDF',
     );
   }
   return _unknownOperation;

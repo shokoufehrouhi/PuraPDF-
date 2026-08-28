@@ -34,4 +34,8 @@ class FeatureColors {
   static const Color pageEdit = Color(0xFFFBD3E4);
   static const Color pageEditDark = Color(0xFFF6BBD5);
   static const Color pageEditIcon = Color(0xFFEC4899);
+
+  static const Color contentEdit = Color(0xFFD6D9FB);
+  static const Color contentEditDark = Color(0xFFC1C6F7);
+  static const Color contentEditIcon = Color(0xFF6366F1);
 }

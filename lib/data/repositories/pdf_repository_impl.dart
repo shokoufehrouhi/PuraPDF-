@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui';
 
@@ -14,7 +15,10 @@ import '../../domain/entities/compression_level.dart';
 import '../../domain/entities/history_file.dart';
 import '../../domain/entities/image_output_format.dart';
 import '../../domain/entities/page_range.dart';
+import '../../domain/entities/pdf_content_edit.dart';
 import '../../domain/entities/pdf_page_edit.dart';
+import '../../domain/entities/pdf_page_image.dart';
+import '../../domain/entities/pdf_text_line.dart';
 import '../../domain/repositories/pdf_repository.dart';
 
 /// Syncfusion-backed implementation of [PdfRepository].
@@ -557,5 +561,154 @@ class PdfRepositoryImpl implements PdfRepository {
       output,
       'purapdf_pages_${DateTime.now().millisecondsSinceEpoch}.pdf',
     );
+  }
+
+  @override
+  Future<List<PdfTextLine>> extractTextLines(String path) async {
+    final PdfDocument doc = await _loadDocument(path);
+    try {
+      final List<TextLine> lines = PdfTextExtractor(doc).extractTextLines();
+      return [
+        for (final line in lines)
+          if (line.text.trim().isNotEmpty)
+            PdfTextLine(
+              pageIndex: line.pageIndex,
+              text: line.text,
+              left: line.bounds.left,
+              top: line.bounds.top,
+              width: line.bounds.width,
+              height: line.bounds.height,
+              fontName: line.fontName,
+              fontSize: line.fontSize,
+            ),
+      ];
+    } finally {
+      doc.dispose();
+    }
+  }
+
+  @override
+  Future<List<PdfPageImage>> renderPageImages(String path) async {
+    final rx.PdfDocument doc = await rx.PdfDocument.openFile(path);
+    final List<PdfPageImage> images = [];
+
+    try {
+      for (int i = 0; i < doc.pages.length; i++) {
+        final rx.PdfPage page = doc.pages[i];
+        // 1.5x scale — legible enough to tap/read individual lines without
+        // the memory cost of rendering every page at full export quality.
+        final int width = (page.width * 1.5).round();
+        final int height = (page.height * 1.5).round();
+        final rx.PdfImage? rendered = await page.render(
+          fullWidth: width.toDouble(),
+          fullHeight: height.toDouble(),
+        );
+        if (rendered == null) continue;
+
+        final img.Image image = img.Image.fromBytes(
+          width: rendered.width,
+          height: rendered.height,
+          bytes: rendered.pixels.buffer,
+          numChannels: 4,
+          order: img.ChannelOrder.bgra,
+        );
+        rendered.dispose();
+        images.add(
+          PdfPageImage(
+            bytes: Uint8List.fromList(img.encodeJpg(image, quality: 85)),
+            pointsWidth: page.width,
+            pointsHeight: page.height,
+          ),
+        );
+      }
+    } finally {
+      await doc.dispose();
+    }
+
+    return images;
+  }
+
+  @override
+  Future<String> editPdfContent(
+    String inputPath,
+    List<PdfContentEdit> edits,
+  ) async {
+    final PdfDocument doc = await _loadDocument(inputPath);
+    final int pageCount = doc.pages.count;
+    for (final edit in edits) {
+      if (edit.pageIndex < 0 || edit.pageIndex >= pageCount) {
+        doc.dispose();
+        throw ArgumentError(
+          'Page index ${edit.pageIndex} out of range (0-${pageCount - 1}).',
+        );
+      }
+    }
+
+    for (final edit in edits) {
+      final PdfPage page = doc.pages[edit.pageIndex];
+      switch (edit) {
+        case PdfTextReplace e:
+          final Rect redactBounds = Rect.fromLTWH(
+            e.left,
+            e.top,
+            e.width,
+            e.height,
+          );
+          // Redact: an opaque box over the original line's exact bounds,
+          // then (unless this is a pure delete) the replacement drawn on
+          // top. The original glyphs remain in the content stream beneath
+          // the box — see PdfContentEdit's doc comment — this is a visual
+          // edit only.
+          page.graphics.drawRectangle(
+            brush: PdfSolidBrush(PdfColor(255, 255, 255)),
+            bounds: redactBounds,
+          );
+          if (e.newText.trim().isNotEmpty) {
+            // drawString silently draws nothing if `bounds` is exactly the
+            // extracted line's tight glyph-height box (confirmed: font
+            // size == box height reliably produces empty output) — pad
+            // generously rather than reusing the tight redact bounds.
+            final double drawWidth = math.max(
+              e.width,
+              e.fontSize * 0.65 * e.newText.length,
+            );
+            final double drawHeight = math.max(e.height, e.fontSize * 1.5);
+            page.graphics.drawString(
+              e.newText,
+              PdfStandardFont(_mapFontFamily(e.fontName), e.fontSize),
+              bounds: Rect.fromLTWH(e.left, e.top, drawWidth, drawHeight),
+            );
+          }
+        case PdfImageInsert e:
+          final PdfBitmap bitmap = PdfBitmap(e.imageBytes);
+          page.graphics.drawImage(
+            bitmap,
+            Rect.fromLTWH(e.left, e.top, e.width, e.height),
+          );
+      }
+    }
+
+    return _writeOutput(
+      doc,
+      'purapdf_content_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
+  }
+
+  /// Best-effort match from an extracted font name to one of the PDF
+  /// standard fonts — Syncfusion's [PdfStandardFont] can't reproduce an
+  /// arbitrary embedded font, so replacement text won't pixel-match the
+  /// original, only approximate its general style (serif/monospace/sans).
+  PdfFontFamily _mapFontFamily(String fontName) {
+    final String lower = fontName.toLowerCase();
+    if (lower.contains('courier') || lower.contains('mono')) {
+      return PdfFontFamily.courier;
+    }
+    if (lower.contains('times') ||
+        lower.contains('serif') ||
+        lower.contains('georgia') ||
+        lower.contains('garamond')) {
+      return PdfFontFamily.timesRoman;
+    }
+    return PdfFontFamily.helvetica;
   }
 }

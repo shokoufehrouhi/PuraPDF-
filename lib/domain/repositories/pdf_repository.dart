@@ -5,7 +5,10 @@ import '../entities/compression_level.dart';
 import '../entities/history_file.dart';
 import '../entities/image_output_format.dart';
 import '../entities/page_range.dart';
+import '../entities/pdf_content_edit.dart';
 import '../entities/pdf_page_edit.dart';
+import '../entities/pdf_page_image.dart';
+import '../entities/pdf_text_line.dart';
 
 /// Abstract contract for PDF operations. Implementations live in the data
 /// layer so the domain/presentation layers never depend on a specific PDF
@@ -62,4 +65,19 @@ abstract class PdfRepository {
   /// Rebuilds the PDF at [inputPath] keeping/reordering/rotating pages per
   /// [edits] (see [PdfPageEdit]) and returns the new file's path.
   Future<String> editPdfPages(String inputPath, List<PdfPageEdit> edits);
+
+  /// Extracts every line of text (with position/font info) from the PDF at
+  /// [path] — used by the content editor to overlay a tappable region per
+  /// line.
+  Future<List<PdfTextLine>> extractTextLines(String path);
+
+  /// Renders every page of the PDF at [path] as an in-memory image, paired
+  /// with that page's size in PDF points — used by the content editor's
+  /// per-page canvas. Higher scale than [renderPageThumbnails] (which is
+  /// preview-only) so tap targets and edits stay legible/accurate.
+  Future<List<PdfPageImage>> renderPageImages(String path);
+
+  /// Applies [edits] (see [PdfContentEdit]) directly onto the existing
+  /// pages of the PDF at [inputPath] and returns the new file's path.
+  Future<String> editPdfContent(String inputPath, List<PdfContentEdit> edits);
 }
