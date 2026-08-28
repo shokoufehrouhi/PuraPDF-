@@ -143,7 +143,7 @@ class WatermarkScreen extends ConsumerWidget {
                       Slider(
                         value: state.fontSize,
                         min: 20,
-                        max: 120,
+                        max: 200,
                         activeColor: _color,
                         onChanged: controller.setFontSize,
                       ),

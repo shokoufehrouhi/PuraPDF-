@@ -751,11 +751,13 @@ class PdfRepositoryImpl implements PdfRepository {
   ) async {
     final PdfDocument doc = await _loadDocument(inputPath);
 
+    // Opacity is NOT the 4th (alpha) arg of PdfColor — that has no effect
+    // on a fill/stroke brush, only graphics.setTransparency() actually
+    // wires up the PDF ExtGState that makes drawing translucent.
     final PdfColor color = PdfColor(
       options.colorR,
       options.colorG,
       options.colorB,
-      (options.opacity.clamp(0, 1) * 255).round(),
     );
     final PdfFont font = PdfStandardFont(
       PdfFontFamily.helvetica,
@@ -767,12 +769,14 @@ class PdfRepositoryImpl implements PdfRepository {
       alignment: PdfTextAlignment.center,
       lineAlignment: PdfVerticalAlignment.middle,
     );
+    final double alpha = options.opacity.clamp(0, 1).toDouble();
 
     for (int i = 0; i < doc.pages.count; i++) {
       final PdfPage page = doc.pages[i];
       final Size size = page.size;
       final PdfGraphics g = page.graphics;
       g.save();
+      g.setTransparency(alpha);
       // Rotate around the page's center and draw the text in a wide box
       // straddling that center — a diagonal stamp, same convention as
       // "CONFIDENTIAL"/"DRAFT" watermarks (bottom-left to top-right).
