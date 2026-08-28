@@ -16,4 +16,8 @@ class AdIds {
       defaultTargetPlatform == TargetPlatform.android
       ? 'ca-app-pub-3940256099942544/1033173712'
       : 'ca-app-pub-3940256099942544/4411468910';
+
+  static String get appOpen => defaultTargetPlatform == TargetPlatform.android
+      ? 'ca-app-pub-3940256099942544/9257395921'
+      : 'ca-app-pub-3940256099942544/5575463023';
 }

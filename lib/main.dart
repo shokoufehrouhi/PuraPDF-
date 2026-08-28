@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +12,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AdsService.instance.init();
   runApp(const ProviderScope(child: PuraPdfApp()));
+  // Fire-and-forget: shows the app-open ad once it's ready (or gives up
+  // after a short timeout) without delaying the home screen's first frame.
+  unawaited(AdsService.instance.appOpen.showIfReady());
 }
 
 class PuraPdfApp extends ConsumerWidget {
