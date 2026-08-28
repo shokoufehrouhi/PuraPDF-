@@ -111,8 +111,12 @@ class EncryptController extends Notifier<EncryptState> {
       state = state.copyWith(error: 'Select a PDF first.');
       return;
     }
-    if (state.password.trim().isEmpty) {
+    if (state.password.isEmpty) {
       state = state.copyWith(error: 'Enter a password.');
+      return;
+    }
+    if (state.password.trim().isEmpty) {
+      state = state.copyWith(error: 'Password can\'t be just spaces.');
       return;
     }
     // Only enforced when setting a new password — removing one must accept

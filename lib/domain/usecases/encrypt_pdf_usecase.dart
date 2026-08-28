@@ -9,8 +9,11 @@ class EncryptPdfUseCase {
   const EncryptPdfUseCase(this.repository);
 
   Future<String> call(String inputPath, String password) async {
-    if (password.trim().isEmpty) {
+    if (password.isEmpty) {
       throw ArgumentError('Enter a password.');
+    }
+    if (password.trim().isEmpty) {
+      throw ArgumentError('Password can\'t be just spaces.');
     }
     return repository.encryptPdf(inputPath, password);
   }
