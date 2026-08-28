@@ -112,5 +112,17 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
+  # Signature "type" fonts (OFL-licensed, bundled — not fetched at runtime,
+  # unlike the google_fonts package — matches the app's on-device promise).
+  fonts:
+    - family: DancingScript
+      fonts:
+        - asset: assets/fonts/DancingScript.ttf
+    - family: Pacifico
+      fonts:
+        - asset: assets/fonts/Pacifico.ttf
+    - family: Caveat
+      fonts:
+        - asset: assets/fonts/Caveat.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

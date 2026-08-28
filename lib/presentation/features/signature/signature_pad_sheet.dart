@@ -9,6 +9,34 @@ import '../../../core/theme/feature_colors.dart';
 
 const Color _color = FeatureColors.signatureIcon;
 
+/// A signature ink color choice.
+class _ColorOption {
+  final String label;
+  final Color color;
+  const _ColorOption(this.label, this.color);
+}
+
+const List<_ColorOption> _colorOptions = [
+  _ColorOption('Blue', Color(0xFF2563EB)),
+  _ColorOption('Red', Color(0xFFDC2626)),
+  _ColorOption('Black', Colors.black),
+  _ColorOption('Green', Color(0xFF16A34A)),
+];
+
+/// A typed-signature font choice — [preview] is shown rendered in its own
+/// font so the difference is obvious at a glance, not just named.
+class _FontOption {
+  final String label;
+  final String family;
+  const _FontOption(this.label, this.family);
+}
+
+const List<_FontOption> _fontOptions = [
+  _FontOption('Elegant', 'DancingScript'),
+  _FontOption('Bold', 'Pacifico'),
+  _FontOption('Casual', 'Caveat'),
+];
+
 /// Pushes a full-screen "create a signature" flow (Draw or Type) and pops
 /// with the resulting PNG bytes (transparent background), or null if the
 /// user backed out without finishing one.
@@ -28,19 +56,39 @@ class _SignaturePadScreen extends StatefulWidget {
 class _SignaturePadScreenState extends State<_SignaturePadScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  late final SignatureController _drawController;
+  late SignatureController _drawController;
   final TextEditingController _typeController = TextEditingController();
   final GlobalKey _typeCaptureKey = GlobalKey();
+
+  _ColorOption _drawColor = _colorOptions[2]; // Black
+  _ColorOption _typeColor = _colorOptions[2];
+  _FontOption _typeFont = _fontOptions[0];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _drawController = SignatureController(
+    _drawController = _newDrawController(_drawColor.color);
+  }
+
+  SignatureController _newDrawController(Color color) {
+    return SignatureController(
       penStrokeWidth: 4,
-      penColor: Colors.black,
+      penColor: color,
       exportBackgroundColor: Colors.transparent,
+      exportPenColor: color,
     );
+  }
+
+  void _setDrawColor(_ColorOption option) {
+    // penColor/exportPenColor are only set at construction, so changing
+    // ink color means starting a fresh controller (and canvas).
+    final old = _drawController;
+    setState(() {
+      _drawColor = option;
+      _drawController = _newDrawController(option.color);
+    });
+    old.dispose();
   }
 
   @override
@@ -71,6 +119,34 @@ class _SignaturePadScreenState extends State<_SignaturePadScreen>
     if (byteData != null && mounted) {
       Navigator.of(context).pop(byteData.buffer.asUint8List());
     }
+  }
+
+  Widget _colorPicker(_ColorOption selected, ValueChanged<_ColorOption> onPick) {
+    return Row(
+      children: [
+        for (final option in _colorOptions)
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: GestureDetector(
+              onTap: () => onPick(option),
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: option.color,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: selected == option
+                        ? _color
+                        : Theme.of(context).colorScheme.outlineVariant,
+                    width: selected == option ? 3 : 1,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 
   @override
@@ -106,6 +182,8 @@ class _SignaturePadScreenState extends State<_SignaturePadScreen>
                     color: scheme.onSurfaceVariant,
                   ),
                 ),
+                const SizedBox(height: 12),
+                _colorPicker(_drawColor, _setDrawColor),
                 const SizedBox(height: 12),
                 Expanded(
                   child: Container(
@@ -173,6 +251,53 @@ class _SignaturePadScreenState extends State<_SignaturePadScreen>
                   onChanged: (_) => setState(() {}),
                   decoration: const InputDecoration(hintText: 'Your name'),
                 ),
+                const SizedBox(height: 16),
+                Text(
+                  'Style',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    for (final font in _fontOptions)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: ChoiceChip(
+                          selected: _typeFont == font,
+                          selectedColor: _color.withValues(alpha: 0.18),
+                          onSelected: (_) => setState(() => _typeFont = font),
+                          label: Text(
+                            'Abc',
+                            style: TextStyle(
+                              fontFamily: font.family,
+                              fontSize: 20,
+                              color: _typeFont == font
+                                  ? _color
+                                  : scheme.onSurface,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Color',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _colorPicker(
+                  _typeColor,
+                  (option) => setState(() => _typeColor = option),
+                ),
                 const SizedBox(height: 20),
                 Container(
                   width: double.infinity,
@@ -188,11 +313,10 @@ class _SignaturePadScreenState extends State<_SignaturePadScreen>
                       _typeController.text.trim().isEmpty
                           ? ' '
                           : _typeController.text,
-                      style: const TextStyle(
+                      style: TextStyle(
+                        fontFamily: _typeFont.family,
                         fontSize: 44,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: _typeColor.color,
                       ),
                     ),
                   ),
