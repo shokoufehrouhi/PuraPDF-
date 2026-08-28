@@ -241,7 +241,18 @@ class PdfRepositoryImpl implements PdfRepository {
   }
 
   @override
-  Future<String> imagesToPdf(List<String> imagePaths) async {
+  Future<String> imagesToPdf(List<String> imagePaths) =>
+      _imagesToPdf(imagePaths, 'purapdf_images_');
+
+  @override
+  Future<String> scannedImagesToPdf(List<String> imagePaths) =>
+      _imagesToPdf(imagePaths, 'purapdf_scan_');
+
+  /// Shared by [imagesToPdf] and [scannedImagesToPdf] — same "one image per
+  /// page" assembly either way, just written under a different filename
+  /// prefix so Recents can tell "Image -> PDF" and "Scan" apart (see
+  /// _operationFor in home_screen.dart).
+  Future<String> _imagesToPdf(List<String> imagePaths, String prefix) async {
     const double maxDimension = 842; // cap so huge camera photos stay sane
     final PdfDocument output = PdfDocument();
     output.pageSettings.margins.all = 0;
@@ -265,7 +276,7 @@ class PdfRepositoryImpl implements PdfRepository {
 
     return _writeOutput(
       output,
-      'purapdf_images_${DateTime.now().millisecondsSinceEpoch}.pdf',
+      '$prefix${DateTime.now().millisecondsSinceEpoch}.pdf',
     );
   }
 

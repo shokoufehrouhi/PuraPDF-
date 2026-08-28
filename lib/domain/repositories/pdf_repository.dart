@@ -30,6 +30,10 @@ abstract class PdfRepository {
   /// ...) into a single PDF, one image per page, in the given order.
   Future<String> imagesToPdf(List<String> imagePaths);
 
+  /// Same as [imagesToPdf], but written under the scanner's own filename
+  /// prefix so Recents shows it as "Scan" rather than "Image -> PDF".
+  Future<String> scannedImagesToPdf(List<String> imagePaths);
+
   /// Renders every page of the PDF at [inputPath] as a raster image in
   /// [format] and returns one output path per page, in page order.
   Future<List<String>> pdfToImages(

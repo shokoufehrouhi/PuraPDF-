@@ -26,4 +26,8 @@ class FeatureColors {
   static const Color imagePdf = Color(0xFFCDEDD0);
   static const Color imagePdfDark = Color(0xFFB8E4BC);
   static const Color imagePdfIcon = Color(0xFF22C55E);
+
+  static const Color scanner = Color(0xFFC9F1E9);
+  static const Color scannerDark = Color(0xFFABE8DD);
+  static const Color scannerIcon = Color(0xFF14B8A6);
 }

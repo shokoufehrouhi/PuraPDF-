@@ -31,6 +31,12 @@
 	<string>ca-app-pub-3940256099942544~1458002511</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- Document Scanner feature (doclens): camera for scanning, photo
+	     library for importing an existing photo to scan. -->
+	<key>NSCameraUsageDescription</key>
+	<string>PuraPDF+ uses the camera to scan documents into a PDF.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PuraPDF+ can import a photo from your library to scan into a PDF.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

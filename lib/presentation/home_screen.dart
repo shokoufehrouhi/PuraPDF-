@@ -6,10 +6,12 @@ import '../core/theme/app_theme.dart';
 import '../core/theme/feature_colors.dart';
 import '../core/theme/theme_mode_controller.dart';
 import '../domain/entities/history_file.dart';
+import '../core/scanner_support.dart';
 import 'features/compress/compress_screen.dart';
 import 'features/history/history_controller.dart';
 import 'features/image_pdf/image_pdf_screen.dart';
 import 'features/merge/merge_screen.dart';
+import 'features/scanner/scanner_screen.dart';
 import 'features/split/split_screen.dart';
 import 'shared_widgets/banner_ad_widget.dart';
 import 'shared_widgets/download_file.dart';
@@ -290,6 +292,18 @@ class _ToolsTab extends StatelessWidget {
                     MaterialPageRoute(builder: (_) => const ImagePdfScreen()),
                   ),
                 ),
+                if (scannerSupported)
+                  _FeatureRowCard(
+                    icon: Icons.document_scanner_outlined,
+                    color: FeatureColors.scanner,
+                    colorDark: FeatureColors.scannerDark,
+                    iconColor: FeatureColors.scannerIcon,
+                    title: 'Scan Document',
+                    subtitle: 'Capture paper documents with your camera',
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const ScannerScreen()),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -530,6 +544,13 @@ _OperationInfo _operationFor(String fileName) {
       Icons.image_outlined,
       FeatureColors.imagePdfIcon,
       'PDF → Image',
+    );
+  }
+  if (fileName.startsWith('purapdf_scan_')) {
+    return const _OperationInfo(
+      Icons.document_scanner_outlined,
+      FeatureColors.scannerIcon,
+      'Scan',
     );
   }
   return _unknownOperation;
