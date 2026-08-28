@@ -36,10 +36,24 @@ class AppOpenAdManager {
   /// Waits briefly for the ad kicked off by [preload] and shows it if it
   /// arrived in time; never blocks app usage past [timeout] waiting on a
   /// network load. Call once, right after the first frame.
+  ///
+  /// Called `unawaited` from `main.dart`, so an escaped exception here
+  /// wouldn't block anything either way — but it would still surface as a
+  /// noisy unhandled-Zone-error at startup for something the user never
+  /// even needs, so it's swallowed the same way [InterstitialAdManager]
+  /// swallows its own.
   Future<void> showIfReady({
     Duration timeout = const Duration(seconds: 4),
   }) async {
     if (!adsSupported) return;
+    try {
+      await _showIfReady(timeout);
+    } catch (_) {
+      // Deliberately swallowed - see doc comment above.
+    }
+  }
+
+  Future<void> _showIfReady(Duration timeout) async {
     final Completer<void>? completer = _loadCompleter;
     if (completer == null) return; // preload() was never called
     await Future.any([completer.future, Future<void>.delayed(timeout)]);

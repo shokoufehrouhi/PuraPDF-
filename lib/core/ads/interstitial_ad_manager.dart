@@ -42,9 +42,23 @@ class InterstitialAdManager {
   /// call after that. A no-op on platforms without ads support; if nothing
   /// is loaded when it's this call's turn to show, kicks off a preload for
   /// next time and returns immediately rather than blocking the operation.
+  ///
+  /// Every call site awaits this *before* its own try/catch (so the ad
+  /// appears before the operation's loading state kicks in) — which means
+  /// this must never let an exception escape. Ads are never essential to a
+  /// PDF operation, so any failure here (a plugin channel error, an ad SDK
+  /// hiccup not already caught by [FullScreenContentCallback]) is swallowed
+  /// rather than silently killing the operation the user actually asked for.
   Future<void> showBeforeOperation() async {
     if (!adsSupported) return;
+    try {
+      await _showBeforeOperation();
+    } catch (_) {
+      // Deliberately swallowed - see doc comment above.
+    }
+  }
 
+  Future<void> _showBeforeOperation() async {
     _operationCount++;
     final bool shouldShow =
         _operationCount == 1 || _operationCount % operationsPerAd == 0;
