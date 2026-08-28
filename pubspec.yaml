@@ -45,6 +45,7 @@ dependencies:
   pdfrx: ^2.4.8
   image: ^4.9.2
   google_mobile_ads: ^9.1.0
+  app_tracking_transparency: ^2.0.6+1
   shared_preferences: ^2.5.5
   doclens: ^0.0.8
   signature: ^6.4.0

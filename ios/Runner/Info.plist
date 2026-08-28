@@ -29,6 +29,18 @@
 	     see lib/core/ads/ad_ids.dart. -->
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-6967597025156397~9910149144</string>
+	<!-- App Tracking Transparency: shown once, before ads are requested, so
+	     AdMob can serve personalized ads with the user's permission (Apple
+	     requires this prompt for any tracking-capable ad SDK). -->
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This lets us show ads that are more relevant to you. PuraPDF+ never tracks or shares your documents.</string>
+	<!-- Export compliance: PuraPDF+ only uses standard, exempt encryption
+	     (the Password Protect feature encrypts PDFs locally with a
+	     library-provided algorithm, not custom cryptography for
+	     transmitting data) - answering this here skips the manual
+	     questionnaire on every App Store Connect upload. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<!-- Document Scanner feature (doclens): camera for scanning, photo
