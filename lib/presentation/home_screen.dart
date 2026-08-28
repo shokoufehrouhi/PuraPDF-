@@ -50,6 +50,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         actions: [
+          _RecentsIconButton(
+            active: _tabIndex == 1,
+            onPressed: () =>
+                setState(() => _tabIndex = _tabIndex == 1 ? 0 : 1),
+          ),
+          const SizedBox(width: 4),
           IconButton(
             icon: Icon(_themeIcon(themeMode)),
             tooltip: '${_themeLabel(themeMode)} — tap to change',
@@ -64,11 +70,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           children: [
             const _Header(),
-            _ToolsRecentsTabBar(
-              index: _tabIndex,
-              onChanged: (i) => setState(() => _tabIndex = i),
-            ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Expanded(
               child: _tabIndex == 0
                   ? const _ToolsTab()
@@ -144,87 +146,29 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _ToolsRecentsTabBar extends StatelessWidget {
-  final int index;
-  final ValueChanged<int> onChanged;
+/// Recents used to be a full "Tools / Recents" segmented tab bar; now it's
+/// this single icon in the app bar, tinted when active — same toggle
+/// behavior as before (switches _tabIndex), just a lighter-weight control
+/// since Tools is the primary/default surface.
+class _RecentsIconButton extends StatelessWidget {
+  final bool active;
+  final VoidCallback onPressed;
 
-  const _ToolsRecentsTabBar({required this.index, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: scheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: _TabButton(
-                label: 'Tools',
-                selected: index == 0,
-                onTap: () => onChanged(0),
-              ),
-            ),
-            Expanded(
-              child: _TabButton(
-                label: 'Recents',
-                selected: index == 1,
-                onTap: () => onChanged(1),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TabButton extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _TabButton({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
+  const _RecentsIconButton({required this.active, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: selected ? scheme.surface : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          label,
-          style: TextStyle(
-            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            color: selected ? scheme.onSurface : scheme.onSurfaceVariant,
-          ),
-        ),
+    return IconButton(
+      icon: const Icon(Icons.history_rounded),
+      tooltip: active ? 'Back to tools' : 'Recents',
+      style: IconButton.styleFrom(
+        backgroundColor: active
+            ? AppTheme.seedColor.withValues(alpha: 0.14)
+            : Colors.transparent,
+        foregroundColor: active ? AppTheme.seedColor : scheme.onSurfaceVariant,
       ),
+      onPressed: onPressed,
     );
   }
 }
@@ -240,133 +184,206 @@ class _ToolsTab extends StatelessWidget {
         return Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 900),
-            child: GridView(
+            child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: columns,
-                mainAxisExtent: 78,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-              ),
               children: [
-                _FeatureRowCard(
-                  icon: Icons.call_merge,
-                  color: FeatureColors.merge,
-                  colorDark: FeatureColors.mergeDark,
-                  iconColor: FeatureColors.mergeIcon,
-                  title: 'Merge PDFs',
-                  subtitle: 'Combine multiple documents',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const MergeScreen()),
-                  ),
-                ),
-                _FeatureRowCard(
-                  icon: Icons.call_split,
-                  color: FeatureColors.split,
-                  colorDark: FeatureColors.splitDark,
-                  iconColor: FeatureColors.splitIcon,
-                  title: 'Split PDF',
-                  subtitle: 'Separate into pages or sections',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const SplitScreen()),
-                  ),
-                ),
-                _FeatureRowCard(
-                  icon: Icons.compress,
-                  color: FeatureColors.compress,
-                  colorDark: FeatureColors.compressDark,
-                  iconColor: FeatureColors.compressIcon,
-                  title: 'Compress PDF',
-                  subtitle: 'Optimize file size for sharing',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const CompressScreen()),
-                  ),
-                ),
-                _FeatureRowCard(
-                  icon: Icons.image_outlined,
-                  color: FeatureColors.imagePdf,
-                  colorDark: FeatureColors.imagePdfDark,
-                  iconColor: FeatureColors.imagePdfIcon,
-                  title: 'Image ⇄ PDF',
-                  subtitle: 'Convert between formats',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ImagePdfScreen()),
-                  ),
-                ),
-                if (scannerSupported)
-                  _FeatureRowCard(
-                    icon: Icons.document_scanner_outlined,
-                    color: FeatureColors.scanner,
-                    colorDark: FeatureColors.scannerDark,
-                    iconColor: FeatureColors.scannerIcon,
-                    title: 'Scan Document',
-                    subtitle: 'Capture paper documents with your camera',
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const ScannerScreen()),
+                _CategorySection(
+                  title: 'Organize',
+                  columns: columns,
+                  cards: [
+                    _FeatureRowCard(
+                      icon: Icons.call_merge,
+                      color: FeatureColors.merge,
+                      colorDark: FeatureColors.mergeDark,
+                      iconColor: FeatureColors.mergeIcon,
+                      title: 'Merge PDFs',
+                      subtitle: 'Combine multiple documents',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const MergeScreen(),
+                        ),
+                      ),
                     ),
-                  ),
-                _FeatureRowCard(
-                  icon: Icons.crop_rotate,
-                  color: FeatureColors.pageEdit,
-                  colorDark: FeatureColors.pageEditDark,
-                  iconColor: FeatureColors.pageEditIcon,
-                  title: 'Edit Pages',
-                  subtitle: 'Rotate, reorder, or remove pages',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const PageEditScreen()),
-                  ),
-                ),
-                _FeatureRowCard(
-                  icon: Icons.text_fields,
-                  color: FeatureColors.contentEdit,
-                  colorDark: FeatureColors.contentEditDark,
-                  iconColor: FeatureColors.contentEditIcon,
-                  title: 'Edit PDF',
-                  subtitle: 'Fix text, remove a line, add an image',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const ContentEditScreen(),
+                    _FeatureRowCard(
+                      icon: Icons.call_split,
+                      color: FeatureColors.split,
+                      colorDark: FeatureColors.splitDark,
+                      iconColor: FeatureColors.splitIcon,
+                      title: 'Split PDF',
+                      subtitle: 'Separate into pages or sections',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SplitScreen(),
+                        ),
+                      ),
                     ),
-                  ),
+                    _FeatureRowCard(
+                      icon: Icons.compress,
+                      color: FeatureColors.compress,
+                      colorDark: FeatureColors.compressDark,
+                      iconColor: FeatureColors.compressIcon,
+                      title: 'Compress PDF',
+                      subtitle: 'Optimize file size for sharing',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const CompressScreen(),
+                        ),
+                      ),
+                    ),
+                    _FeatureRowCard(
+                      icon: Icons.image_outlined,
+                      color: FeatureColors.imagePdf,
+                      colorDark: FeatureColors.imagePdfDark,
+                      iconColor: FeatureColors.imagePdfIcon,
+                      title: 'Image ⇄ PDF',
+                      subtitle: 'Convert between formats',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ImagePdfScreen(),
+                        ),
+                      ),
+                    ),
+                    if (scannerSupported)
+                      _FeatureRowCard(
+                        icon: Icons.document_scanner_outlined,
+                        color: FeatureColors.scanner,
+                        colorDark: FeatureColors.scannerDark,
+                        iconColor: FeatureColors.scannerIcon,
+                        title: 'Scan Document',
+                        subtitle: 'Capture paper documents with your camera',
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ScannerScreen(),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-                _FeatureRowCard(
-                  icon: Icons.lock_outline,
-                  color: FeatureColors.encrypt,
-                  colorDark: FeatureColors.encryptDark,
-                  iconColor: FeatureColors.encryptIcon,
-                  title: 'Password Protect',
-                  subtitle: 'Add or remove a PDF password',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const EncryptScreen()),
-                  ),
-                ),
-                _FeatureRowCard(
-                  icon: Icons.branding_watermark_outlined,
-                  color: FeatureColors.watermark,
-                  colorDark: FeatureColors.watermarkDark,
-                  iconColor: FeatureColors.watermarkIcon,
-                  title: 'Watermark',
-                  subtitle: 'Stamp text across every page',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const WatermarkScreen()),
-                  ),
-                ),
-                _FeatureRowCard(
-                  icon: Icons.draw_outlined,
-                  color: FeatureColors.signature,
-                  colorDark: FeatureColors.signatureDark,
-                  iconColor: FeatureColors.signatureIcon,
-                  title: 'Digital Signature',
-                  subtitle: 'Draw or type a signature, place it, save',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const SignatureScreen()),
-                  ),
+                const SizedBox(height: 20),
+                _CategorySection(
+                  title: 'Edit & Protect',
+                  columns: columns,
+                  cards: [
+                    _FeatureRowCard(
+                      icon: Icons.crop_rotate,
+                      color: FeatureColors.pageEdit,
+                      colorDark: FeatureColors.pageEditDark,
+                      iconColor: FeatureColors.pageEditIcon,
+                      title: 'Edit Pages',
+                      subtitle: 'Rotate, reorder, or remove pages',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const PageEditScreen(),
+                        ),
+                      ),
+                    ),
+                    _FeatureRowCard(
+                      icon: Icons.text_fields,
+                      color: FeatureColors.contentEdit,
+                      colorDark: FeatureColors.contentEditDark,
+                      iconColor: FeatureColors.contentEditIcon,
+                      title: 'Edit PDF',
+                      subtitle: 'Fix text, remove a line, add an image',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ContentEditScreen(),
+                        ),
+                      ),
+                    ),
+                    _FeatureRowCard(
+                      icon: Icons.lock_outline,
+                      color: FeatureColors.encrypt,
+                      colorDark: FeatureColors.encryptDark,
+                      iconColor: FeatureColors.encryptIcon,
+                      title: 'Password Protect',
+                      subtitle: 'Add or remove a PDF password',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const EncryptScreen(),
+                        ),
+                      ),
+                    ),
+                    _FeatureRowCard(
+                      icon: Icons.branding_watermark_outlined,
+                      color: FeatureColors.watermark,
+                      colorDark: FeatureColors.watermarkDark,
+                      iconColor: FeatureColors.watermarkIcon,
+                      title: 'Watermark',
+                      subtitle: 'Stamp text across every page',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const WatermarkScreen(),
+                        ),
+                      ),
+                    ),
+                    _FeatureRowCard(
+                      icon: Icons.draw_outlined,
+                      color: FeatureColors.signature,
+                      colorDark: FeatureColors.signatureDark,
+                      iconColor: FeatureColors.signatureIcon,
+                      title: 'Digital Signature',
+                      subtitle: 'Draw or type a signature, place it, save',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SignatureScreen(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+
+/// One labeled group of tool cards within the Tools tab — cards go in a
+/// non-scrolling grid (the outer ListView owns the scrolling) so multiple
+/// categories stack as one continuous scroll.
+class _CategorySection extends StatelessWidget {
+  final String title;
+  final int columns;
+  final List<Widget> cards;
+
+  const _CategorySection({
+    required this.title,
+    required this.columns,
+    required this.cards,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 0, 4, 10),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.2,
+              color: scheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        GridView(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columns,
+            mainAxisExtent: 78,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+          ),
+          children: cards,
+        ),
+      ],
     );
   }
 }
