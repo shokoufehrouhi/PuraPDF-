@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:doclens/doclens.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -91,6 +89,7 @@ class ScannerController extends Notifier<ScannerState> {
       state = state.copyWith(error: 'Scan at least one page first.');
       return;
     }
+    await AdsService.instance.interstitial.showBeforeOperation();
     state = state.copyWith(
       isCreatingPdf: true,
       clearError: true,
@@ -100,7 +99,6 @@ class ScannerController extends Notifier<ScannerState> {
       final useCase = ref.read(scanDocumentsUseCaseProvider);
       final path = await useCase(state.pages);
       state = state.copyWith(isCreatingPdf: false, resultPath: path);
-      unawaited(AdsService.instance.interstitial.recordOperationAndMaybeShow());
     } catch (e) {
       state = state.copyWith(isCreatingPdf: false, error: e.toString());
     }

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
@@ -136,6 +134,7 @@ class EncryptController extends Notifier<EncryptState> {
       return;
     }
 
+    await AdsService.instance.interstitial.showBeforeOperation();
     state = state.copyWith(
       isProcessing: true,
       clearError: true,
@@ -151,7 +150,6 @@ class EncryptController extends Notifier<EncryptState> {
         path = await useCase(file.path, state.password);
       }
       state = state.copyWith(isProcessing: false, resultPath: path);
-      unawaited(AdsService.instance.interstitial.recordOperationAndMaybeShow());
     } catch (e) {
       state = state.copyWith(isProcessing: false, error: e.toString());
     }

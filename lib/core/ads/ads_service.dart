@@ -4,7 +4,8 @@ import 'ads_support.dart';
 import 'interstitial_ad_manager.dart';
 
 /// App-wide ads entry point: call [init] once at startup, then use
-/// [interstitial] after operations and `BannerAdWidget` in layouts.
+/// [interstitial] right before each operation and `BannerAdWidget` in
+/// layouts.
 class AdsService {
   AdsService._();
   static final AdsService instance = AdsService._();

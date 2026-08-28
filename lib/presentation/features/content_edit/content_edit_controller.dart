@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -186,6 +185,7 @@ class ContentEditController extends Notifier<ContentEditState> {
       return;
     }
 
+    await AdsService.instance.interstitial.showBeforeOperation();
     state = state.copyWith(
       isSaving: true,
       clearError: true,
@@ -224,7 +224,6 @@ class ContentEditController extends Notifier<ContentEditState> {
       final useCase = ref.read(editPdfContentUseCaseProvider);
       final path = await useCase(file.path, edits);
       state = state.copyWith(isSaving: false, resultPath: path);
-      unawaited(AdsService.instance.interstitial.recordOperationAndMaybeShow());
     } catch (e) {
       state = state.copyWith(isSaving: false, error: e.toString());
     }

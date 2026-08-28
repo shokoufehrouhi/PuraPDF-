@@ -1,20 +1,15 @@
+import 'dart:async';
+
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'ad_ids.dart';
 import 'ads_support.dart';
-import 'operation_counter.dart';
 
-/// Loads interstitial ads and shows one every [operationsPerAd] completed
-/// operations (merge/split/compress/...) — never on every single action,
-/// per the roadmap note: don't annoy free users on every use.
-///
-/// The operation counter (see [OperationCounter]) persists across app
-/// restarts instead of resetting every launch.
+/// Loads interstitial ads and shows one before every operation
+/// (merge/split/compress/...) — the user explicitly wants an ad shown
+/// every single time, not just occasionally.
 class InterstitialAdManager {
-  InterstitialAdManager({int operationsPerAd = 3})
-    : _counter = OperationCounter(threshold: operationsPerAd);
-
-  final OperationCounter _counter;
+  InterstitialAdManager();
 
   InterstitialAd? _ad;
   bool _isLoading = false;
@@ -37,15 +32,14 @@ class InterstitialAdManager {
     );
   }
 
-  /// Call after a completed operation (successful merge/split/...). Shows
-  /// the preloaded interstitial once every [operationsPerAd] calls; a no-op
-  /// on platforms without ads support, or if nothing is loaded yet (the
-  /// next preload attempt just tries again for the following round).
-  Future<void> recordOperationAndMaybeShow() async {
+  /// Call right before starting an operation (merge/split/compress/...)
+  /// and await it — the operation should only begin once this returns, so
+  /// the ad genuinely shows *first*. Waits for the ad to be dismissed
+  /// before completing. A no-op on platforms without ads support; if
+  /// nothing is loaded yet, kicks off a preload for next time and returns
+  /// immediately rather than blocking the operation indefinitely.
+  Future<void> showBeforeOperation() async {
     if (!adsSupported) return;
-
-    final bool shouldShow = await _counter.incrementAndCheck();
-    if (!shouldShow) return;
 
     final InterstitialAd? ad = _ad;
     if (ad == null) {
@@ -54,16 +48,20 @@ class InterstitialAdManager {
     }
 
     _ad = null;
+    final Completer<void> done = Completer<void>();
     ad.fullScreenContentCallback = FullScreenContentCallback(
       onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
         preload();
+        if (!done.isCompleted) done.complete();
       },
       onAdFailedToShowFullScreenContent: (ad, error) {
         ad.dispose();
         preload();
+        if (!done.isCompleted) done.complete();
       },
     );
     await ad.show();
+    await done.future;
   }
 }

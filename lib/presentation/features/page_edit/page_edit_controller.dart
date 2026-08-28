@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -123,6 +122,7 @@ class PageEditController extends Notifier<PageEditState> {
       return;
     }
 
+    await AdsService.instance.interstitial.showBeforeOperation();
     state = state.copyWith(
       isSaving: true,
       clearError: true,
@@ -135,7 +135,6 @@ class PageEditController extends Notifier<PageEditState> {
           PdfPageEdit(originalIndex: p.originalIndex, rotationDegrees: p.rotation),
       ]);
       state = state.copyWith(isSaving: false, resultPath: path);
-      unawaited(AdsService.instance.interstitial.recordOperationAndMaybeShow());
     } catch (e) {
       state = state.copyWith(isSaving: false, error: e.toString());
     }

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
@@ -124,6 +122,7 @@ class SplitController extends Notifier<SplitState> {
       }
     }
 
+    await AdsService.instance.interstitial.showBeforeOperation();
     state = state.copyWith(
       isSplitting: true,
       clearError: true,
@@ -133,7 +132,6 @@ class SplitController extends Notifier<SplitState> {
       final useCase = ref.read(splitPdfUseCaseProvider);
       final paths = await useCase(file.path, ranges);
       state = state.copyWith(isSplitting: false, resultPaths: paths);
-      unawaited(AdsService.instance.interstitial.recordOperationAndMaybeShow());
     } catch (e) {
       state = state.copyWith(isSplitting: false, error: e.toString());
     }
