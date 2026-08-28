@@ -152,6 +152,9 @@ class SplitController extends Notifier<SplitState> {
   }
 }
 
-final splitControllerProvider = NotifierProvider<SplitController, SplitState>(
-  SplitController.new,
-);
+// autoDispose: state resets when the screen is popped, so returning to
+// Split later starts fresh instead of showing the previous result.
+final splitControllerProvider =
+    NotifierProvider.autoDispose<SplitController, SplitState>(
+      SplitController.new,
+    );

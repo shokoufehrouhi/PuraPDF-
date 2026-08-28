@@ -91,5 +91,9 @@ class CompressController extends Notifier<CompressState> {
   }
 }
 
+// autoDispose: state resets when the screen is popped, so returning to
+// Compress later starts fresh instead of showing the previous result.
 final compressControllerProvider =
-    NotifierProvider<CompressController, CompressState>(CompressController.new);
+    NotifierProvider.autoDispose<CompressController, CompressState>(
+      CompressController.new,
+    );

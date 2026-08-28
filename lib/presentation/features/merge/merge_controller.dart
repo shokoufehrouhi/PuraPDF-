@@ -93,6 +93,9 @@ class MergeController extends Notifier<MergeState> {
   }
 }
 
-final mergeControllerProvider = NotifierProvider<MergeController, MergeState>(
-  MergeController.new,
-);
+// autoDispose: state resets when the screen is popped, so returning to
+// Merge later starts fresh instead of showing the previous result.
+final mergeControllerProvider =
+    NotifierProvider.autoDispose<MergeController, MergeState>(
+      MergeController.new,
+    );

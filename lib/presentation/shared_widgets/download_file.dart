@@ -3,26 +3,44 @@ import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
-/// Opens the native "Save As" dialog so the user can pick where to save the
-/// file at [sourcePath] (Downloads, a specific folder, etc.), separate from
-/// the OS share sheet. Shows a snackbar with the outcome.
+/// Saves the file at [sourcePath] straight to the device's Downloads
+/// folder when the platform exposes one directly (macOS, Android — see
+/// [getDownloadsDirectory]) — no dialog, just a snackbar with the outcome.
+/// Falls back to the native "Save As" picker on platforms/situations where
+/// that isn't available (iOS has no shared Downloads folder apps can write
+/// to directly; sandboxed macOS without the entitlement would also fail).
 Future<void> downloadFile(BuildContext context, String sourcePath) async {
   final Uint8List bytes = await File(sourcePath).readAsBytes();
   final String fileName = sourcePath.split('/').last;
 
-  final Uri? savedUri = await FilePicker.saveFile(
-    fileName: fileName,
-    bytes: bytes,
-    mimeType: _mimeTypeFor(fileName),
-  );
+  String message;
+  try {
+    final Directory? downloadsDir = await getDownloadsDirectory();
+    if (downloadsDir == null) {
+      throw const FileSystemException('No Downloads directory available');
+    }
+    if (!downloadsDir.existsSync()) {
+      downloadsDir.createSync(recursive: true);
+    }
+    await File(
+      '${downloadsDir.path}/$fileName',
+    ).writeAsBytes(bytes, flush: true);
+    message = 'Saved to Downloads: $fileName';
+  } catch (_) {
+    final Uri? savedUri = await FilePicker.saveFile(
+      fileName: fileName,
+      bytes: bytes,
+      mimeType: _mimeTypeFor(fileName),
+    );
+    message = savedUri != null ? 'Saved: $fileName' : 'Cancelled';
+  }
 
   if (!context.mounted) return;
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(savedUri != null ? 'Saved: $fileName' : 'Cancelled'),
-    ),
-  );
+  ScaffoldMessenger.of(
+    context,
+  ).showSnackBar(SnackBar(content: Text(message)));
 }
 
 String _mimeTypeFor(String fileName) {

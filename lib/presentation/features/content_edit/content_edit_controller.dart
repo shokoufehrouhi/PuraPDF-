@@ -235,7 +235,9 @@ class ContentEditController extends Notifier<ContentEditState> {
   }
 }
 
+// autoDispose: state resets when the screen is popped, so returning to
+// Edit PDF later starts fresh instead of showing the previous result.
 final contentEditControllerProvider =
-    NotifierProvider<ContentEditController, ContentEditState>(
+    NotifierProvider.autoDispose<ContentEditController, ContentEditState>(
       ContentEditController.new,
     );

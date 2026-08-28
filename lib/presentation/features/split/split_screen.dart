@@ -239,12 +239,19 @@ class SplitScreen extends ConsumerWidget {
                                     child: OutlinedButton.icon(
                                       style: OutlinedButton.styleFrom(
                                         foregroundColor: _color,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                        ),
                                         side: BorderSide(
                                           color: _color.withValues(alpha: 0.5),
                                         ),
                                       ),
                                       icon: const Icon(Icons.folder_zip),
-                                      label: const Text('Share ZIP'),
+                                      label: const Text(
+                                        'Share ZIP',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                       onPressed: () async {
                                         final zipPath = await controller
                                             .zipResults();
@@ -263,12 +270,19 @@ class SplitScreen extends ConsumerWidget {
                                     child: OutlinedButton.icon(
                                       style: OutlinedButton.styleFrom(
                                         foregroundColor: _color,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                        ),
                                         side: BorderSide(
                                           color: _color.withValues(alpha: 0.5),
                                         ),
                                       ),
                                       icon: const Icon(Icons.download_outlined),
-                                      label: const Text('Download ZIP'),
+                                      label: const Text(
+                                        'Download ZIP',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                       onPressed: () async {
                                         final zipPath = await controller
                                             .zipResults();

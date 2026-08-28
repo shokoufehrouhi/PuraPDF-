@@ -111,5 +111,9 @@ class ScannerController extends Notifier<ScannerState> {
   }
 }
 
+// autoDispose: state resets when the screen is popped, so returning to
+// Scan later starts fresh instead of showing the previous result.
 final scannerControllerProvider =
-    NotifierProvider<ScannerController, ScannerState>(ScannerController.new);
+    NotifierProvider.autoDispose<ScannerController, ScannerState>(
+      ScannerController.new,
+    );

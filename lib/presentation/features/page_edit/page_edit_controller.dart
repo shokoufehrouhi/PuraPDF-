@@ -146,7 +146,9 @@ class PageEditController extends Notifier<PageEditState> {
   }
 }
 
+// autoDispose: state resets when the screen is popped, so returning to
+// Edit Pages later starts fresh instead of showing the previous result.
 final pageEditControllerProvider =
-    NotifierProvider<PageEditController, PageEditState>(
+    NotifierProvider.autoDispose<PageEditController, PageEditState>(
       PageEditController.new,
     );

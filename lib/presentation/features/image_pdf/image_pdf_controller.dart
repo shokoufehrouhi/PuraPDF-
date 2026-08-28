@@ -160,5 +160,9 @@ class ImagePdfController extends Notifier<ImagePdfState> {
   }
 }
 
+// autoDispose: state resets when the screen is popped, so returning to
+// Image <-> PDF later starts fresh instead of showing the previous result.
 final imagePdfControllerProvider =
-    NotifierProvider<ImagePdfController, ImagePdfState>(ImagePdfController.new);
+    NotifierProvider.autoDispose<ImagePdfController, ImagePdfState>(
+      ImagePdfController.new,
+    );
