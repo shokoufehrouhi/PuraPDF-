@@ -110,7 +110,12 @@ class ScannerScreen extends ConsumerWidget {
                             itemBuilder: (context, index) {
                               final String path = state.pages[index];
                               return Card(
-                                key: ValueKey('${path}_$index'),
+                                // Not index-based - scanned pages keep the
+                                // same generated path across a reorder, and
+                                // keying by index too would make Flutter
+                                // treat every dragged item as a brand new
+                                // widget and break the reorder animation.
+                                key: ValueKey(path),
                                 margin: const EdgeInsets.only(bottom: 8),
                                 child: ListTile(
                                   leading: Stack(

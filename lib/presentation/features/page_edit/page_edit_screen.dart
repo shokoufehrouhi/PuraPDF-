@@ -119,9 +119,13 @@ class PageEditScreen extends ConsumerWidget {
                             itemBuilder: (context, index) {
                               final PageEditItem page = state.pages[index];
                               return Card(
-                                key: ValueKey(
-                                  '${page.originalIndex}_$index',
-                                ),
+                                // originalIndex alone is already a stable,
+                                // unique-per-page id (see PageEditItem) -
+                                // mixing in the list index too would make
+                                // Flutter treat every dragged item as a
+                                // brand new widget and break the reorder
+                                // animation.
+                                key: ValueKey(page.originalIndex),
                                 margin: const EdgeInsets.only(bottom: 8),
                                 child: ListTile(
                                   leading: Stack(

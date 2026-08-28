@@ -116,7 +116,13 @@ class MergeScreen extends ConsumerWidget {
                             itemBuilder: (context, index) {
                               final f = state.files[index];
                               return Card(
-                                key: ValueKey('${f.path}_$index'),
+                                // Identity-based, not index-based: the same
+                                // PdfFile instance just moves position on
+                                // reorder (see MergeController.reorderItem),
+                                // so keying by index too would make Flutter
+                                // think it's a different widget on every
+                                // drag and break the reorder animation.
+                                key: ObjectKey(f),
                                 margin: const EdgeInsets.only(bottom: 8),
                                 child: ListTile(
                                   leading: Container(
