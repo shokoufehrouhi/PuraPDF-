@@ -424,19 +424,6 @@ class _PdfToImagesPane extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.ios_share),
-                              tooltip: 'Share',
-                              onPressed: () => SharePlus.instance.share(
-                                ShareParams(files: [XFile(p)]),
-                              ),
-                            ),
-                            DownloadIconButton(path: p),
-                          ],
-                        ),
                       ),
                     ),
                   ),
