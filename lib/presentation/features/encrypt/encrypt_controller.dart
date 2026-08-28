@@ -115,14 +115,16 @@ class EncryptController extends Notifier<EncryptState> {
       state = state.copyWith(error: 'Enter a password.');
       return;
     }
-    if (state.password.trim().isEmpty) {
-      state = state.copyWith(error: 'Password can\'t be just spaces.');
+    // The password field's inputFormatters already block typing whitespace,
+    // but this stays as a defense-in-depth check (e.g. pasted text).
+    if (RegExp(r'\s').hasMatch(state.password)) {
+      state = state.copyWith(error: 'Password can\'t contain spaces.');
       return;
     }
     // Only enforced when setting a new password — removing one must accept
     // whatever password the PDF already has, short or not.
     if (state.action == PasswordAction.add &&
-        state.password.trim().length < minPasswordLength) {
+        state.password.length < minPasswordLength) {
       state = state.copyWith(
         error: 'Password must be at least $minPasswordLength characters.',
       );

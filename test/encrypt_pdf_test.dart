@@ -106,4 +106,11 @@ void main() {
 
     expect(() => useCase(source, '    '), throwsArgumentError);
   });
+
+  test('EncryptPdfUseCase rejects a password containing a space', () async {
+    final source = await _writeDummyPdf('${tempDir.path}/source.pdf', 1);
+    final useCase = EncryptPdfUseCase(PdfRepositoryImpl());
+
+    expect(() => useCase(source, '12 34'), throwsArgumentError);
+  });
 }

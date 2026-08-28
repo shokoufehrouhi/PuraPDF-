@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -98,12 +99,15 @@ class EncryptScreen extends ConsumerWidget {
                       TextField(
                         obscureText: state.obscurePassword,
                         onChanged: controller.setPassword,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                        ],
                         decoration: InputDecoration(
                           labelText: isAdd ? 'Password' : 'Current password',
                           helperText: isAdd
                               ? 'At least '
                                     '${EncryptController.minPasswordLength} '
-                                    'characters'
+                                    'characters, no spaces'
                               : null,
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -120,6 +124,9 @@ class EncryptScreen extends ConsumerWidget {
                         TextField(
                           obscureText: state.obscureConfirmPassword,
                           onChanged: controller.setConfirmPassword,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                          ],
                           decoration: InputDecoration(
                             labelText: 'Confirm password',
                             suffixIcon: IconButton(

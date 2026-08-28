@@ -12,8 +12,8 @@ class EncryptPdfUseCase {
     if (password.isEmpty) {
       throw ArgumentError('Enter a password.');
     }
-    if (password.trim().isEmpty) {
-      throw ArgumentError('Password can\'t be just spaces.');
+    if (RegExp(r'\s').hasMatch(password)) {
+      throw ArgumentError('Password can\'t contain spaces.');
     }
     return repository.encryptPdf(inputPath, password);
   }
