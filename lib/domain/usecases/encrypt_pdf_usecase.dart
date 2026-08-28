@@ -9,7 +9,7 @@ class EncryptPdfUseCase {
   const EncryptPdfUseCase(this.repository);
 
   Future<String> call(String inputPath, String password) async {
-    if (password.isEmpty) {
+    if (password.trim().isEmpty) {
       throw ArgumentError('Enter a password.');
     }
     return repository.encryptPdf(inputPath, password);

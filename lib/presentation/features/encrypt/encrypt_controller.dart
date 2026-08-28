@@ -111,14 +111,14 @@ class EncryptController extends Notifier<EncryptState> {
       state = state.copyWith(error: 'Select a PDF first.');
       return;
     }
-    if (state.password.isEmpty) {
+    if (state.password.trim().isEmpty) {
       state = state.copyWith(error: 'Enter a password.');
       return;
     }
     // Only enforced when setting a new password — removing one must accept
     // whatever password the PDF already has, short or not.
     if (state.action == PasswordAction.add &&
-        state.password.length < minPasswordLength) {
+        state.password.trim().length < minPasswordLength) {
       state = state.copyWith(
         error: 'Password must be at least $minPasswordLength characters.',
       );
