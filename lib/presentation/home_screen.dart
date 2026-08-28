@@ -95,17 +95,13 @@ class _Header extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: AppTheme.seedColor,
-                  borderRadius: BorderRadius.circular(11),
-                ),
-                child: const Icon(
-                  Icons.picture_as_pdf,
-                  color: Colors.white,
-                  size: 20,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(11),
+                child: Image.asset(
+                  'assets/icon/icon.png',
+                  width: 38,
+                  height: 38,
+                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(width: 10),
