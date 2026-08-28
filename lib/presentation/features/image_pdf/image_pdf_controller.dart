@@ -149,6 +149,15 @@ class ImagePdfController extends Notifier<ImagePdfState> {
   void reset() {
     state = ImagePdfState(direction: state.direction);
   }
+
+  /// Bundles the PDF→Images conversion's output images into one ZIP.
+  Future<String> zipResults() {
+    final repo = ref.read(pdfRepositoryProvider);
+    return repo.zipFiles(
+      state.resultImagePaths,
+      'purapdf_images_${DateTime.now().millisecondsSinceEpoch}.zip',
+    );
+  }
 }
 
 final imagePdfControllerProvider =

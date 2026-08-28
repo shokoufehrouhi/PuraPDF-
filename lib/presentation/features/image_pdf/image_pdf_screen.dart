@@ -424,9 +424,68 @@ class _PdfToImagesPane extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.ios_share),
+                              tooltip: 'Share',
+                              onPressed: () => SharePlus.instance.share(
+                                ShareParams(files: [XFile(p)]),
+                              ),
+                            ),
+                            DownloadIconButton(path: p),
+                          ],
+                        ),
                       ),
                     ),
                   ),
+                  if (state.resultImagePaths.length > 1) ...[
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: _color,
+                              side: BorderSide(
+                                color: _color.withValues(alpha: 0.5),
+                              ),
+                            ),
+                            icon: const Icon(Icons.folder_zip),
+                            label: const Text('Share ZIP'),
+                            onPressed: () async {
+                              final zipPath = await controller.zipResults();
+                              if (context.mounted) {
+                                await SharePlus.instance.share(
+                                  ShareParams(files: [XFile(zipPath)]),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: _color,
+                              side: BorderSide(
+                                color: _color.withValues(alpha: 0.5),
+                              ),
+                            ),
+                            icon: const Icon(Icons.download_outlined),
+                            label: const Text('Download ZIP'),
+                            onPressed: () async {
+                              final zipPath = await controller.zipResults();
+                              if (context.mounted) {
+                                await downloadFile(context, zipPath);
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
