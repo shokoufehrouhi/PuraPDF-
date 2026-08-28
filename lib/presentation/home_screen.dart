@@ -818,13 +818,64 @@ class _RecentsTabState extends ConsumerState<_RecentsTab> {
       );
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-      itemCount: state.files.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 10),
-      itemBuilder: (context, index) =>
-          _RecentRecordRow(file: state.files[index]),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 12, 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton.icon(
+                onPressed: () => _confirmClearAll(context),
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                ),
+                icon: const Icon(Icons.delete_sweep_outlined, size: 18),
+                label: const Text('Clear'),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.separated(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+            itemCount: state.files.length,
+            separatorBuilder: (_, _) => const SizedBox(height: 10),
+            itemBuilder: (context, index) =>
+                _RecentRecordRow(file: state.files[index]),
+          ),
+        ),
+      ],
     );
+  }
+
+  Future<void> _confirmClearAll(BuildContext context) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Clear all recents?'),
+        content: const Text(
+          'This deletes every file listed here from your device. '
+          'This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(dialogContext).colorScheme.error,
+            ),
+            child: const Text('Clear all'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await ref.read(historyControllerProvider.notifier).clearAll();
+    }
   }
 }
 

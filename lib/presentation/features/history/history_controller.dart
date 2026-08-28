@@ -80,6 +80,25 @@ class HistoryController extends Notifier<HistoryState> {
     }
   }
 
+  /// Deletes every file currently listed. Keeps whatever was already there
+  /// on a partial failure (mid-loop error) rather than guessing at which
+  /// ones actually got removed — a follow-up [refresh] will resync either
+  /// way.
+  Future<void> clearAll() async {
+    if (state.files.isEmpty) return;
+    final deleteFile = ref.read(deleteHistoryFileUseCaseProvider);
+    try {
+      for (final file in state.files) {
+        await deleteFile(file.path);
+      }
+      state = state.copyWith(files: const []);
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+    } finally {
+      await refresh();
+    }
+  }
+
   Future<void> rename(String path, String newName) async {
     try {
       final newPath = await ref.read(renameHistoryFileUseCaseProvider)(
