@@ -206,6 +206,7 @@ class _ImagesToPdfPane extends StatelessWidget {
                               ),
                               trailing: IconButton(
                                 icon: const Icon(Icons.close),
+                                tooltip: 'Remove',
                                 onPressed: () =>
                                     controller.removeImageAt(index),
                               ),

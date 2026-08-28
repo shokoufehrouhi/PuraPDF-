@@ -159,6 +159,7 @@ class ScannerScreen extends ConsumerWidget {
                                     children: [
                                       IconButton(
                                         icon: const Icon(Icons.close),
+                                        tooltip: 'Remove',
                                         onPressed: () =>
                                             controller.removeAt(index),
                                       ),

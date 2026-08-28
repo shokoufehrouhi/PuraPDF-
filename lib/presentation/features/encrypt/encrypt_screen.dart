@@ -115,6 +115,9 @@ class EncryptScreen extends ConsumerWidget {
                                   ? Icons.visibility_outlined
                                   : Icons.visibility_off_outlined,
                             ),
+                            tooltip: state.obscurePassword
+                                ? 'Show password'
+                                : 'Hide password',
                             onPressed: controller.toggleObscurePassword,
                           ),
                         ),
@@ -135,6 +138,9 @@ class EncryptScreen extends ConsumerWidget {
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
                               ),
+                              tooltip: state.obscureConfirmPassword
+                                  ? 'Show password'
+                                  : 'Hide password',
                               onPressed: controller.toggleObscureConfirmPassword,
                             ),
                           ),

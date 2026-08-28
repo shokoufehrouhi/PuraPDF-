@@ -143,6 +143,7 @@ class ContentEditScreen extends ConsumerWidget {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.chevron_left),
+                                tooltip: 'Previous page',
                                 onPressed: state.currentPageIndex > 0
                                     ? () => controller.setPage(
                                         state.currentPageIndex - 1,
@@ -162,6 +163,7 @@ class ContentEditScreen extends ConsumerWidget {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.chevron_right),
+                                tooltip: 'Next page',
                                 onPressed:
                                     state.currentPageIndex <
                                         state.pages.length - 1
