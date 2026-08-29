@@ -8,6 +8,7 @@ import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/image_output_format.dart';
 import '../../../domain/entities/pdf_file.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../shared_widgets/direction_label.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
@@ -89,11 +90,11 @@ class ImagePdfScreen extends ConsumerWidget {
                 segments: [
                   ButtonSegment(
                     value: ConversionDirection.imagesToPdf,
-                    label: Text(l10n.imagesToPdfSegment),
+                    label: DirectionLabel(from: l10n.imagesWord, to: 'PDF'),
                   ),
                   ButtonSegment(
                     value: ConversionDirection.pdfToImages,
-                    label: Text(l10n.pdfToImagesSegment),
+                    label: DirectionLabel(from: 'PDF', to: l10n.imagesWord),
                   ),
                 ],
                 selected: {state.direction},

@@ -454,6 +454,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get beforeLabel => 'Antes';
+
+  @override
+  String get afterLabel => 'Después';
+
+  @override
   String get imagePdfTitle => 'Imagen ⇄ PDF';
 
   @override
@@ -484,6 +490,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get pdfToImagesSegment => 'PDF → Imágenes';
+
+  @override
+  String get imagesWord => 'Imágenes';
 
   @override
   String get addImages => 'Añadir imágenes';

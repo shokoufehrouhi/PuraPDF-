@@ -137,10 +137,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get opCompress => 'ضغط';
 
   @override
-  String get opImageToPdf => 'صورة → PDF';
+  String get opImageToPdf => 'صورة ← PDF';
 
   @override
-  String get opPdfToImage => 'PDF → صورة';
+  String get opPdfToImage => 'PDF ← صورة';
 
   @override
   String get opScan => 'مسح ضوئي';
@@ -450,6 +450,12 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get beforeLabel => 'قبل';
+
+  @override
+  String get afterLabel => 'بعد';
+
+  @override
   String get imagePdfTitle => 'صورة ⇄ PDF';
 
   @override
@@ -476,10 +482,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get imagePdfStepFormat => 'اختيار الصيغة';
 
   @override
-  String get imagesToPdfSegment => 'صور → PDF';
+  String get imagesToPdfSegment => 'صور ← PDF';
 
   @override
-  String get pdfToImagesSegment => 'PDF → صور';
+  String get pdfToImagesSegment => 'PDF ← صور';
+
+  @override
+  String get imagesWord => 'صور';
 
   @override
   String get addImages => 'إضافة صور';

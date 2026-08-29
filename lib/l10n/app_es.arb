@@ -197,6 +197,8 @@
       "after": {}
     }
   },
+  "beforeLabel": "Antes",
+  "afterLabel": "Después",
   "imagePdfTitle": "Imagen ⇄ PDF",
   "imagesToPdfDescription": "Convierte una o varias fotos en un solo documento PDF.",
   "pdfToImagesDescription": "Exporta cada página de un PDF como un archivo de imagen independiente.",
@@ -207,6 +209,7 @@
   "imagePdfStepFormat": "Elegir formato",
   "imagesToPdfSegment": "Imágenes → PDF",
   "pdfToImagesSegment": "PDF → Imágenes",
+  "imagesWord": "Imágenes",
   "addImages": "Añadir imágenes",
   "addImagesHint": "Puedes seleccionar varias fotos a la vez",
   "imagesSelectedCount": "{count, plural, one{1 imagen seleccionada} other{{count} imágenes seleccionadas}}",

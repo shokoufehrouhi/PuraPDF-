@@ -880,6 +880,18 @@ abstract class AppLocalizations {
   /// **'Before: {before}  →  After: {after}'**
   String compressBeforeAfter(Object before, Object after);
 
+  /// No description provided for @beforeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Before'**
+  String get beforeLabel;
+
+  /// No description provided for @afterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'After'**
+  String get afterLabel;
+
   /// No description provided for @imagePdfTitle.
   ///
   /// In en, this message translates to:
@@ -939,6 +951,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PDF → Images'**
   String get pdfToImagesSegment;
+
+  /// No description provided for @imagesWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get imagesWord;
 
   /// No description provided for @addImages.
   ///

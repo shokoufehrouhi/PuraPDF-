@@ -136,10 +136,10 @@ class AppLocalizationsFa extends AppLocalizations {
   String get opCompress => 'فشرده‌سازی';
 
   @override
-  String get opImageToPdf => 'تصویر → PDF';
+  String get opImageToPdf => 'تصویر ← PDF';
 
   @override
-  String get opPdfToImage => 'PDF → تصویر';
+  String get opPdfToImage => 'PDF ← تصویر';
 
   @override
   String get opScan => 'اسکن';
@@ -448,6 +448,12 @@ class AppLocalizationsFa extends AppLocalizations {
   }
 
   @override
+  String get beforeLabel => 'قبل';
+
+  @override
+  String get afterLabel => 'بعد';
+
+  @override
   String get imagePdfTitle => 'تصویر ⇄ PDF';
 
   @override
@@ -474,10 +480,13 @@ class AppLocalizationsFa extends AppLocalizations {
   String get imagePdfStepFormat => 'انتخاب فرمت';
 
   @override
-  String get imagesToPdfSegment => 'تصویر → PDF';
+  String get imagesToPdfSegment => 'تصویر ← PDF';
 
   @override
-  String get pdfToImagesSegment => 'PDF → تصویر';
+  String get pdfToImagesSegment => 'PDF ← تصویر';
+
+  @override
+  String get imagesWord => 'تصویر';
 
   @override
   String get addImages => 'افزودن تصویر';

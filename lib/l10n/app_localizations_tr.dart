@@ -452,6 +452,12 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get beforeLabel => 'Önce';
+
+  @override
+  String get afterLabel => 'Sonra';
+
+  @override
   String get imagePdfTitle => 'Görsel ⇄ PDF';
 
   @override
@@ -482,6 +488,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get pdfToImagesSegment => 'PDF → Görsel';
+
+  @override
+  String get imagesWord => 'Görsel';
 
   @override
   String get addImages => 'Görsel ekle';

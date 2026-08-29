@@ -197,6 +197,8 @@
       "after": {}
     }
   },
+  "beforeLabel": "Önce",
+  "afterLabel": "Sonra",
   "imagePdfTitle": "Görsel ⇄ PDF",
   "imagesToPdfDescription": "Bir veya daha fazla fotoğrafı tek bir PDF belgesine dönüştürün.",
   "pdfToImagesDescription": "Bir PDF'nin her sayfasını ayrı bir görsel dosyası olarak dışa aktarın.",
@@ -207,6 +209,7 @@
   "imagePdfStepFormat": "Format seç",
   "imagesToPdfSegment": "Görsel → PDF",
   "pdfToImagesSegment": "PDF → Görsel",
+  "imagesWord": "Görsel",
   "addImages": "Görsel ekle",
   "addImagesHint": "Birden fazla fotoğrafı aynı anda seçebilirsiniz",
   "imagesSelectedCount": "{count, plural, one{1 görsel seçildi} other{{count} görsel seçildi}}",

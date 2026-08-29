@@ -8,6 +8,7 @@ import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/compression_level.dart';
 import '../../../domain/entities/pdf_file.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../shared_widgets/direction_label.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
@@ -184,13 +185,11 @@ class CompressScreen extends ConsumerWidget {
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              l10n.compressBeforeAfter(
-                                _formatSize(state.result!.originalSizeBytes),
-                                _formatSize(
-                                  state.result!.compressedSizeBytes,
-                                ),
-                              ),
+                            DirectionLabel(
+                              from:
+                                  '${l10n.beforeLabel}: ${_formatSize(state.result!.originalSizeBytes)}',
+                              to:
+                                  '${l10n.afterLabel}: ${_formatSize(state.result!.compressedSizeBytes)}',
                               style: TextStyle(
                                 fontSize: 12.5,
                                 color: scheme.onSurfaceVariant,

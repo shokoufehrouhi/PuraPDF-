@@ -21,6 +21,7 @@ import 'features/signature/signature_screen.dart';
 import 'features/split/split_screen.dart';
 import 'features/watermark/watermark_screen.dart';
 import 'shared_widgets/banner_ad_widget.dart';
+import 'shared_widgets/direction_label.dart';
 import 'shared_widgets/download_file.dart';
 import 'shared_widgets/language_switcher_button.dart';
 
@@ -615,92 +616,110 @@ class _DiagonalSheenPainter extends CustomPainter {
 class _OperationInfo {
   final IconData icon;
   final Color color;
-  final String label;
+  final Widget label;
 
   const _OperationInfo(this.icon, this.color, this.label);
 }
 
 _OperationInfo _operationFor(String fileName, AppLocalizations l10n) {
   if (fileName.startsWith('purapdf_merged_')) {
-    return _OperationInfo(Icons.call_merge, FeatureColors.mergeIcon, l10n.opMerge);
+    return _OperationInfo(
+      Icons.call_merge,
+      FeatureColors.mergeIcon,
+      Text(l10n.opMerge),
+    );
   }
   if (fileName.startsWith('purapdf_split_')) {
-    return _OperationInfo(Icons.call_split, FeatureColors.splitIcon, l10n.opSplit);
+    return _OperationInfo(
+      Icons.call_split,
+      FeatureColors.splitIcon,
+      Text(l10n.opSplit),
+    );
   }
   if (fileName.startsWith('purapdf_compressed_')) {
     return _OperationInfo(
       Icons.compress,
       FeatureColors.compressIcon,
-      l10n.opCompress,
+      Text(l10n.opCompress),
     );
   }
   if (fileName.startsWith('purapdf_images_')) {
     return _OperationInfo(
       Icons.image_outlined,
       FeatureColors.imagePdfIcon,
-      l10n.opImageToPdf,
+      DirectionLabel(
+        from: l10n.imagesWord,
+        to: 'PDF',
+        iconColor: FeatureColors.imagePdfIcon,
+        iconSize: 12,
+      ),
     );
   }
   if (fileName.startsWith('purapdf_page_')) {
     return _OperationInfo(
       Icons.image_outlined,
       FeatureColors.imagePdfIcon,
-      l10n.opPdfToImage,
+      DirectionLabel(
+        from: 'PDF',
+        to: l10n.imagesWord,
+        iconColor: FeatureColors.imagePdfIcon,
+        iconSize: 12,
+      ),
     );
   }
   if (fileName.startsWith('purapdf_scan_')) {
     return _OperationInfo(
       Icons.document_scanner_outlined,
       FeatureColors.scannerIcon,
-      l10n.opScan,
+      Text(l10n.opScan),
     );
   }
   if (fileName.startsWith('purapdf_pages_')) {
     return _OperationInfo(
       Icons.crop_rotate,
       FeatureColors.pageEditIcon,
-      l10n.opPageEdit,
+      Text(l10n.opPageEdit),
     );
   }
   if (fileName.startsWith('purapdf_content_')) {
     return _OperationInfo(
       Icons.text_fields,
       FeatureColors.contentEditIcon,
-      l10n.opContentEdit,
+      Text(l10n.opContentEdit),
     );
   }
   if (fileName.startsWith('purapdf_locked_')) {
     return _OperationInfo(
       Icons.lock_outline,
       FeatureColors.encryptIcon,
-      l10n.opLocked,
+      Text(l10n.opLocked),
     );
   }
   if (fileName.startsWith('purapdf_unlocked_')) {
     return _OperationInfo(
       Icons.lock_open_outlined,
       FeatureColors.encryptIcon,
-      l10n.opUnlocked,
+      Text(l10n.opUnlocked),
     );
   }
   if (fileName.startsWith('purapdf_watermark_')) {
     return _OperationInfo(
       Icons.branding_watermark_outlined,
       FeatureColors.watermarkIcon,
-      l10n.opWatermark,
+      Text(l10n.opWatermark),
     );
   }
   if (fileName.startsWith('purapdf_signed_')) {
     return _OperationInfo(
       Icons.draw_outlined,
       FeatureColors.signatureIcon,
-      l10n.opSigned,
+      Text(l10n.opSigned),
     );
   }
   return _OperationInfo(
     Icons.insert_drive_file,
     const Color(0xFF9CA3AF),
-    l10n.opUnknown,
+    Text(l10n.opUnknown),
   );
 }
 
@@ -922,13 +941,13 @@ class _RecentRecordRow extends StatelessWidget {
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    Text(
-                      op.label,
+                    DefaultTextStyle.merge(
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w600,
                         color: op.color,
                       ),
+                      child: op.label,
                     ),
                     Text(
                       '  •  ${_formatDateTime(file.createdAt, Localizations.localeOf(context))}',
