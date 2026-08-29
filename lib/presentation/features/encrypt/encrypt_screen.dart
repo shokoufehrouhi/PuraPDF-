@@ -56,6 +56,7 @@ class EncryptScreen extends ConsumerWidget {
                 description: isAdd
                     ? l10n.encryptDescription
                     : l10n.encryptRemoveDescription,
+                fixedDescriptionLines: 3,
                 steps: isAdd
                     ? [
                         l10n.selectPdf,

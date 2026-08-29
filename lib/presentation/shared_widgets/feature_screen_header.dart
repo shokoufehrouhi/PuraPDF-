@@ -11,6 +11,18 @@ class FeatureScreenHeader extends StatelessWidget {
   final String description;
   final List<String> steps;
 
+  /// When a screen swaps [description] based on some in-screen toggle (e.g.
+  /// Image<->PDF's direction segments, Password's add/remove segments), the
+  /// two variants rarely wrap to the same number of lines - left alone,
+  /// that makes whatever sits below the header (a SegmentedButton, say)
+  /// shift position every time the toggle changes. Passing this reserves a
+  /// fixed height (this many lines, top-aligned, longer text ellipsized)
+  /// instead of sizing to the current variant, so the header's total
+  /// height - and everything below it - stays put. Leave null (the
+  /// default) for screens with a single fixed description, where sizing
+  /// to content is the more compact, correct behavior.
+  final int? fixedDescriptionLines;
+
   const FeatureScreenHeader({
     super.key,
     required this.icon,
@@ -18,11 +30,25 @@ class FeatureScreenHeader extends StatelessWidget {
     required this.title,
     required this.description,
     required this.steps,
+    this.fixedDescriptionLines,
   });
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
+    const TextStyle descriptionStyle = TextStyle(
+      fontSize: 13.5,
+      height: 1.4,
+    );
+    final Widget descriptionText = Text(
+      description,
+      maxLines: fixedDescriptionLines,
+      overflow: fixedDescriptionLines != null
+          ? TextOverflow.ellipsis
+          : TextOverflow.clip,
+      style: descriptionStyle.copyWith(color: scheme.onSurfaceVariant),
+    );
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
       child: Column(
@@ -53,14 +79,18 @@ class FeatureScreenHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: 13.5,
-              height: 1.4,
-              color: scheme.onSurfaceVariant,
-            ),
-          ),
+          fixedDescriptionLines != null
+              ? SizedBox(
+                  height:
+                      descriptionStyle.fontSize! *
+                      descriptionStyle.height! *
+                      fixedDescriptionLines!,
+                  child: Align(
+                    alignment: AlignmentDirectional.topStart,
+                    child: descriptionText,
+                  ),
+                )
+              : descriptionText,
           const SizedBox(height: 16),
           _StepStrip(steps: steps, color: color),
         ],

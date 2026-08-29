@@ -67,6 +67,7 @@ class ImagePdfScreen extends ConsumerWidget {
               description: isImagesToPdf
                   ? l10n.imagesToPdfDescription
                   : l10n.pdfToImagesDescription,
+              fixedDescriptionLines: 3,
               steps: isImagesToPdf
                   ? [
                       l10n.imagePdfStepAddImages,

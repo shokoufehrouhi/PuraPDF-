@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -99,54 +101,71 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(11),
-                child: Image.asset(
-                  'assets/icon/icon.png',
-                  width: 38,
-                  height: 38,
-                  fit: BoxFit.cover,
+    // The brand lockup (icon + "PuraPDF+") stays pinned top-left and in LTR
+    // order even under RTL locales - it's a logo/name, not translatable
+    // content, and mirroring it looks broken rather than localized. Only
+    // the tagline underneath (real translated text) should follow the
+    // actual locale direction, so it gets its own Directionality pinned
+    // back to that real value inside this forced-LTR subtree.
+    // `intl`'s own TextDirection type is also in scope in this file (for
+    // DateFormat), so this can't be explicitly typed as bare TextDirection
+    // without the compiler picking the wrong one - let it infer instead.
+    final realDirection = Directionality.of(context);
+
+    return Directionality(
+      textDirection: ui.TextDirection.ltr,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(11),
+                  child: Image.asset(
+                    'assets/icon/icon.png',
+                    width: 38,
+                    height: 38,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'PuraPDF',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: scheme.onSurface,
+                const SizedBox(width: 10),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'PuraPDF',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: scheme.onSurface,
+                        ),
                       ),
-                    ),
-                    TextSpan(
-                      text: '+',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.seedColor,
+                      TextSpan(
+                        text: '+',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.seedColor,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Directionality(
+              textDirection: realDirection,
+              child: Text(
+                AppLocalizations.of(context).appTagline,
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: scheme.onSurfaceVariant),
               ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            AppLocalizations.of(context).appTagline,
-            style: Theme.of(context).textTheme.bodyMedium
-                ?.copyWith(color: scheme.onSurfaceVariant),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
