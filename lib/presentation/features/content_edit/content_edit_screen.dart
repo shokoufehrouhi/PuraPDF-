@@ -184,17 +184,99 @@ class ContentEditScreen extends ConsumerWidget {
                           ),
                         ),
                         Expanded(
-                          child: SingleChildScrollView(
+                          child: Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 20,
                             ),
-                            child: _PageCanvas(
-                              state: state,
-                              onTapLine: (lineIndex, text) =>
-                                  _editLine(context, ref, lineIndex, text),
-                              onMoveImage: controller.moveImage,
-                              onRemoveImage: controller.removeImage,
-                            ),
+                            // Pages can pack a lot of small text - pinch (or
+                            // trackpad/ctrl-scroll) to zoom in and clearly
+                            // see which line you're about to tap.
+                            //
+                            // InteractiveViewer's own GestureDetector is
+                            // HitTestBehavior.opaque with a ScaleGestureRecognizer
+                            // that wins the gesture arena for *any* pointer
+                            // movement under it, single-finger included -
+                            // confirmed with a widget test, plain taps still
+                            // reach a nested GestureDetector fine (taps need
+                            // no movement to resolve), but a nested
+                            // onPanUpdate drag never fires at all, even with
+                            // panEnabled:false (that only makes
+                            // InteractiveViewer's own reaction to the
+                            // gesture a no-op - it still wins the arena and
+                            // starves the child). That would silently break
+                            // dragging a pending image into place, so zoom
+                            // only replaces the plain view while there's
+                            // nothing to drag; with a pending image, fall
+                            // back to the old scrollable (non-zoomable)
+                            // rendering so that drag keeps working.
+                            child: state.pendingImages.isEmpty
+                                ? LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      final page =
+                                          state.pages[state.currentPageIndex];
+                                      double fitWidth = constraints.maxWidth;
+                                      double fitHeight =
+                                          fitWidth *
+                                          page.pointsHeight /
+                                          page.pointsWidth;
+                                      if (fitHeight > constraints.maxHeight) {
+                                        fitHeight = constraints.maxHeight;
+                                        fitWidth =
+                                            fitHeight *
+                                            page.pointsWidth /
+                                            page.pointsHeight;
+                                      }
+                                      // constrained:false: InteractiveViewer's
+                                      // own constrained:true auto-fit measures
+                                      // the child against loose/unbounded
+                                      // constraints, which left _PageCanvas's
+                                      // width math seeing bogus constraints
+                                      // and every overlay landing off the
+                                      // page. Doing the fit-to-viewport math
+                                      // by hand (BoxFit.contain-style)
+                                      // against this Padding's real bounded
+                                      // size sidesteps that.
+                                      return InteractiveViewer(
+                                        constrained: false,
+                                        minScale: 1.0,
+                                        maxScale: 4.0,
+                                        child: _PageCanvas(
+                                          width: fitWidth,
+                                          state: state,
+                                          onTapLine: (lineIndex, text) =>
+                                              _editLine(
+                                                context,
+                                                ref,
+                                                lineIndex,
+                                                text,
+                                              ),
+                                          onMoveImage: controller.moveImage,
+                                          onRemoveImage:
+                                              controller.removeImage,
+                                        ),
+                                      );
+                                    },
+                                  )
+                                : SingleChildScrollView(
+                                    child: LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        return _PageCanvas(
+                                          width: constraints.maxWidth,
+                                          state: state,
+                                          onTapLine: (lineIndex, text) =>
+                                              _editLine(
+                                                context,
+                                                ref,
+                                                lineIndex,
+                                                text,
+                                              ),
+                                          onMoveImage: controller.moveImage,
+                                          onRemoveImage:
+                                              controller.removeImage,
+                                        );
+                                      },
+                                    ),
+                                  ),
                           ),
                         ),
                         Padding(
@@ -272,6 +354,7 @@ class ContentEditScreen extends ConsumerWidget {
 /// image insert — all positioned as fractions of the page so this doesn't
 /// need to know the underlying render resolution.
 class _PageCanvas extends StatelessWidget {
+  final double width;
   final ContentEditState state;
   final void Function(int lineIndex, String text) onTapLine;
   final void Function(int pendingIndex, double leftFrac, double topFrac)
@@ -279,6 +362,7 @@ class _PageCanvas extends StatelessWidget {
   final void Function(int pendingIndex) onRemoveImage;
 
   const _PageCanvas({
+    required this.width,
     required this.state,
     required this.onTapLine,
     required this.onMoveImage,
@@ -299,57 +383,53 @@ class _PageCanvas extends StatelessWidget {
           (index: i, image: state.pendingImages[i]),
     ];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double dispWidth = constraints.maxWidth;
-        final double dispHeight =
-            dispWidth * page.pointsHeight / page.pointsWidth;
+    final double dispWidth = width;
+    final double dispHeight =
+        dispWidth * page.pointsHeight / page.pointsWidth;
 
-        return SizedBox(
-          width: dispWidth,
-          height: dispHeight,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.memory(page.bytes, fit: BoxFit.fill),
+    return SizedBox(
+      width: dispWidth,
+      height: dispHeight,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.memory(page.bytes, fit: BoxFit.fill),
+            ),
+          ),
+          for (final entry in lines)
+            Positioned(
+              left: entry.line.left / page.pointsWidth * dispWidth,
+              top: entry.line.top / page.pointsHeight * dispHeight,
+              width: entry.line.width / page.pointsWidth * dispWidth,
+              height: entry.line.height / page.pointsHeight * dispHeight,
+              child: _LineOverlay(
+                edited: state.textEdits.containsKey(entry.index),
+                onTap: () => onTapLine(
+                  entry.index,
+                  state.textEdits[entry.index] ?? entry.line.text,
                 ),
               ),
-              for (final entry in lines)
-                Positioned(
-                  left: entry.line.left / page.pointsWidth * dispWidth,
-                  top: entry.line.top / page.pointsHeight * dispHeight,
-                  width: entry.line.width / page.pointsWidth * dispWidth,
-                  height: entry.line.height / page.pointsHeight * dispHeight,
-                  child: _LineOverlay(
-                    edited: state.textEdits.containsKey(entry.index),
-                    onTap: () => onTapLine(
-                      entry.index,
-                      state.textEdits[entry.index] ?? entry.line.text,
-                    ),
-                  ),
+            ),
+          for (final entry in images)
+            Positioned(
+              left: entry.image.leftFrac * dispWidth,
+              top: entry.image.topFrac * dispHeight,
+              width: entry.image.widthFrac * dispWidth,
+              height: entry.image.heightFrac * dispHeight,
+              child: _PendingImageOverlay(
+                image: entry.image,
+                onDrag: (delta) => onMoveImage(
+                  entry.index,
+                  entry.image.leftFrac + delta.dx / dispWidth,
+                  entry.image.topFrac + delta.dy / dispHeight,
                 ),
-              for (final entry in images)
-                Positioned(
-                  left: entry.image.leftFrac * dispWidth,
-                  top: entry.image.topFrac * dispHeight,
-                  width: entry.image.widthFrac * dispWidth,
-                  height: entry.image.heightFrac * dispHeight,
-                  child: _PendingImageOverlay(
-                    image: entry.image,
-                    onDrag: (delta) => onMoveImage(
-                      entry.index,
-                      entry.image.leftFrac + delta.dx / dispWidth,
-                      entry.image.topFrac + delta.dy / dispHeight,
-                    ),
-                    onRemove: () => onRemoveImage(entry.index),
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
+                onRemove: () => onRemoveImage(entry.index),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
