@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/error_message.dart';
 import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/pdf_file.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
@@ -39,6 +41,7 @@ class SignatureScreen extends ConsumerWidget {
     final state = ref.watch(signatureControllerProvider);
     final controller = ref.read(signatureControllerProvider.notifier);
     final ColorScheme scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -50,20 +53,23 @@ class SignatureScreen extends ConsumerWidget {
         top: false,
         child: Column(
           children: [
-            const FeatureScreenHeader(
+            FeatureScreenHeader(
               icon: Icons.draw_outlined,
               color: _color,
-              title: 'Digital Signature',
-              description:
-                  'Draw or type a signature, place it on any page, and '
-                  'save.',
-              steps: ['Select PDF', 'Sign', 'Place', 'Save'],
+              title: l10n.signatureTitle,
+              description: l10n.signatureDescription,
+              steps: [
+                l10n.signatureStepSelect,
+                l10n.signatureStepCreate,
+                l10n.signatureStepPlace,
+                l10n.save,
+              ],
             ),
             if (state.error != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                 child: Text(
-                  state.error!,
+                  localizedError(context, state.error!),
                   style: TextStyle(color: scheme.error),
                 ),
               ),
@@ -76,8 +82,8 @@ class SignatureScreen extends ConsumerWidget {
                         child: PickerCard(
                           icon: Icons.upload_file,
                           color: _color,
-                          label: 'Select a PDF',
-                          hint: 'Tap to browse your files',
+                          label: l10n.selectAPdf,
+                          hint: l10n.tapToBrowseFiles,
                           onTap: () => _pickFile(ref),
                         ),
                       ),
@@ -85,7 +91,7 @@ class SignatureScreen extends ConsumerWidget {
                   : state.isLoadingPages
                   ? const Center(child: CircularProgressIndicator())
                   : state.pages.isEmpty
-                  ? const Center(child: Text('This PDF has no pages.'))
+                  ? Center(child: Text(l10n.thisPdfHasNoPages))
                   : Column(
                       children: [
                         Padding(
@@ -94,7 +100,7 @@ class SignatureScreen extends ConsumerWidget {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.chevron_left),
-                                tooltip: 'Previous page',
+                                tooltip: l10n.previousPage,
                                 onPressed: state.currentPageIndex > 0
                                     ? () => controller.setPage(
                                         state.currentPageIndex - 1,
@@ -103,8 +109,10 @@ class SignatureScreen extends ConsumerWidget {
                               ),
                               Expanded(
                                 child: Text(
-                                  'Page ${state.currentPageIndex + 1} of '
-                                  '${state.pages.length}',
+                                  l10n.pageOfTotal(
+                                    state.currentPageIndex + 1,
+                                    state.pages.length,
+                                  ),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
@@ -114,7 +122,7 @@ class SignatureScreen extends ConsumerWidget {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.chevron_right),
-                                tooltip: 'Next page',
+                                tooltip: l10n.nextPage,
                                 onPressed:
                                     state.currentPageIndex <
                                         state.pages.length - 1
@@ -153,8 +161,8 @@ class SignatureScreen extends ConsumerWidget {
                             ),
                             label: Text(
                               state.signatureBytes == null
-                                  ? 'Add Signature'
-                                  : 'Change Signature',
+                                  ? l10n.addSignature
+                                  : l10n.changeSignature,
                             ),
                             onPressed: () => _createSignature(context, ref),
                           ),
@@ -198,8 +206,8 @@ class SignatureScreen extends ConsumerWidget {
                                 : const Icon(Icons.save_outlined),
                             label: Text(
                               state.signatureBytes == null
-                                  ? 'Add a signature first'
-                                  : 'Save signed PDF',
+                                  ? l10n.errorAddSignatureFirst
+                                  : l10n.signatureStepSave,
                             ),
                             onPressed:
                                 state.isProcessing ||
@@ -285,6 +293,7 @@ class _ResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -293,14 +302,14 @@ class _ResultCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.check_circle, color: _color),
-              SizedBox(width: 8),
+              const Icon(Icons.check_circle, color: _color),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'PDF signed successfully',
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                  l10n.pdfSignedSuccess,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),
             ],
@@ -315,7 +324,7 @@ class _ResultCard extends StatelessWidget {
                     foregroundColor: Colors.white,
                   ),
                   icon: const Icon(Icons.ios_share),
-                  label: const Text('Share'),
+                  label: Text(l10n.share),
                   onPressed: () => SharePlus.instance.share(
                     ShareParams(files: [XFile(path)]),
                   ),
@@ -329,7 +338,7 @@ class _ResultCard extends StatelessWidget {
                     side: BorderSide(color: _color.withValues(alpha: 0.5)),
                   ),
                   icon: const Icon(Icons.download_outlined),
-                  label: const Text('Download'),
+                  label: Text(l10n.download),
                   onPressed: () => downloadFile(context, path),
                 ),
               ),

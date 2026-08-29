@@ -68,7 +68,7 @@ class CompressController extends Notifier<CompressState> {
   Future<void> compress() async {
     final file = state.sourceFile;
     if (file == null) {
-      state = state.copyWith(error: 'Avval ye PDF entekhab kon.');
+      state = state.copyWith(error: 'errorSelectPdfFirst');
       return;
     }
     await AdsService.instance.interstitial.showBeforeOperation();

@@ -9,11 +9,11 @@ class SplitPdfUseCase {
 
   Future<List<String>> call(String inputPath, List<PageRange> ranges) async {
     if (ranges.isEmpty) {
-      throw ArgumentError('Provide at least one page range to split.');
+      throw ArgumentError('errorProvideAtLeastOneRange');
     }
     for (final range in ranges) {
       if (!range.isValid) {
-        throw ArgumentError('Invalid page range: $range');
+        throw ArgumentError('errorInvalidPageRange:$range');
       }
     }
     final pageCount = await repository.getPageCount(inputPath);

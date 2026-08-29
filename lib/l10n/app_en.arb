@@ -1,0 +1,366 @@
+{
+  "@@locale": "en",
+  "appName": "PuraPDF+",
+  "appTagline": "Your PDF toolkit — merge, split, compress, and convert, all on-device.",
+  "categoryOrganize": "Organize",
+  "categoryEditProtect": "Edit & Protect",
+  "recentsTooltip": "Recents",
+  "backToToolsTooltip": "Back to tools",
+  "themeLightTooltip": "Light theme",
+  "themeDarkTooltip": "Dark theme",
+  "languageTooltip": "Language",
+  "featureMergeTitle": "Merge PDFs",
+  "featureMergeSubtitle": "Combine multiple documents",
+  "featureSplitTitle": "Split PDF",
+  "featureSplitSubtitle": "Separate into pages or sections",
+  "featureCompressTitle": "Compress PDF",
+  "featureCompressSubtitle": "Optimize file size for sharing",
+  "featureImagePdfTitle": "Image ⇄ PDF",
+  "featureImagePdfSubtitle": "Convert between formats",
+  "featureScanTitle": "Scan Document",
+  "featureScanSubtitle": "Capture paper documents with your camera",
+  "featurePageEditTitle": "Edit Pages",
+  "featurePageEditSubtitle": "Rotate, reorder, or remove pages",
+  "featureContentEditTitle": "Edit PDF",
+  "featureContentEditSubtitle": "Fix text, remove a line, add an image",
+  "featureEncryptTitle": "Password Protect",
+  "featureEncryptSubtitle": "Add or remove a PDF password",
+  "featureWatermarkTitle": "Watermark",
+  "featureWatermarkSubtitle": "Stamp text across every page",
+  "featureSignatureTitle": "Digital Signature",
+  "featureSignatureSubtitle": "Draw or type a signature, place it, save",
+  "recentsEmptyTitle": "No files yet",
+  "recentsEmptyBody": "Files you create with Merge, Split, Compress, or Image ⇄ PDF will show up here.",
+  "browseTools": "Browse tools",
+  "clear": "Clear",
+  "clearAllTitle": "Clear all recents?",
+  "clearAllBody": "This deletes every file listed here from your device. This cannot be undone.",
+  "cancel": "Cancel",
+  "clearAllConfirm": "Clear all",
+  "opUnknown": "File",
+  "opMerge": "Merge",
+  "opSplit": "Split",
+  "opCompress": "Compress",
+  "opImageToPdf": "Image → PDF",
+  "opPdfToImage": "PDF → Image",
+  "opScan": "Scan",
+  "opPageEdit": "Edit Pages",
+  "opContentEdit": "Edit PDF",
+  "opLocked": "Locked",
+  "opUnlocked": "Unlocked",
+  "opWatermark": "Watermark",
+  "opSigned": "Signed",
+  "share": "Share",
+  "download": "Download",
+  "startOver": "Start over",
+  "save": "Save",
+  "remove": "Remove",
+  "selectAPdf": "Select a PDF",
+  "selectPdf": "Select PDF",
+  "tapToBrowseFiles": "Tap to browse your files",
+  "tapToChangeFile": "Tap to change file",
+  "previousPage": "Previous page",
+  "nextPage": "Next page",
+  "downloadSavedToDownloads": "Saved to Downloads: {fileName}",
+  "@downloadSavedToDownloads": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "downloadSaved": "Saved: {fileName}",
+  "@downloadSaved": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "downloadCancelled": "Cancelled",
+  "downloadNoDirectory": "No Downloads directory available",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "errorSelectPdfFirst": "Select a PDF first.",
+  "errorEnterPassword": "Enter a password.",
+  "errorEnterPdfPassword": "Enter the PDF's password.",
+  "errorPasswordNoSpaces": "Password can't contain spaces.",
+  "errorPasswordTooShort": "Password must be at least {minLength} characters.",
+  "@errorPasswordTooShort": {
+    "placeholders": {
+      "minLength": {}
+    }
+  },
+  "errorPasswordsDontMatch": "Passwords don't match.",
+  "errorAtLeastOnePageMustRemain": "At least one page must remain.",
+  "errorAtLeastOnePageMustRemainInPdf": "At least one page must remain in the PDF.",
+  "errorMakeAChangeBeforeSaving": "Make at least one change before saving.",
+  "errorSelectAtLeastOneImage": "Select at least one image.",
+  "errorMergeNeedsTwoFiles": "Merge requires at least 2 PDF files.",
+  "errorNewNameEmpty": "New name cannot be empty.",
+  "errorScanAtLeastOnePage": "Scan at least one page.",
+  "errorScanAtLeastOnePageFirst": "Scan at least one page first.",
+  "errorProvideAtLeastOneRange": "Provide at least one page range to split.",
+  "errorInvalidPageRange": "Invalid page range: {range}",
+  "@errorInvalidPageRange": {
+    "placeholders": {
+      "range": {}
+    }
+  },
+  "errorRangeExceedsPageCount": "Range {range} exceeds document page count ({pageCount}).",
+  "@errorRangeExceedsPageCount": {
+    "placeholders": {
+      "range": {},
+      "pageCount": {}
+    }
+  },
+  "errorEnterWatermarkText": "Enter watermark text.",
+  "errorAddSignatureFirst": "Add a signature first.",
+  "errorPageIndexOutOfRange": "Page index {index} out of range (0-{max}).",
+  "@errorPageIndexOutOfRange": {
+    "placeholders": {
+      "index": {},
+      "max": {}
+    }
+  },
+  "errorWrongPasswordOrNotProtected": "Wrong password, or this PDF isn't password-protected.",
+  "errorUnsupportedImageFormat": "This image format isn't supported. Try a JPEG or PNG instead.",
+  "mergeTitle": "Merge PDFs",
+  "mergeDescription": "Combine multiple PDF files into a single document, in whatever order you like.",
+  "mergeStepAdd": "Add files",
+  "mergeStepReorder": "Reorder",
+  "mergeStepMerge": "Merge",
+  "mergeStepSave": "Save",
+  "mergeAddFiles": "Add PDF files",
+  "mergeAddFilesHint": "You can select multiple files at once",
+  "mergeFileCount": "{count, plural, one{1 file} other{{count} files}} — drag to reorder",
+  "@mergeFileCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "addMore": "Add more",
+  "mergeButtonNeedsMore": "Add at least 2 files to merge",
+  "mergeButtonReady": "Merge {count} files",
+  "@mergeButtonReady": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "mergeSuccess": "Merged successfully",
+  "splitTitle": "Split PDF",
+  "splitDescription": "Break a PDF into separate files — by page or by custom ranges.",
+  "splitStepSelect": "Select PDF",
+  "splitStepChoose": "Choose pages",
+  "splitStepSplit": "Split",
+  "splitStepSave": "Save",
+  "splitPageCountHint": "{count} pages — tap to change file",
+  "@splitPageCountHint": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "splitOneFilePerPage": "Split into one file per page",
+  "splitPageRanges": "Page ranges",
+  "splitPageRangesHint": "e.g. 1-3, 5, 7-9",
+  "splitButton": "Split",
+  "splitFilesCreated": "{count, plural, one{1 file created} other{{count} files created}}",
+  "@splitFilesCreated": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "shareZip": "Share ZIP",
+  "downloadZip": "Download ZIP",
+  "compressTitle": "Compress PDF",
+  "compressDescription": "Shrink a PDF's file size for easier sharing, with three quality levels to choose from.",
+  "compressStepSelect": "Select PDF",
+  "compressStepLevel": "Pick level",
+  "compressStepCompress": "Compress",
+  "compressStepSave": "Save",
+  "compressOriginalSizeHint": "Original size: {size} — tap to change file",
+  "@compressOriginalSizeHint": {
+    "placeholders": {
+      "size": {}
+    }
+  },
+  "compressLow": "Low",
+  "compressMedium": "Medium",
+  "compressHigh": "High",
+  "compressHighWarning": "High rebuilds every page as an image — best size reduction for scans/photos, but the result loses selectable/searchable text. On text-heavy PDFs where that would backfire, it automatically falls back so the result is never bigger than the original.",
+  "compressButton": "Compress",
+  "compressReductionPercent": "{percent}% smaller",
+  "@compressReductionPercent": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "compressBeforeAfter": "Before: {before}  →  After: {after}",
+  "@compressBeforeAfter": {
+    "placeholders": {
+      "before": {},
+      "after": {}
+    }
+  },
+  "imagePdfTitle": "Image ⇄ PDF",
+  "imagesToPdfDescription": "Turn one or more photos into a single PDF document.",
+  "pdfToImagesDescription": "Export every page of a PDF as a separate image file.",
+  "imagePdfStepAddImages": "Add images",
+  "imagePdfStepConvert": "Convert",
+  "imagePdfStepSave": "Save",
+  "imagePdfStepSelect": "Select PDF",
+  "imagePdfStepFormat": "Pick format",
+  "imagesToPdfSegment": "Images → PDF",
+  "pdfToImagesSegment": "PDF → Images",
+  "addImages": "Add images",
+  "addImagesHint": "You can select multiple photos at once",
+  "imagesSelectedCount": "{count, plural, one{1 image selected} other{{count} images selected}}",
+  "@imagesSelectedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pdfCreatedSuccess": "PDF created successfully",
+  "convertButton": "Convert",
+  "convertButtonEmpty": "Add images to convert",
+  "convertButtonReady": "{count, plural, one{Convert 1 image} other{Convert {count} images}}",
+  "@convertButtonReady": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "imagesCreatedCount": "{count, plural, one{1 image created} other{{count} images created}}",
+  "@imagesCreatedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "scanTitle": "Scan Document",
+  "scanDescription": "Turn photos of paper documents into a clean PDF — edge detection and cropping happen automatically as you scan.",
+  "scanStepScan": "Scan",
+  "scanStepReorder": "Reorder",
+  "scanStepCreatePdf": "Create PDF",
+  "scanStepSave": "Save",
+  "scanADocument": "Scan a document",
+  "scanHint": "Uses your camera — edges are detected and cropped automatically",
+  "openingCamera": "Opening camera…",
+  "scanMore": "Scan more",
+  "scanPageCount": "{count, plural, one{1 page} other{{count} pages}} — drag to reorder",
+  "@scanPageCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pageNumberLabel": "Page {number}",
+  "@pageNumberLabel": {
+    "placeholders": {
+      "number": {}
+    }
+  },
+  "createPdfButton": "Create PDF",
+  "createPdfButtonReady": "{count, plural, one{Create PDF from 1 page} other{Create PDF from {count} pages}}",
+  "@createPdfButtonReady": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pageEditTitle": "Edit Pages",
+  "pageEditDescription": "Rotate, reorder, or remove pages from a PDF — the rest of the document stays untouched.",
+  "pageEditStepSelect": "Select PDF",
+  "pageEditStepEdit": "Edit pages",
+  "pageEditStepSave": "Save changes",
+  "rotate": "Rotate",
+  "removePage": "Remove page",
+  "saveChanges": "Save changes",
+  "pdfSavedSuccess": "PDF saved successfully",
+  "contentEditTitle": "Edit PDF",
+  "contentEditDescription": "Tap a line to fix or remove it, or drop in an image — edits cover the original spot rather than reflowing the page.",
+  "contentEditStepSelect": "Select PDF",
+  "contentEditStepEdit": "Tap to edit",
+  "contentEditStepSave": "Save changes",
+  "editLine": "Edit line",
+  "lineText": "Line text",
+  "delete": "Delete",
+  "addImageToPage": "Add image to this page",
+  "addImage": "Add image",
+  "thisPdfHasNoPages": "This PDF has no pages.",
+  "encryptTitle": "Password Protect",
+  "encryptDescription": "Lock a PDF with a password so only people who know it can open it.",
+  "addPasswordSegment": "Add Password",
+  "removePasswordSegment": "Remove Password",
+  "password": "Password",
+  "currentPassword": "Current password",
+  "confirmPassword": "Confirm password",
+  "passwordHelperText": "At least {minLength} characters, no spaces",
+  "@passwordHelperText": {
+    "placeholders": {
+      "minLength": {}
+    }
+  },
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "lockButton": "Lock",
+  "unlockButton": "Unlock",
+  "passwordAdded": "Password added",
+  "passwordRemoved": "Password removed",
+  "watermarkTitle": "Watermark",
+  "watermarkDescription": "Stamp text diagonally across every page — great for \"DRAFT\", \"CONFIDENTIAL\", or a company name.",
+  "watermarkStepSelect": "Select PDF",
+  "watermarkStepText": "Set text",
+  "watermarkStepStamp": "Stamp",
+  "watermarkStepSave": "Save",
+  "watermarkText": "Watermark text",
+  "watermarkTextHint": "e.g. CONFIDENTIAL",
+  "color": "Color",
+  "opacityPercent": "Opacity: {percent}%",
+  "@opacityPercent": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "sizeValue": "Size: {size}",
+  "@sizeValue": {
+    "placeholders": {
+      "size": {}
+    }
+  },
+  "watermarkButton": "Stamp",
+  "watermarkAdded": "Watermark added",
+  "signatureTitle": "Digital Signature",
+  "signatureDescription": "Draw or type a signature, place it on any page, and save.",
+  "signatureStepSelect": "Select PDF",
+  "signatureStepCreate": "Set signature",
+  "signatureStepPlace": "Place",
+  "signatureStepSave": "Save signed PDF",
+  "addSignature": "Add Signature",
+  "changeSignature": "Change Signature",
+  "placeButton": "Place",
+  "signButton": "Sign",
+  "pdfSignedSuccess": "PDF signed successfully",
+  "signaturePadDraw": "Draw",
+  "signaturePadType": "Type",
+  "signaturePadCreateTitle": "Create Signature",
+  "signaturePadDrawHint": "Sign with your finger or mouse",
+  "signaturePadClear": "Clear",
+  "signaturePadColor": "Color",
+  "signaturePadStyle": "Style",
+  "signaturePadYourName": "Your name",
+  "signaturePadTypeYourName": "Type your name",
+  "signaturePadDone": "Done",
+  "signaturePadFontCasual": "Casual",
+  "signaturePadFontElegant": "Elegant",
+  "signaturePadFontBold": "Bold",
+  "colorBlack": "Black",
+  "colorBlue": "Blue",
+  "colorRed": "Red",
+  "colorGreen": "Green",
+  "languagePickerTitle": "Choose your language",
+  "languagePickerSubtitle": "You can change this later from the home screen.",
+  "languagePickerContinue": "Continue",
+  "changeFile": "Change file",
+  "pageOfTotal": "Page {current} of {total}",
+  "@pageOfTotal": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "encryptRemoveDescription": "Remove a PDF's password, given the correct one.",
+  "encryptStepSetPassword": "Set password",
+  "encryptStepEnterPassword": "Enter password"
+}

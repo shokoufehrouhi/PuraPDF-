@@ -1,0 +1,366 @@
+{
+  "@@locale": "fa",
+  "appName": "PuraPDF+",
+  "appTagline": "ابزار PDF شما — ادغام، تقسیم، فشرده‌سازی و تبدیل، همه روی دستگاه.",
+  "categoryOrganize": "سازمان‌دهی",
+  "categoryEditProtect": "ویرایش و محافظت",
+  "recentsTooltip": "اخیر",
+  "backToToolsTooltip": "بازگشت به ابزارها",
+  "themeLightTooltip": "پوسته روشن",
+  "themeDarkTooltip": "پوسته تیره",
+  "languageTooltip": "زبان",
+  "featureMergeTitle": "ادغام PDF",
+  "featureMergeSubtitle": "ترکیب چند سند",
+  "featureSplitTitle": "تقسیم PDF",
+  "featureSplitSubtitle": "جدا کردن به صفحه یا بخش",
+  "featureCompressTitle": "فشرده‌سازی PDF",
+  "featureCompressSubtitle": "بهینه‌سازی حجم برای اشتراک‌گذاری",
+  "featureImagePdfTitle": "تصویر ⇄ PDF",
+  "featureImagePdfSubtitle": "تبدیل بین فرمت‌ها",
+  "featureScanTitle": "اسکن سند",
+  "featureScanSubtitle": "ثبت اسناد کاغذی با دوربین",
+  "featurePageEditTitle": "ویرایش صفحات",
+  "featurePageEditSubtitle": "چرخش، جابجایی یا حذف صفحات",
+  "featureContentEditTitle": "ویرایش PDF",
+  "featureContentEditSubtitle": "اصلاح متن، حذف خط، افزودن تصویر",
+  "featureEncryptTitle": "محافظت با رمز",
+  "featureEncryptSubtitle": "افزودن یا حذف رمز عبور PDF",
+  "featureWatermarkTitle": "واترمارک",
+  "featureWatermarkSubtitle": "درج متن روی تمام صفحات",
+  "featureSignatureTitle": "امضای دیجیتال",
+  "featureSignatureSubtitle": "کشیدن یا تایپ امضا، قرار دادن، ذخیره",
+  "recentsEmptyTitle": "هنوز فایلی نیست",
+  "recentsEmptyBody": "فایل‌هایی که با ادغام، تقسیم، فشرده‌سازی یا تصویر ⇄ PDF می‌سازید اینجا نمایش داده می‌شوند.",
+  "browseTools": "مرور ابزارها",
+  "clear": "پاک کردن",
+  "clearAllTitle": "همه موارد اخیر پاک شوند؟",
+  "clearAllBody": "این کار همه فایل‌های این لیست را از دستگاه شما حذف می‌کند. این عمل قابل بازگشت نیست.",
+  "cancel": "لغو",
+  "clearAllConfirm": "پاک کردن همه",
+  "opUnknown": "فایل",
+  "opMerge": "ادغام",
+  "opSplit": "تقسیم",
+  "opCompress": "فشرده‌سازی",
+  "opImageToPdf": "تصویر → PDF",
+  "opPdfToImage": "PDF → تصویر",
+  "opScan": "اسکن",
+  "opPageEdit": "ویرایش صفحات",
+  "opContentEdit": "ویرایش PDF",
+  "opLocked": "قفل‌شده",
+  "opUnlocked": "بازشده",
+  "opWatermark": "واترمارک",
+  "opSigned": "امضاشده",
+  "share": "اشتراک‌گذاری",
+  "download": "دانلود",
+  "startOver": "شروع دوباره",
+  "save": "ذخیره",
+  "remove": "حذف",
+  "selectAPdf": "انتخاب یک PDF",
+  "selectPdf": "انتخاب PDF",
+  "tapToBrowseFiles": "برای مرور فایل‌ها ضربه بزنید",
+  "tapToChangeFile": "برای تغییر فایل ضربه بزنید",
+  "previousPage": "صفحه قبل",
+  "nextPage": "صفحه بعد",
+  "downloadSavedToDownloads": "در Downloads ذخیره شد: {fileName}",
+  "@downloadSavedToDownloads": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "downloadSaved": "ذخیره شد: {fileName}",
+  "@downloadSaved": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "downloadCancelled": "لغو شد",
+  "downloadNoDirectory": "پوشه Downloads در دسترس نیست",
+  "errorGeneric": "مشکلی پیش آمد. دوباره امتحان کنید.",
+  "errorSelectPdfFirst": "اول یک PDF انتخاب کنید.",
+  "errorEnterPassword": "رمز عبور را وارد کنید.",
+  "errorEnterPdfPassword": "رمز عبور PDF را وارد کنید.",
+  "errorPasswordNoSpaces": "رمز عبور نمی‌تواند فاصله داشته باشد.",
+  "errorPasswordTooShort": "رمز عبور باید حداقل {minLength} کاراکتر باشد.",
+  "@errorPasswordTooShort": {
+    "placeholders": {
+      "minLength": {}
+    }
+  },
+  "errorPasswordsDontMatch": "رمزهای عبور مطابقت ندارند.",
+  "errorAtLeastOnePageMustRemain": "حداقل یک صفحه باید باقی بماند.",
+  "errorAtLeastOnePageMustRemainInPdf": "حداقل یک صفحه باید در PDF باقی بماند.",
+  "errorMakeAChangeBeforeSaving": "قبل از ذخیره حداقل یک تغییر ایجاد کنید.",
+  "errorSelectAtLeastOneImage": "حداقل یک تصویر انتخاب کنید.",
+  "errorMergeNeedsTwoFiles": "برای ادغام حداقل به ۲ فایل PDF نیاز است.",
+  "errorNewNameEmpty": "نام جدید نمی‌تواند خالی باشد.",
+  "errorScanAtLeastOnePage": "حداقل یک صفحه اسکن کنید.",
+  "errorScanAtLeastOnePageFirst": "اول حداقل یک صفحه اسکن کنید.",
+  "errorProvideAtLeastOneRange": "حداقل یک بازه صفحه برای تقسیم وارد کنید.",
+  "errorInvalidPageRange": "بازه صفحه نامعتبر: {range}",
+  "@errorInvalidPageRange": {
+    "placeholders": {
+      "range": {}
+    }
+  },
+  "errorRangeExceedsPageCount": "بازه {range} از تعداد صفحات سند ({pageCount}) بیشتر است.",
+  "@errorRangeExceedsPageCount": {
+    "placeholders": {
+      "range": {},
+      "pageCount": {}
+    }
+  },
+  "errorEnterWatermarkText": "متن واترمارک را وارد کنید.",
+  "errorAddSignatureFirst": "اول یک امضا اضافه کنید.",
+  "errorPageIndexOutOfRange": "شماره صفحه {index} خارج از محدوده است (۰ تا {max}).",
+  "@errorPageIndexOutOfRange": {
+    "placeholders": {
+      "index": {},
+      "max": {}
+    }
+  },
+  "errorWrongPasswordOrNotProtected": "رمز عبور اشتباه است، یا این PDF رمزگذاری نشده.",
+  "errorUnsupportedImageFormat": "این فرمت تصویر پشتیبانی نمی‌شود. یک JPEG یا PNG امتحان کنید.",
+  "mergeTitle": "ادغام PDF",
+  "mergeDescription": "چند فایل PDF را با هر ترتیبی که بخواهید در یک سند ادغام کنید.",
+  "mergeStepAdd": "افزودن فایل",
+  "mergeStepReorder": "جابجایی",
+  "mergeStepMerge": "ادغام",
+  "mergeStepSave": "ذخیره",
+  "mergeAddFiles": "افزودن فایل‌های PDF",
+  "mergeAddFilesHint": "می‌توانید چند فایل را همزمان انتخاب کنید",
+  "mergeFileCount": "{count, plural, one{۱ فایل} other{{count} فایل}} — برای جابجایی بکشید",
+  "@mergeFileCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "addMore": "افزودن بیشتر",
+  "mergeButtonNeedsMore": "برای ادغام حداقل ۲ فایل اضافه کنید",
+  "mergeButtonReady": "ادغام {count} فایل",
+  "@mergeButtonReady": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "mergeSuccess": "با موفقیت ادغام شد",
+  "splitTitle": "تقسیم PDF",
+  "splitDescription": "یک PDF را به فایل‌های جداگانه تقسیم کنید — بر اساس صفحه یا بازه‌های دلخواه.",
+  "splitStepSelect": "انتخاب PDF",
+  "splitStepChoose": "انتخاب صفحات",
+  "splitStepSplit": "تقسیم",
+  "splitStepSave": "ذخیره",
+  "splitPageCountHint": "{count} صفحه — برای تغییر فایل ضربه بزنید",
+  "@splitPageCountHint": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "splitOneFilePerPage": "تقسیم به یک فایل برای هر صفحه",
+  "splitPageRanges": "بازه صفحات",
+  "splitPageRangesHint": "مثلاً ۱-۳، ۵، ۷-۹",
+  "splitButton": "تقسیم",
+  "splitFilesCreated": "{count, plural, one{۱ فایل ساخته شد} other{{count} فایل ساخته شد}}",
+  "@splitFilesCreated": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "shareZip": "اشتراک‌گذاری ZIP",
+  "downloadZip": "دانلود ZIP",
+  "compressTitle": "فشرده‌سازی PDF",
+  "compressDescription": "حجم فایل PDF را برای اشتراک‌گذاری آسان‌تر کاهش دهید، با سه سطح کیفیت.",
+  "compressStepSelect": "انتخاب PDF",
+  "compressStepLevel": "انتخاب سطح",
+  "compressStepCompress": "فشرده‌سازی",
+  "compressStepSave": "ذخیره",
+  "compressOriginalSizeHint": "حجم اصلی: {size} — برای تغییر فایل ضربه بزنید",
+  "@compressOriginalSizeHint": {
+    "placeholders": {
+      "size": {}
+    }
+  },
+  "compressLow": "کم",
+  "compressMedium": "متوسط",
+  "compressHigh": "زیاد",
+  "compressHighWarning": "سطح «زیاد» هر صفحه را به تصویر تبدیل می‌کند — بهترین کاهش حجم برای اسکن/عکس، اما متن قابل انتخاب/جستجو از بین می‌رود. در PDFهای متنی که این کار نتیجه معکوس بدهد، به‌طور خودکار به روش دیگری برمی‌گردد تا نتیجه هرگز از فایل اصلی بزرگ‌تر نشود.",
+  "compressButton": "فشرده‌سازی",
+  "compressReductionPercent": "{percent}٪ کوچک‌تر",
+  "@compressReductionPercent": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "compressBeforeAfter": "قبل: {before}  ←  بعد: {after}",
+  "@compressBeforeAfter": {
+    "placeholders": {
+      "before": {},
+      "after": {}
+    }
+  },
+  "imagePdfTitle": "تصویر ⇄ PDF",
+  "imagesToPdfDescription": "یک یا چند عکس را به یک سند PDF تبدیل کنید.",
+  "pdfToImagesDescription": "هر صفحه از یک PDF را به‌صورت فایل تصویر جداگانه استخراج کنید.",
+  "imagePdfStepAddImages": "افزودن تصویر",
+  "imagePdfStepConvert": "تبدیل",
+  "imagePdfStepSave": "ذخیره",
+  "imagePdfStepSelect": "انتخاب PDF",
+  "imagePdfStepFormat": "انتخاب فرمت",
+  "imagesToPdfSegment": "تصویر → PDF",
+  "pdfToImagesSegment": "PDF → تصویر",
+  "addImages": "افزودن تصویر",
+  "addImagesHint": "می‌توانید چند عکس را همزمان انتخاب کنید",
+  "imagesSelectedCount": "{count, plural, one{۱ تصویر انتخاب شد} other{{count} تصویر انتخاب شد}}",
+  "@imagesSelectedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pdfCreatedSuccess": "PDF با موفقیت ساخته شد",
+  "convertButton": "تبدیل",
+  "convertButtonEmpty": "برای تبدیل، تصویر اضافه کنید",
+  "convertButtonReady": "{count, plural, one{تبدیل ۱ تصویر} other{تبدیل {count} تصویر}}",
+  "@convertButtonReady": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "imagesCreatedCount": "{count, plural, one{۱ تصویر ساخته شد} other{{count} تصویر ساخته شد}}",
+  "@imagesCreatedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "scanTitle": "اسکن سند",
+  "scanDescription": "عکس اسناد کاغذی را به یک PDF تمیز تبدیل کنید — تشخیص لبه و برش هنگام اسکن به‌طور خودکار انجام می‌شود.",
+  "scanStepScan": "اسکن",
+  "scanStepReorder": "جابجایی",
+  "scanStepCreatePdf": "ساخت PDF",
+  "scanStepSave": "ذخیره",
+  "scanADocument": "اسکن یک سند",
+  "scanHint": "از دوربین استفاده می‌کند — لبه‌ها به‌طور خودکار تشخیص و برش داده می‌شوند",
+  "openingCamera": "در حال باز کردن دوربین…",
+  "scanMore": "اسکن بیشتر",
+  "scanPageCount": "{count, plural, one{۱ صفحه} other{{count} صفحه}} — برای جابجایی بکشید",
+  "@scanPageCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pageNumberLabel": "صفحه {number}",
+  "@pageNumberLabel": {
+    "placeholders": {
+      "number": {}
+    }
+  },
+  "createPdfButton": "ساخت PDF",
+  "createPdfButtonReady": "{count, plural, one{ساخت PDF از ۱ صفحه} other{ساخت PDF از {count} صفحه}}",
+  "@createPdfButtonReady": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pageEditTitle": "ویرایش صفحات",
+  "pageEditDescription": "صفحات یک PDF را بچرخانید، جابجا کنید یا حذف کنید — بقیه سند دست‌نخورده می‌ماند.",
+  "pageEditStepSelect": "انتخاب PDF",
+  "pageEditStepEdit": "ویرایش صفحات",
+  "pageEditStepSave": "ذخیره تغییرات",
+  "rotate": "چرخش",
+  "removePage": "حذف صفحه",
+  "saveChanges": "ذخیره تغییرات",
+  "pdfSavedSuccess": "PDF با موفقیت ذخیره شد",
+  "contentEditTitle": "ویرایش PDF",
+  "contentEditDescription": "برای اصلاح یا حذف یک خط روی آن ضربه بزنید، یا یک تصویر اضافه کنید — ویرایش‌ها روی همان محل قبلی قرار می‌گیرند و باعث جابجایی بقیه صفحه نمی‌شوند.",
+  "contentEditStepSelect": "انتخاب PDF",
+  "contentEditStepEdit": "برای ویرایش ضربه بزنید",
+  "contentEditStepSave": "ذخیره تغییرات",
+  "editLine": "ویرایش خط",
+  "lineText": "متن خط",
+  "delete": "حذف",
+  "addImageToPage": "افزودن تصویر به این صفحه",
+  "addImage": "افزودن تصویر",
+  "thisPdfHasNoPages": "این PDF صفحه‌ای ندارد.",
+  "encryptTitle": "محافظت با رمز",
+  "encryptDescription": "یک PDF را با رمز عبور قفل کنید تا فقط افرادی که رمز را می‌دانند بتوانند آن را باز کنند.",
+  "addPasswordSegment": "افزودن رمز",
+  "removePasswordSegment": "حذف رمز",
+  "password": "رمز عبور",
+  "currentPassword": "رمز عبور فعلی",
+  "confirmPassword": "تکرار رمز عبور",
+  "passwordHelperText": "حداقل {minLength} کاراکتر، بدون فاصله",
+  "@passwordHelperText": {
+    "placeholders": {
+      "minLength": {}
+    }
+  },
+  "showPassword": "نمایش رمز عبور",
+  "hidePassword": "پنهان‌کردن رمز عبور",
+  "lockButton": "قفل کردن",
+  "unlockButton": "باز کردن قفل",
+  "passwordAdded": "رمز عبور اضافه شد",
+  "passwordRemoved": "رمز عبور حذف شد",
+  "watermarkTitle": "واترمارک",
+  "watermarkDescription": "متن را به‌صورت مورب روی تمام صفحات درج کنید — مناسب برای «پیش‌نویس»، «محرمانه» یا نام شرکت.",
+  "watermarkStepSelect": "انتخاب PDF",
+  "watermarkStepText": "تنظیم متن",
+  "watermarkStepStamp": "درج",
+  "watermarkStepSave": "ذخیره",
+  "watermarkText": "متن واترمارک",
+  "watermarkTextHint": "مثلاً محرمانه",
+  "color": "رنگ",
+  "opacityPercent": "شفافیت: {percent}٪",
+  "@opacityPercent": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "sizeValue": "اندازه: {size}",
+  "@sizeValue": {
+    "placeholders": {
+      "size": {}
+    }
+  },
+  "watermarkButton": "درج",
+  "watermarkAdded": "واترمارک اضافه شد",
+  "signatureTitle": "امضای دیجیتال",
+  "signatureDescription": "یک امضا بکشید یا تایپ کنید، آن را روی هر صفحه‌ای قرار دهید و ذخیره کنید.",
+  "signatureStepSelect": "انتخاب PDF",
+  "signatureStepCreate": "تنظیم امضا",
+  "signatureStepPlace": "قرار دادن",
+  "signatureStepSave": "ذخیره PDF امضاشده",
+  "addSignature": "افزودن امضا",
+  "changeSignature": "تغییر امضا",
+  "placeButton": "قرار دادن",
+  "signButton": "امضا",
+  "pdfSignedSuccess": "PDF با موفقیت امضا شد",
+  "signaturePadDraw": "کشیدن",
+  "signaturePadType": "تایپ",
+  "signaturePadCreateTitle": "ساخت امضا",
+  "signaturePadDrawHint": "با انگشت یا ماوس امضا کنید",
+  "signaturePadClear": "پاک کردن",
+  "signaturePadColor": "رنگ",
+  "signaturePadStyle": "سبک",
+  "signaturePadYourName": "نام شما",
+  "signaturePadTypeYourName": "نام خود را تایپ کنید",
+  "signaturePadDone": "تمام",
+  "signaturePadFontCasual": "غیررسمی",
+  "signaturePadFontElegant": "شیک",
+  "signaturePadFontBold": "پررنگ",
+  "colorBlack": "مشکی",
+  "colorBlue": "آبی",
+  "colorRed": "قرمز",
+  "colorGreen": "سبز",
+  "languagePickerTitle": "زبان خود را انتخاب کنید",
+  "languagePickerSubtitle": "می‌توانید بعداً این را از صفحه اصلی تغییر دهید.",
+  "languagePickerContinue": "ادامه",
+  "changeFile": "تغییر فایل",
+  "pageOfTotal": "صفحه {current} از {total}",
+  "@pageOfTotal": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "encryptRemoveDescription": "رمز عبور یک PDF را حذف کنید، در صورت داشتن رمز درست.",
+  "encryptStepSetPassword": "تنظیم رمز عبور",
+  "encryptStepEnterPassword": "وارد کردن رمز عبور"
+}

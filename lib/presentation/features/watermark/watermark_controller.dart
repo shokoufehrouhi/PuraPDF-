@@ -112,11 +112,11 @@ class WatermarkController extends Notifier<WatermarkState> {
   Future<void> submit() async {
     final file = state.sourceFile;
     if (file == null) {
-      state = state.copyWith(error: 'Select a PDF first.');
+      state = state.copyWith(error: 'errorSelectPdfFirst');
       return;
     }
     if (state.text.trim().isEmpty) {
-      state = state.copyWith(error: 'Enter watermark text.');
+      state = state.copyWith(error: 'errorEnterWatermarkText');
       return;
     }
 

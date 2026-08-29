@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/error_message.dart';
 import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/pdf_file.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
@@ -31,6 +33,7 @@ class SplitScreen extends ConsumerWidget {
     final state = ref.watch(splitControllerProvider);
     final controller = ref.read(splitControllerProvider.notifier);
     final ColorScheme scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,14 +47,17 @@ class SplitScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const FeatureScreenHeader(
+              FeatureScreenHeader(
                 icon: Icons.call_split,
                 color: _color,
-                title: 'Split PDF',
-                description:
-                    'Break a PDF into separate files — by page or by '
-                    'custom ranges.',
-                steps: ['Select PDF', 'Choose pages', 'Split', 'Save'],
+                title: l10n.splitTitle,
+                description: l10n.splitDescription,
+                steps: [
+                  l10n.splitStepSelect,
+                  l10n.splitStepChoose,
+                  l10n.splitStepSplit,
+                  l10n.splitStepSave,
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -61,12 +67,12 @@ class SplitScreen extends ConsumerWidget {
                     PickerCard(
                       icon: Icons.upload_file,
                       color: _color,
-                      label: state.sourceFile?.name ?? 'Select a PDF',
+                      label: state.sourceFile?.name ?? l10n.selectAPdf,
                       hint: state.sourceFile == null
-                          ? 'Tap to browse your files'
+                          ? l10n.tapToBrowseFiles
                           : state.pageCount != null
-                          ? '${state.pageCount} pages — tap to change file'
-                          : 'Tap to change file',
+                          ? l10n.splitPageCountHint(state.pageCount!)
+                          : l10n.tapToChangeFile,
                       onTap: () => _pickFile(ref),
                     ),
                     if (state.sourceFile != null) ...[
@@ -78,7 +84,7 @@ class SplitScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: SwitchListTile(
-                          title: const Text('Split into one file per page'),
+                          title: Text(l10n.splitOneFilePerPage),
                           value: state.everyPage,
                           activeThumbColor: _color,
                           onChanged: controller.setEveryPage,
@@ -87,9 +93,9 @@ class SplitScreen extends ConsumerWidget {
                       if (!state.everyPage) ...[
                         const SizedBox(height: 12),
                         TextField(
-                          decoration: const InputDecoration(
-                            labelText: 'Page ranges',
-                            hintText: 'e.g. 1-3, 5, 7-9',
+                          decoration: InputDecoration(
+                            labelText: l10n.splitPageRanges,
+                            hintText: l10n.splitPageRangesHint,
                           ),
                           onChanged: controller.setRangesInput,
                         ),
@@ -116,7 +122,7 @@ class SplitScreen extends ConsumerWidget {
                                   ),
                                 )
                               : const Icon(Icons.call_split),
-                          label: const Text('Split'),
+                          label: Text(l10n.splitButton),
                           onPressed: state.isSplitting
                               ? null
                               : controller.split,
@@ -124,7 +130,10 @@ class SplitScreen extends ConsumerWidget {
                     ],
                     if (state.error != null) ...[
                       const SizedBox(height: 12),
-                      Text(state.error!, style: TextStyle(color: scheme.error)),
+                      Text(
+                        localizedError(context, state.error!),
+                        style: TextStyle(color: scheme.error),
+                      ),
                     ],
                     if (state.resultPaths.isNotEmpty) ...[
                       const SizedBox(height: 20),
@@ -142,8 +151,9 @@ class SplitScreen extends ConsumerWidget {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    '${state.resultPaths.length} file(s) '
-                                    'created',
+                                    l10n.splitFilesCreated(
+                                      state.resultPaths.length,
+                                    ),
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -173,7 +183,7 @@ class SplitScreen extends ConsumerWidget {
                                               icon: const Icon(
                                                 Icons.ios_share,
                                               ),
-                                              tooltip: 'Share',
+                                              tooltip: l10n.share,
                                               onPressed: () =>
                                                   SharePlus.instance.share(
                                                     ShareParams(
@@ -201,7 +211,7 @@ class SplitScreen extends ConsumerWidget {
                                         ),
                                       ),
                                       icon: const Icon(Icons.ios_share),
-                                      label: const Text('Share'),
+                                      label: Text(l10n.share),
                                       onPressed: () => SharePlus.instance
                                           .share(
                                             ShareParams(
@@ -222,7 +232,7 @@ class SplitScreen extends ConsumerWidget {
                                         ),
                                       ),
                                       icon: const Icon(Icons.download_outlined),
-                                      label: const Text('Download'),
+                                      label: Text(l10n.download),
                                       onPressed: () => downloadFile(
                                         context,
                                         state.resultPaths.first,
@@ -247,8 +257,8 @@ class SplitScreen extends ConsumerWidget {
                                         ),
                                       ),
                                       icon: const Icon(Icons.folder_zip),
-                                      label: const Text(
-                                        'Share ZIP',
+                                      label: Text(
+                                        l10n.shareZip,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -278,8 +288,8 @@ class SplitScreen extends ConsumerWidget {
                                         ),
                                       ),
                                       icon: const Icon(Icons.download_outlined),
-                                      label: const Text(
-                                        'Download ZIP',
+                                      label: Text(
+                                        l10n.downloadZip,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),

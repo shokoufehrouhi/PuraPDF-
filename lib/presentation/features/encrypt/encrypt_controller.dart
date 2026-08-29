@@ -107,17 +107,17 @@ class EncryptController extends Notifier<EncryptState> {
   Future<void> submit() async {
     final file = state.sourceFile;
     if (file == null) {
-      state = state.copyWith(error: 'Select a PDF first.');
+      state = state.copyWith(error: 'errorSelectPdfFirst');
       return;
     }
     if (state.password.isEmpty) {
-      state = state.copyWith(error: 'Enter a password.');
+      state = state.copyWith(error: 'errorEnterPassword');
       return;
     }
     // The password field's inputFormatters already block typing whitespace,
     // but this stays as a defense-in-depth check (e.g. pasted text).
     if (RegExp(r'\s').hasMatch(state.password)) {
-      state = state.copyWith(error: 'Password can\'t contain spaces.');
+      state = state.copyWith(error: 'errorPasswordNoSpaces');
       return;
     }
     // Only enforced when setting a new password — removing one must accept
@@ -125,13 +125,13 @@ class EncryptController extends Notifier<EncryptState> {
     if (state.action == PasswordAction.add &&
         state.password.length < minPasswordLength) {
       state = state.copyWith(
-        error: 'Password must be at least $minPasswordLength characters.',
+        error: 'errorPasswordTooShort:$minPasswordLength',
       );
       return;
     }
     if (state.action == PasswordAction.add &&
         state.password != state.confirmPassword) {
-      state = state.copyWith(error: 'Passwords don\'t match.');
+      state = state.copyWith(error: 'errorPasswordsDontMatch');
       return;
     }
 

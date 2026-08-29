@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../core/theme/app_theme.dart';
@@ -7,6 +8,7 @@ import '../core/theme/feature_colors.dart';
 import '../core/theme/theme_mode_controller.dart';
 import '../domain/entities/history_file.dart';
 import '../core/scanner_support.dart';
+import '../l10n/app_localizations.dart';
 import 'features/compress/compress_screen.dart';
 import 'features/content_edit/content_edit_screen.dart';
 import 'features/encrypt/encrypt_screen.dart';
@@ -20,6 +22,7 @@ import 'features/split/split_screen.dart';
 import 'features/watermark/watermark_screen.dart';
 import 'shared_widgets/banner_ad_widget.dart';
 import 'shared_widgets/download_file.dart';
+import 'shared_widgets/language_switcher_button.dart';
 
 /// Landing screen — feature hub. Grows one tile per Phase-1 feature as each
 /// lands (merge/split/compress/...).
@@ -37,8 +40,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ? Icons.dark_mode_outlined
       : Icons.light_mode_outlined;
 
-  String _themeLabel(ThemeMode mode) =>
-      mode == ThemeMode.dark ? 'Dark theme' : 'Light theme';
+  String _themeLabel(BuildContext context, ThemeMode mode) =>
+      mode == ThemeMode.dark
+      ? AppLocalizations.of(context).themeDarkTooltip
+      : AppLocalizations.of(context).themeLightTooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -58,10 +63,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(width: 4),
           IconButton(
             icon: Icon(_themeIcon(themeMode)),
-            tooltip: '${_themeLabel(themeMode)} — tap to change',
+            tooltip: _themeLabel(context, themeMode),
             onPressed: () =>
                 ref.read(themeModeControllerProvider.notifier).cycle(),
           ),
+          const LanguageSwitcherButton(),
           const SizedBox(width: 4),
         ],
       ),
@@ -135,8 +141,7 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Your PDF toolkit — merge, split, compress, and convert, '
-            'all on-device.',
+            AppLocalizations.of(context).appTagline,
             style: Theme.of(context).textTheme.bodyMedium
                 ?.copyWith(color: scheme.onSurfaceVariant),
           ),
@@ -161,7 +166,9 @@ class _RecentsIconButton extends StatelessWidget {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     return IconButton(
       icon: const Icon(Icons.history_rounded),
-      tooltip: active ? 'Back to tools' : 'Recents',
+      tooltip: active
+          ? AppLocalizations.of(context).backToToolsTooltip
+          : AppLocalizations.of(context).recentsTooltip,
       style: IconButton.styleFrom(
         backgroundColor: active
             ? AppTheme.seedColor.withValues(alpha: 0.14)
@@ -191,6 +198,7 @@ class _ToolsTabState extends State<_ToolsTab> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final int columns = constraints.maxWidth >= 600 ? 2 : 1;
+        final l10n = AppLocalizations.of(context);
 
         final List<Widget> organizeCards = [
           if (scannerSupported)
@@ -199,8 +207,8 @@ class _ToolsTabState extends State<_ToolsTab> {
               color: FeatureColors.scanner,
               colorDark: FeatureColors.scannerDark,
               iconColor: FeatureColors.scannerIcon,
-              title: 'Scan Document',
-              subtitle: 'Capture paper documents with your camera',
+              title: l10n.featureScanTitle,
+              subtitle: l10n.featureScanSubtitle,
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const ScannerScreen()),
               ),
@@ -210,8 +218,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             color: FeatureColors.imagePdf,
             colorDark: FeatureColors.imagePdfDark,
             iconColor: FeatureColors.imagePdfIcon,
-            title: 'Image ⇄ PDF',
-            subtitle: 'Convert between formats',
+            title: l10n.featureImagePdfTitle,
+            subtitle: l10n.featureImagePdfSubtitle,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ImagePdfScreen()),
             ),
@@ -221,8 +229,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             color: FeatureColors.merge,
             colorDark: FeatureColors.mergeDark,
             iconColor: FeatureColors.mergeIcon,
-            title: 'Merge PDFs',
-            subtitle: 'Combine multiple documents',
+            title: l10n.featureMergeTitle,
+            subtitle: l10n.featureMergeSubtitle,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const MergeScreen()),
             ),
@@ -232,8 +240,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             color: FeatureColors.split,
             colorDark: FeatureColors.splitDark,
             iconColor: FeatureColors.splitIcon,
-            title: 'Split PDF',
-            subtitle: 'Separate into pages or sections',
+            title: l10n.featureSplitTitle,
+            subtitle: l10n.featureSplitSubtitle,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const SplitScreen()),
             ),
@@ -243,8 +251,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             color: FeatureColors.compress,
             colorDark: FeatureColors.compressDark,
             iconColor: FeatureColors.compressIcon,
-            title: 'Compress PDF',
-            subtitle: 'Optimize file size for sharing',
+            title: l10n.featureCompressTitle,
+            subtitle: l10n.featureCompressSubtitle,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const CompressScreen()),
             ),
@@ -257,8 +265,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             color: FeatureColors.contentEdit,
             colorDark: FeatureColors.contentEditDark,
             iconColor: FeatureColors.contentEditIcon,
-            title: 'Edit PDF',
-            subtitle: 'Fix text, remove a line, add an image',
+            title: l10n.featureContentEditTitle,
+            subtitle: l10n.featureContentEditSubtitle,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ContentEditScreen()),
             ),
@@ -268,8 +276,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             color: FeatureColors.pageEdit,
             colorDark: FeatureColors.pageEditDark,
             iconColor: FeatureColors.pageEditIcon,
-            title: 'Edit Pages',
-            subtitle: 'Rotate, reorder, or remove pages',
+            title: l10n.featurePageEditTitle,
+            subtitle: l10n.featurePageEditSubtitle,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const PageEditScreen()),
             ),
@@ -279,8 +287,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             color: FeatureColors.encrypt,
             colorDark: FeatureColors.encryptDark,
             iconColor: FeatureColors.encryptIcon,
-            title: 'Password Protect',
-            subtitle: 'Add or remove a PDF password',
+            title: l10n.featureEncryptTitle,
+            subtitle: l10n.featureEncryptSubtitle,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const EncryptScreen()),
             ),
@@ -290,8 +298,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             color: FeatureColors.watermark,
             colorDark: FeatureColors.watermarkDark,
             iconColor: FeatureColors.watermarkIcon,
-            title: 'Watermark',
-            subtitle: 'Stamp text across every page',
+            title: l10n.featureWatermarkTitle,
+            subtitle: l10n.featureWatermarkSubtitle,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const WatermarkScreen()),
             ),
@@ -301,8 +309,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             color: FeatureColors.signature,
             colorDark: FeatureColors.signatureDark,
             iconColor: FeatureColors.signatureIcon,
-            title: 'Digital Signature',
-            subtitle: 'Draw or type a signature, place it, save',
+            title: l10n.featureSignatureTitle,
+            subtitle: l10n.featureSignatureSubtitle,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const SignatureScreen()),
             ),
@@ -362,12 +370,12 @@ class _CategoryTabBar extends StatelessWidget {
       child: Row(
         children: [
           _CategoryTabSegment(
-            label: 'Organize',
+            label: AppLocalizations.of(context).categoryOrganize,
             selected: index == 0,
             onTap: () => onChanged(0),
           ),
           _CategoryTabSegment(
-            label: 'Edit & Protect',
+            label: AppLocalizations.of(context).categoryEditProtect,
             selected: index == 1,
             onTap: () => onChanged(1),
           ),
@@ -612,122 +620,95 @@ class _OperationInfo {
   const _OperationInfo(this.icon, this.color, this.label);
 }
 
-const _OperationInfo _unknownOperation = _OperationInfo(
-  Icons.insert_drive_file,
-  Color(0xFF9CA3AF),
-  'File',
-);
-
-_OperationInfo _operationFor(String fileName) {
+_OperationInfo _operationFor(String fileName, AppLocalizations l10n) {
   if (fileName.startsWith('purapdf_merged_')) {
-    return const _OperationInfo(
-      Icons.call_merge,
-      FeatureColors.mergeIcon,
-      'Merge',
-    );
+    return _OperationInfo(Icons.call_merge, FeatureColors.mergeIcon, l10n.opMerge);
   }
   if (fileName.startsWith('purapdf_split_')) {
-    return const _OperationInfo(
-      Icons.call_split,
-      FeatureColors.splitIcon,
-      'Split',
-    );
+    return _OperationInfo(Icons.call_split, FeatureColors.splitIcon, l10n.opSplit);
   }
   if (fileName.startsWith('purapdf_compressed_')) {
-    return const _OperationInfo(
+    return _OperationInfo(
       Icons.compress,
       FeatureColors.compressIcon,
-      'Compress',
+      l10n.opCompress,
     );
   }
   if (fileName.startsWith('purapdf_images_')) {
-    return const _OperationInfo(
+    return _OperationInfo(
       Icons.image_outlined,
       FeatureColors.imagePdfIcon,
-      'Image → PDF',
+      l10n.opImageToPdf,
     );
   }
   if (fileName.startsWith('purapdf_page_')) {
-    return const _OperationInfo(
+    return _OperationInfo(
       Icons.image_outlined,
       FeatureColors.imagePdfIcon,
-      'PDF → Image',
+      l10n.opPdfToImage,
     );
   }
   if (fileName.startsWith('purapdf_scan_')) {
-    return const _OperationInfo(
+    return _OperationInfo(
       Icons.document_scanner_outlined,
       FeatureColors.scannerIcon,
-      'Scan',
+      l10n.opScan,
     );
   }
   if (fileName.startsWith('purapdf_pages_')) {
-    return const _OperationInfo(
+    return _OperationInfo(
       Icons.crop_rotate,
       FeatureColors.pageEditIcon,
-      'Edit Pages',
+      l10n.opPageEdit,
     );
   }
   if (fileName.startsWith('purapdf_content_')) {
-    return const _OperationInfo(
+    return _OperationInfo(
       Icons.text_fields,
       FeatureColors.contentEditIcon,
-      'Edit PDF',
+      l10n.opContentEdit,
     );
   }
   if (fileName.startsWith('purapdf_locked_')) {
-    return const _OperationInfo(
+    return _OperationInfo(
       Icons.lock_outline,
       FeatureColors.encryptIcon,
-      'Locked',
+      l10n.opLocked,
     );
   }
   if (fileName.startsWith('purapdf_unlocked_')) {
-    return const _OperationInfo(
+    return _OperationInfo(
       Icons.lock_open_outlined,
       FeatureColors.encryptIcon,
-      'Unlocked',
+      l10n.opUnlocked,
     );
   }
   if (fileName.startsWith('purapdf_watermark_')) {
-    return const _OperationInfo(
+    return _OperationInfo(
       Icons.branding_watermark_outlined,
       FeatureColors.watermarkIcon,
-      'Watermark',
+      l10n.opWatermark,
     );
   }
   if (fileName.startsWith('purapdf_signed_')) {
-    return const _OperationInfo(
+    return _OperationInfo(
       Icons.draw_outlined,
       FeatureColors.signatureIcon,
-      'Signed',
+      l10n.opSigned,
     );
   }
-  return _unknownOperation;
+  return _OperationInfo(
+    Icons.insert_drive_file,
+    const Color(0xFF9CA3AF),
+    l10n.opUnknown,
+  );
 }
 
-const List<String> _monthAbbrevs = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
-String _formatDateTime(DateTime dt) {
-  final DateTime local = dt.toLocal();
-  final String month = _monthAbbrevs[local.month - 1];
-  final int hour12 = local.hour % 12 == 0 ? 12 : local.hour % 12;
-  final String ampm = local.hour < 12 ? 'AM' : 'PM';
-  final String minute = local.minute.toString().padLeft(2, '0');
-  return '$month ${local.day}, $hour12:$minute $ampm';
+String _formatDateTime(DateTime dt, Locale locale) {
+  final DateFormat format = DateFormat.MMMd(
+    locale.toLanguageTag(),
+  ).add_jm();
+  return format.format(dt.toLocal());
 }
 
 /// Recents tab — the app's only history surface (the dedicated History
@@ -772,6 +753,8 @@ class _RecentsTabState extends ConsumerState<_RecentsTab> {
       return const Center(child: CircularProgressIndicator());
     }
 
+    final l10n = AppLocalizations.of(context);
+
     if (state.files.isEmpty) {
       final ColorScheme scheme = Theme.of(context).colorScheme;
       return Center(
@@ -795,7 +778,7 @@ class _RecentsTabState extends ConsumerState<_RecentsTab> {
               ),
               const SizedBox(height: 20),
               Text(
-                'No files yet',
+                l10n.recentsEmptyTitle,
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -804,8 +787,7 @@ class _RecentsTabState extends ConsumerState<_RecentsTab> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Files you create with Merge, Split, Compress, or '
-                'Image ⇄ PDF will show up here.',
+                l10n.recentsEmptyBody,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13,
@@ -823,7 +805,7 @@ class _RecentsTabState extends ConsumerState<_RecentsTab> {
                   ),
                 ),
                 icon: const Icon(Icons.grid_view_rounded, size: 18),
-                label: const Text('Browse tools'),
+                label: Text(l10n.browseTools),
               ),
             ],
           ),
@@ -844,7 +826,7 @@ class _RecentsTabState extends ConsumerState<_RecentsTab> {
                   foregroundColor: Theme.of(context).colorScheme.error,
                 ),
                 icon: const Icon(Icons.delete_sweep_outlined, size: 18),
-                label: const Text('Clear'),
+                label: Text(l10n.clear),
               ),
             ],
           ),
@@ -863,25 +845,23 @@ class _RecentsTabState extends ConsumerState<_RecentsTab> {
   }
 
   Future<void> _confirmClearAll(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Clear all recents?'),
-        content: const Text(
-          'This deletes every file listed here from your device. '
-          'This cannot be undone.',
-        ),
+        title: Text(l10n.clearAllTitle),
+        content: Text(l10n.clearAllBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(dialogContext).colorScheme.error,
             ),
-            child: const Text('Clear all'),
+            child: Text(l10n.clearAllConfirm),
           ),
         ],
       ),
@@ -900,7 +880,8 @@ class _RecentRecordRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    final _OperationInfo op = _operationFor(file.name);
+    final l10n = AppLocalizations.of(context);
+    final _OperationInfo op = _operationFor(file.name, l10n);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 8, 4, 8),
@@ -950,7 +931,7 @@ class _RecentRecordRow extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '  •  ${_formatDateTime(file.createdAt)}',
+                      '  •  ${_formatDateTime(file.createdAt, Localizations.localeOf(context))}',
                       style: TextStyle(
                         fontSize: 11.5,
                         color: scheme.onSurfaceVariant,
@@ -964,12 +945,12 @@ class _RecentRecordRow extends StatelessWidget {
           // Download / share columns.
           IconButton(
             icon: const Icon(Icons.download_outlined),
-            tooltip: 'Download',
+            tooltip: l10n.download,
             onPressed: () => downloadFile(context, file.path),
           ),
           IconButton(
             icon: const Icon(Icons.ios_share),
-            tooltip: 'Share',
+            tooltip: l10n.share,
             onPressed: () => SharePlus.instance.share(
               ShareParams(files: [XFile(file.path)]),
             ),

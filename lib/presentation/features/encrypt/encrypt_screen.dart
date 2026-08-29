@@ -4,8 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/error_message.dart';
 import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/pdf_file.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
@@ -33,6 +35,7 @@ class EncryptScreen extends ConsumerWidget {
     final controller = ref.read(encryptControllerProvider.notifier);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final bool isAdd = state.action == PasswordAction.add;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -49,14 +52,23 @@ class EncryptScreen extends ConsumerWidget {
               FeatureScreenHeader(
                 icon: Icons.lock_outline,
                 color: _color,
-                title: 'Password Protect',
+                title: l10n.encryptTitle,
                 description: isAdd
-                    ? 'Lock a PDF with a password so only people who know '
-                          'it can open it.'
-                    : 'Remove a PDF\'s password, given the correct one.',
+                    ? l10n.encryptDescription
+                    : l10n.encryptRemoveDescription,
                 steps: isAdd
-                    ? const ['Select PDF', 'Set password', 'Lock', 'Save']
-                    : const ['Select PDF', 'Enter password', 'Unlock', 'Save'],
+                    ? [
+                        l10n.selectPdf,
+                        l10n.encryptStepSetPassword,
+                        l10n.lockButton,
+                        l10n.save,
+                      ]
+                    : [
+                        l10n.selectPdf,
+                        l10n.encryptStepEnterPassword,
+                        l10n.unlockButton,
+                        l10n.save,
+                      ],
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -70,14 +82,14 @@ class EncryptScreen extends ConsumerWidget {
                         ),
                         selectedForegroundColor: _color,
                       ),
-                      segments: const [
+                      segments: [
                         ButtonSegment(
                           value: PasswordAction.add,
-                          label: Text('Add Password'),
+                          label: Text(l10n.addPasswordSegment),
                         ),
                         ButtonSegment(
                           value: PasswordAction.remove,
-                          label: Text('Remove Password'),
+                          label: Text(l10n.removePasswordSegment),
                         ),
                       ],
                       selected: {state.action},
@@ -88,10 +100,10 @@ class EncryptScreen extends ConsumerWidget {
                     PickerCard(
                       icon: Icons.upload_file,
                       color: _color,
-                      label: state.sourceFile?.name ?? 'Select a PDF',
+                      label: state.sourceFile?.name ?? l10n.selectAPdf,
                       hint: state.sourceFile == null
-                          ? 'Tap to browse your files'
-                          : 'Tap to change file',
+                          ? l10n.tapToBrowseFiles
+                          : l10n.tapToChangeFile,
                       onTap: () => _pickFile(ref),
                     ),
                     if (state.sourceFile != null) ...[
@@ -103,11 +115,13 @@ class EncryptScreen extends ConsumerWidget {
                           FilteringTextInputFormatter.deny(RegExp(r'\s')),
                         ],
                         decoration: InputDecoration(
-                          labelText: isAdd ? 'Password' : 'Current password',
+                          labelText: isAdd
+                              ? l10n.password
+                              : l10n.currentPassword,
                           helperText: isAdd
-                              ? 'At least '
-                                    '${EncryptController.minPasswordLength} '
-                                    'characters, no spaces'
+                              ? l10n.passwordHelperText(
+                                  EncryptController.minPasswordLength,
+                                )
                               : null,
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -116,8 +130,8 @@ class EncryptScreen extends ConsumerWidget {
                                   : Icons.visibility_off_outlined,
                             ),
                             tooltip: state.obscurePassword
-                                ? 'Show password'
-                                : 'Hide password',
+                                ? l10n.showPassword
+                                : l10n.hidePassword,
                             onPressed: controller.toggleObscurePassword,
                           ),
                         ),
@@ -131,7 +145,7 @@ class EncryptScreen extends ConsumerWidget {
                             FilteringTextInputFormatter.deny(RegExp(r'\s')),
                           ],
                           decoration: InputDecoration(
-                            labelText: 'Confirm password',
+                            labelText: l10n.confirmPassword,
                             suffixIcon: IconButton(
                               icon: Icon(
                                 state.obscureConfirmPassword
@@ -139,8 +153,8 @@ class EncryptScreen extends ConsumerWidget {
                                     : Icons.visibility_off_outlined,
                               ),
                               tooltip: state.obscureConfirmPassword
-                                  ? 'Show password'
-                                  : 'Hide password',
+                                  ? l10n.showPassword
+                                  : l10n.hidePassword,
                               onPressed: controller.toggleObscureConfirmPassword,
                             ),
                           ),
@@ -172,7 +186,11 @@ class EncryptScreen extends ConsumerWidget {
                                       ? Icons.lock_outline
                                       : Icons.lock_open_outlined,
                                 ),
-                          label: Text(isAdd ? 'Add Password' : 'Remove Password'),
+                          label: Text(
+                            isAdd
+                                ? l10n.addPasswordSegment
+                                : l10n.removePasswordSegment,
+                          ),
                           onPressed: state.isProcessing
                               ? null
                               : controller.submit,
@@ -180,7 +198,10 @@ class EncryptScreen extends ConsumerWidget {
                     ],
                     if (state.error != null) ...[
                       const SizedBox(height: 12),
-                      Text(state.error!, style: TextStyle(color: scheme.error)),
+                      Text(
+                        localizedError(context, state.error!),
+                        style: TextStyle(color: scheme.error),
+                      ),
                     ],
                     if (state.resultPath != null) ...[
                       const SizedBox(height: 20),
@@ -199,8 +220,8 @@ class EncryptScreen extends ConsumerWidget {
                                 Expanded(
                                   child: Text(
                                     isAdd
-                                        ? 'Password added'
-                                        : 'Password removed',
+                                        ? l10n.passwordAdded
+                                        : l10n.passwordRemoved,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -218,7 +239,7 @@ class EncryptScreen extends ConsumerWidget {
                                       foregroundColor: Colors.white,
                                     ),
                                     icon: const Icon(Icons.ios_share),
-                                    label: const Text('Share'),
+                                    label: Text(l10n.share),
                                     onPressed: () => SharePlus.instance.share(
                                       ShareParams(
                                         files: [XFile(state.resultPath!)],
@@ -236,7 +257,7 @@ class EncryptScreen extends ConsumerWidget {
                                       ),
                                     ),
                                     icon: const Icon(Icons.download_outlined),
-                                    label: const Text('Download'),
+                                    label: Text(l10n.download),
                                     onPressed: () =>
                                         downloadFile(context, state.resultPath!),
                                   ),

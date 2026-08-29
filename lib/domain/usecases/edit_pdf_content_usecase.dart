@@ -10,7 +10,7 @@ class EditPdfContentUseCase {
 
   Future<String> call(String inputPath, List<PdfContentEdit> edits) async {
     if (edits.isEmpty) {
-      throw ArgumentError('Make at least one change before saving.');
+      throw ArgumentError('errorMakeAChangeBeforeSaving');
     }
     return repository.editPdfContent(inputPath, edits);
   }

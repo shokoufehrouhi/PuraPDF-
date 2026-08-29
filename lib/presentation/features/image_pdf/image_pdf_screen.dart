@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/error_message.dart';
 import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/image_output_format.dart';
 import '../../../domain/entities/pdf_file.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
@@ -45,6 +47,7 @@ class ImagePdfScreen extends ConsumerWidget {
     final state = ref.watch(imagePdfControllerProvider);
     final controller = ref.read(imagePdfControllerProvider.notifier);
     final isImagesToPdf = state.direction == ConversionDirection.imagesToPdf;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -59,13 +62,22 @@ class ImagePdfScreen extends ConsumerWidget {
             FeatureScreenHeader(
               icon: Icons.image_outlined,
               color: _color,
-              title: 'Image ⇄ PDF',
+              title: l10n.imagePdfTitle,
               description: isImagesToPdf
-                  ? 'Turn one or more photos into a single PDF document.'
-                  : 'Export every page of a PDF as a separate image file.',
+                  ? l10n.imagesToPdfDescription
+                  : l10n.pdfToImagesDescription,
               steps: isImagesToPdf
-                  ? const ['Add images', 'Convert', 'Save']
-                  : const ['Select PDF', 'Pick format', 'Convert', 'Save'],
+                  ? [
+                      l10n.imagePdfStepAddImages,
+                      l10n.imagePdfStepConvert,
+                      l10n.imagePdfStepSave,
+                    ]
+                  : [
+                      l10n.imagePdfStepSelect,
+                      l10n.imagePdfStepFormat,
+                      l10n.imagePdfStepConvert,
+                      l10n.imagePdfStepSave,
+                    ],
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
@@ -74,14 +86,14 @@ class ImagePdfScreen extends ConsumerWidget {
                   selectedBackgroundColor: _color.withValues(alpha: 0.18),
                   selectedForegroundColor: _color,
                 ),
-                segments: const [
+                segments: [
                   ButtonSegment(
                     value: ConversionDirection.imagesToPdf,
-                    label: Text('Images → PDF'),
+                    label: Text(l10n.imagesToPdfSegment),
                   ),
                   ButtonSegment(
                     value: ConversionDirection.pdfToImages,
-                    label: Text('PDF → Images'),
+                    label: Text(l10n.pdfToImagesSegment),
                   ),
                 ],
                 selected: {state.direction},
@@ -125,6 +137,7 @@ class _ImagesToPdfPane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       children: [
@@ -137,8 +150,8 @@ class _ImagesToPdfPane extends StatelessWidget {
                     child: PickerCard(
                       icon: Icons.add_photo_alternate,
                       color: _color,
-                      label: 'Add images',
-                      hint: 'You can select multiple photos at once',
+                      label: l10n.addImages,
+                      hint: l10n.addImagesHint,
                       onTap: pickImages,
                     ),
                   ),
@@ -151,9 +164,7 @@ class _ImagesToPdfPane extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              '${state.images.length} image'
-                              '${state.images.length == 1 ? '' : 's'} '
-                              'selected',
+                              l10n.imagesSelectedCount(state.images.length),
                               style: TextStyle(
                                 fontSize: 12.5,
                                 color: scheme.onSurfaceVariant,
@@ -163,7 +174,7 @@ class _ImagesToPdfPane extends StatelessWidget {
                           TextButton.icon(
                             onPressed: pickImages,
                             icon: const Icon(Icons.add, size: 18),
-                            label: const Text('Add more'),
+                            label: Text(l10n.addMore),
                             style: TextButton.styleFrom(
                               foregroundColor: _color,
                               padding: EdgeInsets.zero,
@@ -206,7 +217,7 @@ class _ImagesToPdfPane extends StatelessWidget {
                               ),
                               trailing: IconButton(
                                 icon: const Icon(Icons.close),
-                                tooltip: 'Remove',
+                                tooltip: l10n.remove,
                                 onPressed: () =>
                                     controller.removeImageAt(index),
                               ),
@@ -221,7 +232,10 @@ class _ImagesToPdfPane extends StatelessWidget {
         if (state.error != null)
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-            child: Text(state.error!, style: TextStyle(color: scheme.error)),
+            child: Text(
+              localizedError(context, state.error!),
+              style: TextStyle(color: scheme.error),
+            ),
           ),
         if (state.resultPdfPath != null)
           Padding(
@@ -234,14 +248,14 @@ class _ImagesToPdfPane extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.check_circle, color: _color),
-                      SizedBox(width: 8),
+                      const Icon(Icons.check_circle, color: _color),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'PDF created successfully',
-                          style: TextStyle(fontWeight: FontWeight.w700),
+                          l10n.pdfCreatedSuccess,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                       ),
                     ],
@@ -256,7 +270,7 @@ class _ImagesToPdfPane extends StatelessWidget {
                             foregroundColor: Colors.white,
                           ),
                           icon: const Icon(Icons.ios_share),
-                          label: const Text('Share'),
+                          label: Text(l10n.share),
                           onPressed: () => SharePlus.instance.share(
                             ShareParams(files: [XFile(state.resultPdfPath!)]),
                           ),
@@ -272,7 +286,7 @@ class _ImagesToPdfPane extends StatelessWidget {
                             ),
                           ),
                           icon: const Icon(Icons.download_outlined),
-                          label: const Text('Download'),
+                          label: Text(l10n.download),
                           onPressed: () =>
                               downloadFile(context, state.resultPdfPath!),
                         ),
@@ -308,9 +322,8 @@ class _ImagesToPdfPane extends StatelessWidget {
                           : const Icon(Icons.picture_as_pdf),
                       label: Text(
                         state.images.isEmpty
-                            ? 'Add images to convert'
-                            : 'Convert ${state.images.length} image'
-                                  '${state.images.length == 1 ? '' : 's'}',
+                            ? l10n.convertButtonEmpty
+                            : l10n.convertButtonReady(state.images.length),
                       ),
                       onPressed: state.isProcessing || state.images.isEmpty
                           ? null
@@ -338,6 +351,7 @@ class _PdfToImagesPane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -347,10 +361,10 @@ class _PdfToImagesPane extends StatelessWidget {
           PickerCard(
             icon: Icons.upload_file,
             color: _color,
-            label: state.sourcePdf?.name ?? 'Select a PDF',
+            label: state.sourcePdf?.name ?? l10n.selectAPdf,
             hint: state.sourcePdf == null
-                ? 'Tap to browse your files'
-                : 'Tap to change file',
+                ? l10n.tapToBrowseFiles
+                : l10n.tapToChangeFile,
             onTap: pickPdf,
           ),
           const SizedBox(height: 16),
@@ -385,12 +399,15 @@ class _PdfToImagesPane extends StatelessWidget {
                       ),
                     )
                   : const Icon(Icons.image),
-              label: const Text('Convert'),
+              label: Text(l10n.convertButton),
               onPressed: state.isProcessing ? null : controller.convert,
             ),
           if (state.error != null) ...[
             const SizedBox(height: 12),
-            Text(state.error!, style: TextStyle(color: scheme.error)),
+            Text(
+              localizedError(context, state.error!),
+              style: TextStyle(color: scheme.error),
+            ),
           ],
           if (state.resultImagePaths.isNotEmpty) ...[
             const SizedBox(height: 20),
@@ -408,7 +425,9 @@ class _PdfToImagesPane extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '${state.resultImagePaths.length} image(s) created',
+                          l10n.imagesCreatedCount(
+                            state.resultImagePaths.length,
+                          ),
                           style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                       ),
@@ -430,7 +449,7 @@ class _PdfToImagesPane extends StatelessWidget {
                           children: [
                             IconButton(
                               icon: const Icon(Icons.ios_share),
-                              tooltip: 'Share',
+                              tooltip: l10n.share,
                               onPressed: () => SharePlus.instance.share(
                                 ShareParams(files: [XFile(p)]),
                               ),
@@ -457,8 +476,8 @@ class _PdfToImagesPane extends StatelessWidget {
                               ),
                             ),
                             icon: const Icon(Icons.folder_zip),
-                            label: const Text(
-                              'Share ZIP',
+                            label: Text(
+                              l10n.shareZip,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -485,8 +504,8 @@ class _PdfToImagesPane extends StatelessWidget {
                               ),
                             ),
                             icon: const Icon(Icons.download_outlined),
-                            label: const Text(
-                              'Download ZIP',
+                            label: Text(
+                              l10n.downloadZip,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),

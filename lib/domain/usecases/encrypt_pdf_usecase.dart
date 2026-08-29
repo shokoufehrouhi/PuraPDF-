@@ -10,10 +10,10 @@ class EncryptPdfUseCase {
 
   Future<String> call(String inputPath, String password) async {
     if (password.isEmpty) {
-      throw ArgumentError('Enter a password.');
+      throw ArgumentError('errorEnterPassword');
     }
     if (RegExp(r'\s').hasMatch(password)) {
-      throw ArgumentError('Password can\'t contain spaces.');
+      throw ArgumentError('errorPasswordNoSpaces');
     }
     return repository.encryptPdf(inputPath, password);
   }

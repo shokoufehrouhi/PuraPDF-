@@ -7,7 +7,7 @@ class ImagesToPdfUseCase {
 
   Future<String> call(List<String> imagePaths) {
     if (imagePaths.isEmpty) {
-      throw ArgumentError('Select at least one image.');
+      throw ArgumentError('errorSelectAtLeastOneImage');
     }
     return repository.imagesToPdf(imagePaths);
   }

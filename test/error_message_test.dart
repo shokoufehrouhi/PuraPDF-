@@ -3,20 +3,14 @@ import 'package:purapdf/core/error_message.dart';
 
 void main() {
   group('friendlyErrorMessage', () {
-    test('shows an ArgumentError\'s message as-is, no Dart prefix', () {
-      final error = ArgumentError('Enter a password.');
-      expect(friendlyErrorMessage(error), 'Enter a password.');
+    test('passes an ArgumentError\'s message through as-is (a l10n key)', () {
+      final error = ArgumentError('errorEnterPassword');
+      expect(friendlyErrorMessage(error), 'errorEnterPassword');
     });
 
-    test('falls back to a generic message for anything else', () {
-      expect(
-        friendlyErrorMessage(Exception('some internal detail')),
-        'Something went wrong. Please try again.',
-      );
-      expect(
-        friendlyErrorMessage(StateError('bad state')),
-        'Something went wrong. Please try again.',
-      );
+    test('falls back to the generic key for anything else', () {
+      expect(friendlyErrorMessage(Exception('some internal detail')), 'errorGeneric');
+      expect(friendlyErrorMessage(StateError('bad state')), 'errorGeneric');
     });
   });
 }

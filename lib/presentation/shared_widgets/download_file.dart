@@ -5,6 +5,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../l10n/app_localizations.dart';
+
 /// Saves the file at [sourcePath] straight to the device's Downloads
 /// folder when the platform exposes one directly (macOS, Android — see
 /// [getDownloadsDirectory]) — no dialog, just a snackbar with the outcome.
@@ -14,6 +16,8 @@ import 'package:path_provider/path_provider.dart';
 Future<void> downloadFile(BuildContext context, String sourcePath) async {
   final Uint8List bytes = await File(sourcePath).readAsBytes();
   final String fileName = sourcePath.split('/').last;
+  if (!context.mounted) return;
+  final l10n = AppLocalizations.of(context);
 
   String message;
   try {
@@ -27,14 +31,16 @@ Future<void> downloadFile(BuildContext context, String sourcePath) async {
     await File(
       '${downloadsDir.path}/$fileName',
     ).writeAsBytes(bytes, flush: true);
-    message = 'Saved to Downloads: $fileName';
+    message = l10n.downloadSavedToDownloads(fileName);
   } catch (_) {
     final Uri? savedUri = await FilePicker.saveFile(
       fileName: fileName,
       bytes: bytes,
       mimeType: _mimeTypeFor(fileName),
     );
-    message = savedUri != null ? 'Saved: $fileName' : 'Cancelled';
+    message = savedUri != null
+        ? l10n.downloadSaved(fileName)
+        : l10n.downloadCancelled;
   }
 
   if (!context.mounted) return;
@@ -64,7 +70,7 @@ class DownloadIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.download_outlined),
-      tooltip: 'Download',
+      tooltip: AppLocalizations.of(context).download,
       onPressed: () => downloadFile(context, path),
     );
   }

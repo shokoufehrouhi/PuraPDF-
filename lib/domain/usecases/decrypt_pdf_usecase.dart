@@ -8,7 +8,7 @@ class DecryptPdfUseCase {
 
   Future<String> call(String inputPath, String password) async {
     if (password.isEmpty) {
-      throw ArgumentError('Enter the PDF\'s password.');
+      throw ArgumentError('errorEnterPdfPassword');
     }
     return repository.decryptPdf(inputPath, password);
   }

@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:signature/signature.dart';
 
 import '../../../core/theme/feature_colors.dart';
+import '../../../l10n/app_localizations.dart';
 
 const Color _color = FeatureColors.signatureIcon;
 
@@ -152,17 +153,18 @@ class _SignaturePadScreenState extends State<_SignaturePadScreen>
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Signature'),
+        title: Text(l10n.signaturePadCreateTitle),
         bottom: TabBar(
           controller: _tabController,
           labelColor: _color,
           indicatorColor: _color,
-          tabs: const [
-            Tab(text: 'Draw'),
-            Tab(text: 'Type'),
+          tabs: [
+            Tab(text: l10n.signaturePadDraw),
+            Tab(text: l10n.signaturePadType),
           ],
         ),
       ),
@@ -176,7 +178,7 @@ class _SignaturePadScreenState extends State<_SignaturePadScreen>
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Sign with your finger or mouse',
+                  l10n.signaturePadDrawHint,
                   style: TextStyle(
                     fontSize: 12.5,
                     color: scheme.onSurfaceVariant,
@@ -210,7 +212,7 @@ class _SignaturePadScreenState extends State<_SignaturePadScreen>
                           ),
                         ),
                         icon: const Icon(Icons.refresh),
-                        label: const Text('Clear'),
+                        label: Text(l10n.signaturePadClear),
                         onPressed: _drawController.clear,
                       ),
                     ),
@@ -222,7 +224,7 @@ class _SignaturePadScreenState extends State<_SignaturePadScreen>
                           foregroundColor: Colors.white,
                         ),
                         icon: const Icon(Icons.check),
-                        label: const Text('Done'),
+                        label: Text(l10n.signaturePadDone),
                         onPressed: _finishDraw,
                       ),
                     ),
@@ -238,7 +240,7 @@ class _SignaturePadScreenState extends State<_SignaturePadScreen>
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Type your name',
+                  l10n.signaturePadTypeYourName,
                   style: TextStyle(
                     fontSize: 12.5,
                     color: scheme.onSurfaceVariant,
@@ -249,11 +251,11 @@ class _SignaturePadScreenState extends State<_SignaturePadScreen>
                   controller: _typeController,
                   autofocus: true,
                   onChanged: (_) => setState(() {}),
-                  decoration: const InputDecoration(hintText: 'Your name'),
+                  decoration: InputDecoration(hintText: l10n.signaturePadYourName),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Style',
+                  l10n.signaturePadStyle,
                   style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
@@ -286,7 +288,7 @@ class _SignaturePadScreenState extends State<_SignaturePadScreen>
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Color',
+                  l10n.signaturePadColor,
                   style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
@@ -328,7 +330,7 @@ class _SignaturePadScreenState extends State<_SignaturePadScreen>
                     foregroundColor: Colors.white,
                   ),
                   icon: const Icon(Icons.check),
-                  label: const Text('Done'),
+                  label: Text(l10n.signaturePadDone),
                   onPressed: _typeController.text.trim().isEmpty
                       ? null
                       : _finishType,

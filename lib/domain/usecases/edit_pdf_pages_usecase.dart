@@ -10,7 +10,7 @@ class EditPdfPagesUseCase {
 
   Future<String> call(String inputPath, List<PdfPageEdit> edits) async {
     if (edits.isEmpty) {
-      throw ArgumentError('At least one page must remain in the PDF.');
+      throw ArgumentError('errorAtLeastOnePageMustRemainInPdf');
     }
     return repository.editPdfPages(inputPath, edits);
   }

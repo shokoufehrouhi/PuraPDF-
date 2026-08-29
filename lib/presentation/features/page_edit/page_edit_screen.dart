@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/error_message.dart';
 import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/pdf_file.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
@@ -31,6 +33,7 @@ class PageEditScreen extends ConsumerWidget {
     final state = ref.watch(pageEditControllerProvider);
     final controller = ref.read(pageEditControllerProvider.notifier);
     final ColorScheme scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -42,20 +45,23 @@ class PageEditScreen extends ConsumerWidget {
         top: false,
         child: Column(
           children: [
-            const FeatureScreenHeader(
+            FeatureScreenHeader(
               icon: Icons.crop_rotate,
               color: _color,
-              title: 'Edit Pages',
-              description:
-                  'Rotate, reorder, or remove pages from a PDF — the rest '
-                  'of the document stays untouched.',
-              steps: ['Select PDF', 'Edit pages', 'Save', 'Download'],
+              title: l10n.pageEditTitle,
+              description: l10n.pageEditDescription,
+              steps: [
+                l10n.pageEditStepSelect,
+                l10n.pageEditStepEdit,
+                l10n.pageEditStepSave,
+                l10n.download,
+              ],
             ),
             if (state.error != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                 child: Text(
-                  state.error!,
+                  localizedError(context, state.error!),
                   style: TextStyle(color: scheme.error),
                 ),
               ),
@@ -68,8 +74,8 @@ class PageEditScreen extends ConsumerWidget {
                         child: PickerCard(
                           icon: Icons.upload_file,
                           color: _color,
-                          label: 'Select a PDF',
-                          hint: 'Tap to browse your files',
+                          label: l10n.selectAPdf,
+                          hint: l10n.tapToBrowseFiles,
                           onTap: () => _pickFile(ref),
                         ),
                       ),
@@ -84,9 +90,7 @@ class PageEditScreen extends ConsumerWidget {
                             children: [
                               Expanded(
                                 child: Text(
-                                  '${state.pages.length} page'
-                                  '${state.pages.length == 1 ? '' : 's'} '
-                                  '— drag to reorder',
+                                  l10n.scanPageCount(state.pages.length),
                                   style: TextStyle(
                                     fontSize: 12.5,
                                     color: scheme.onSurfaceVariant,
@@ -99,7 +103,7 @@ class PageEditScreen extends ConsumerWidget {
                                   Icons.swap_horiz,
                                   size: 18,
                                 ),
-                                label: const Text('Change file'),
+                                label: Text(l10n.changeFile),
                                 style: TextButton.styleFrom(
                                   foregroundColor: _color,
                                   padding: EdgeInsets.zero,
@@ -172,19 +176,19 @@ class PageEditScreen extends ConsumerWidget {
                                       ),
                                     ],
                                   ),
-                                  title: Text('Page ${index + 1}'),
+                                  title: Text(l10n.pageNumberLabel(index + 1)),
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
                                         icon: const Icon(Icons.rotate_right),
-                                        tooltip: 'Rotate',
+                                        tooltip: l10n.rotate,
                                         onPressed: () =>
                                             controller.rotateAt(index),
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.close),
-                                        tooltip: 'Remove page',
+                                        tooltip: l10n.removePage,
                                         onPressed: () =>
                                             controller.removeAt(index),
                                       ),
@@ -233,8 +237,8 @@ class PageEditScreen extends ConsumerWidget {
                                 : const Icon(Icons.save_outlined),
                             label: Text(
                               state.pages.isEmpty
-                                  ? 'At least one page must remain'
-                                  : 'Save changes',
+                                  ? l10n.errorAtLeastOnePageMustRemain
+                                  : l10n.saveChanges,
                             ),
                             onPressed: state.isSaving || state.pages.isEmpty
                                 ? null
@@ -257,6 +261,7 @@ class _ResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -265,14 +270,14 @@ class _ResultCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.check_circle, color: _color),
-              SizedBox(width: 8),
+              const Icon(Icons.check_circle, color: _color),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'PDF saved successfully',
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                  l10n.pdfSavedSuccess,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),
             ],
@@ -287,7 +292,7 @@ class _ResultCard extends StatelessWidget {
                     foregroundColor: Colors.white,
                   ),
                   icon: const Icon(Icons.ios_share),
-                  label: const Text('Share'),
+                  label: Text(l10n.share),
                   onPressed: () => SharePlus.instance.share(
                     ShareParams(files: [XFile(path)]),
                   ),
@@ -301,7 +306,7 @@ class _ResultCard extends StatelessWidget {
                     side: BorderSide(color: _color.withValues(alpha: 0.5)),
                   ),
                   icon: const Icon(Icons.download_outlined),
-                  label: const Text('Download'),
+                  label: Text(l10n.download),
                   onPressed: () => downloadFile(context, path),
                 ),
               ),

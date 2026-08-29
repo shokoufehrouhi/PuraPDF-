@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/error_message.dart';
 import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/pdf_file.dart';
 import '../../../domain/entities/pdf_text_line.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
@@ -45,29 +47,30 @@ class ContentEditScreen extends ConsumerWidget {
     String currentText,
   ) async {
     final controller = TextEditingController(text: currentText);
+    final l10n = AppLocalizations.of(context);
     final String? action = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit line'),
+        title: Text(l10n.editLine),
         content: TextField(
           controller: controller,
           autofocus: true,
           maxLines: null,
-          decoration: const InputDecoration(hintText: 'Line text'),
+          decoration: InputDecoration(hintText: l10n.lineText),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop('delete'),
-            child: Text('Delete', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            child: Text(l10n.delete, style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: _color),
             onPressed: () => Navigator.of(context).pop('save'),
-            child: const Text('Save'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -87,6 +90,7 @@ class ContentEditScreen extends ConsumerWidget {
     final state = ref.watch(contentEditControllerProvider);
     final controller = ref.read(contentEditControllerProvider.notifier);
     final ColorScheme scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -98,21 +102,23 @@ class ContentEditScreen extends ConsumerWidget {
         top: false,
         child: Column(
           children: [
-            const FeatureScreenHeader(
+            FeatureScreenHeader(
               icon: Icons.text_fields,
               color: _color,
-              title: 'Edit PDF',
-              description:
-                  'Tap a line to fix or remove it, or drop in an image — '
-                  'edits cover the original spot rather than reflowing '
-                  'the page.',
-              steps: ['Select PDF', 'Tap to edit', 'Add image', 'Save'],
+              title: l10n.contentEditTitle,
+              description: l10n.contentEditDescription,
+              steps: [
+                l10n.contentEditStepSelect,
+                l10n.contentEditStepEdit,
+                l10n.addImage,
+                l10n.contentEditStepSave,
+              ],
             ),
             if (state.error != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                 child: Text(
-                  state.error!,
+                  localizedError(context, state.error!),
                   style: TextStyle(color: scheme.error),
                 ),
               ),
@@ -125,8 +131,8 @@ class ContentEditScreen extends ConsumerWidget {
                         child: PickerCard(
                           icon: Icons.upload_file,
                           color: _color,
-                          label: 'Select a PDF',
-                          hint: 'Tap to browse your files',
+                          label: l10n.selectAPdf,
+                          hint: l10n.tapToBrowseFiles,
                           onTap: () => _pickFile(ref),
                         ),
                       ),
@@ -134,7 +140,7 @@ class ContentEditScreen extends ConsumerWidget {
                   : state.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : state.pages.isEmpty
-                  ? const Center(child: Text('This PDF has no pages.'))
+                  ? Center(child: Text(l10n.thisPdfHasNoPages))
                   : Column(
                       children: [
                         Padding(
@@ -143,7 +149,7 @@ class ContentEditScreen extends ConsumerWidget {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.chevron_left),
-                                tooltip: 'Previous page',
+                                tooltip: l10n.previousPage,
                                 onPressed: state.currentPageIndex > 0
                                     ? () => controller.setPage(
                                         state.currentPageIndex - 1,
@@ -152,8 +158,10 @@ class ContentEditScreen extends ConsumerWidget {
                               ),
                               Expanded(
                                 child: Text(
-                                  'Page ${state.currentPageIndex + 1} of '
-                                  '${state.pages.length}',
+                                  l10n.pageOfTotal(
+                                    state.currentPageIndex + 1,
+                                    state.pages.length,
+                                  ),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
@@ -163,7 +171,7 @@ class ContentEditScreen extends ConsumerWidget {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.chevron_right),
-                                tooltip: 'Next page',
+                                tooltip: l10n.nextPage,
                                 onPressed:
                                     state.currentPageIndex <
                                         state.pages.length - 1
@@ -199,7 +207,7 @@ class ContentEditScreen extends ConsumerWidget {
                               ),
                             ),
                             icon: const Icon(Icons.add_photo_alternate_outlined),
-                            label: const Text('Add image to this page'),
+                            label: Text(l10n.addImageToPage),
                             onPressed: () => _pickImage(ref),
                           ),
                         ),
@@ -242,8 +250,8 @@ class ContentEditScreen extends ConsumerWidget {
                                 : const Icon(Icons.save_outlined),
                             label: Text(
                               state.hasEdits
-                                  ? 'Save changes'
-                                  : 'Make a change to save',
+                                  ? l10n.contentEditStepSave
+                                  : l10n.errorMakeAChangeBeforeSaving,
                             ),
                             onPressed: state.isSaving || !state.hasEdits
                                 ? null
@@ -425,6 +433,7 @@ class _ResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -433,14 +442,14 @@ class _ResultCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.check_circle, color: _color),
-              SizedBox(width: 8),
+              const Icon(Icons.check_circle, color: _color),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'PDF saved successfully',
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                  l10n.pdfSavedSuccess,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),
             ],
@@ -455,7 +464,7 @@ class _ResultCard extends StatelessWidget {
                     foregroundColor: Colors.white,
                   ),
                   icon: const Icon(Icons.ios_share),
-                  label: const Text('Share'),
+                  label: Text(l10n.share),
                   onPressed: () => SharePlus.instance.share(
                     ShareParams(files: [XFile(path)]),
                   ),
@@ -469,7 +478,7 @@ class _ResultCard extends StatelessWidget {
                     side: BorderSide(color: _color.withValues(alpha: 0.5)),
                   ),
                   icon: const Icon(Icons.download_outlined),
-                  label: const Text('Download'),
+                  label: Text(l10n.download),
                   onPressed: () => downloadFile(context, path),
                 ),
               ),

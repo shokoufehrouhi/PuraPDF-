@@ -715,9 +715,7 @@ class PdfRepositoryImpl implements PdfRepository {
   Uint8List _normalizeImageBytes(Uint8List bytes) {
     final img.Image? decoded = img.decodeImage(bytes);
     if (decoded == null) {
-      throw ArgumentError(
-        'This image format isn\'t supported. Try a JPEG or PNG instead.',
-      );
+      throw ArgumentError('errorUnsupportedImageFormat');
     }
     return Uint8List.fromList(img.encodePng(decoded));
   }
@@ -739,9 +737,7 @@ class PdfRepositoryImpl implements PdfRepository {
     try {
       doc = await _loadDocument(inputPath, password: password);
     } catch (_) {
-      throw ArgumentError(
-        'Wrong password, or this PDF isn\'t password-protected.',
-      );
+      throw ArgumentError('errorWrongPasswordOrNotProtected');
     }
     // Empty passwords are how Syncfusion drops encryption on save — see
     // pdf_repository_impl's test coverage: re-saving a loaded encrypted

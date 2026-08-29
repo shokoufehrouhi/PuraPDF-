@@ -1,0 +1,366 @@
+{
+  "@@locale": "ar",
+  "appName": "PuraPDF+",
+  "appTagline": "أداة PDF الخاصة بك — دمج وتقسيم وضغط وتحويل، كل ذلك على جهازك.",
+  "categoryOrganize": "تنظيم",
+  "categoryEditProtect": "تحرير وحماية",
+  "recentsTooltip": "الأخيرة",
+  "backToToolsTooltip": "العودة إلى الأدوات",
+  "themeLightTooltip": "المظهر الفاتح",
+  "themeDarkTooltip": "المظهر الداكن",
+  "languageTooltip": "اللغة",
+  "featureMergeTitle": "دمج ملفات PDF",
+  "featureMergeSubtitle": "دمج عدة مستندات",
+  "featureSplitTitle": "تقسيم PDF",
+  "featureSplitSubtitle": "الفصل إلى صفحات أو أقسام",
+  "featureCompressTitle": "ضغط PDF",
+  "featureCompressSubtitle": "تحسين حجم الملف للمشاركة",
+  "featureImagePdfTitle": "صورة ⇄ PDF",
+  "featureImagePdfSubtitle": "التحويل بين الصيغ",
+  "featureScanTitle": "مسح مستند",
+  "featureScanSubtitle": "التقاط المستندات الورقية بالكاميرا",
+  "featurePageEditTitle": "تحرير الصفحات",
+  "featurePageEditSubtitle": "تدوير الصفحات أو إعادة ترتيبها أو حذفها",
+  "featureContentEditTitle": "تحرير PDF",
+  "featureContentEditSubtitle": "تصحيح النص، حذف سطر، إضافة صورة",
+  "featureEncryptTitle": "الحماية بكلمة مرور",
+  "featureEncryptSubtitle": "إضافة أو إزالة كلمة مرور PDF",
+  "featureWatermarkTitle": "علامة مائية",
+  "featureWatermarkSubtitle": "طباعة نص على كل صفحة",
+  "featureSignatureTitle": "توقيع رقمي",
+  "featureSignatureSubtitle": "ارسم أو اكتب توقيعًا، ضعه، احفظ",
+  "recentsEmptyTitle": "لا توجد ملفات بعد",
+  "recentsEmptyBody": "الملفات التي تنشئها باستخدام الدمج أو التقسيم أو الضغط أو صورة ⇄ PDF ستظهر هنا.",
+  "browseTools": "تصفح الأدوات",
+  "clear": "مسح",
+  "clearAllTitle": "هل تريد مسح جميع الملفات الأخيرة؟",
+  "clearAllBody": "سيؤدي هذا إلى حذف كل الملفات المدرجة هنا من جهازك. لا يمكن التراجع عن هذا الإجراء.",
+  "cancel": "إلغاء",
+  "clearAllConfirm": "مسح الكل",
+  "opUnknown": "ملف",
+  "opMerge": "دمج",
+  "opSplit": "تقسيم",
+  "opCompress": "ضغط",
+  "opImageToPdf": "صورة → PDF",
+  "opPdfToImage": "PDF → صورة",
+  "opScan": "مسح ضوئي",
+  "opPageEdit": "تحرير الصفحات",
+  "opContentEdit": "تحرير PDF",
+  "opLocked": "مقفل",
+  "opUnlocked": "غير مقفل",
+  "opWatermark": "علامة مائية",
+  "opSigned": "موقّع",
+  "share": "مشاركة",
+  "download": "تنزيل",
+  "startOver": "البدء من جديد",
+  "save": "حفظ",
+  "remove": "إزالة",
+  "selectAPdf": "اختر ملف PDF",
+  "selectPdf": "اختيار PDF",
+  "tapToBrowseFiles": "اضغط لتصفح ملفاتك",
+  "tapToChangeFile": "اضغط لتغيير الملف",
+  "previousPage": "الصفحة السابقة",
+  "nextPage": "الصفحة التالية",
+  "downloadSavedToDownloads": "تم الحفظ في التنزيلات: {fileName}",
+  "@downloadSavedToDownloads": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "downloadSaved": "تم الحفظ: {fileName}",
+  "@downloadSaved": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "downloadCancelled": "تم الإلغاء",
+  "downloadNoDirectory": "مجلد التنزيلات غير متاح",
+  "errorGeneric": "حدث خطأ ما. حاول مرة أخرى.",
+  "errorSelectPdfFirst": "اختر ملف PDF أولًا.",
+  "errorEnterPassword": "أدخل كلمة مرور.",
+  "errorEnterPdfPassword": "أدخل كلمة مرور ملف PDF.",
+  "errorPasswordNoSpaces": "لا يمكن أن تحتوي كلمة المرور على مسافات.",
+  "errorPasswordTooShort": "يجب أن تتكون كلمة المرور من {minLength} حرفًا على الأقل.",
+  "@errorPasswordTooShort": {
+    "placeholders": {
+      "minLength": {}
+    }
+  },
+  "errorPasswordsDontMatch": "كلمتا المرور غير متطابقتين.",
+  "errorAtLeastOnePageMustRemain": "يجب أن تبقى صفحة واحدة على الأقل.",
+  "errorAtLeastOnePageMustRemainInPdf": "يجب أن تبقى صفحة واحدة على الأقل في ملف PDF.",
+  "errorMakeAChangeBeforeSaving": "قم بإجراء تغيير واحد على الأقل قبل الحفظ.",
+  "errorSelectAtLeastOneImage": "اختر صورة واحدة على الأقل.",
+  "errorMergeNeedsTwoFiles": "يتطلب الدمج ملفي PDF على الأقل.",
+  "errorNewNameEmpty": "لا يمكن أن يكون الاسم الجديد فارغًا.",
+  "errorScanAtLeastOnePage": "امسح صفحة واحدة على الأقل.",
+  "errorScanAtLeastOnePageFirst": "امسح صفحة واحدة على الأقل أولًا.",
+  "errorProvideAtLeastOneRange": "حدد نطاق صفحات واحدًا على الأقل للتقسيم.",
+  "errorInvalidPageRange": "نطاق صفحات غير صالح: {range}",
+  "@errorInvalidPageRange": {
+    "placeholders": {
+      "range": {}
+    }
+  },
+  "errorRangeExceedsPageCount": "النطاق {range} يتجاوز عدد صفحات المستند ({pageCount}).",
+  "@errorRangeExceedsPageCount": {
+    "placeholders": {
+      "range": {},
+      "pageCount": {}
+    }
+  },
+  "errorEnterWatermarkText": "أدخل نص العلامة المائية.",
+  "errorAddSignatureFirst": "أضف توقيعًا أولًا.",
+  "errorPageIndexOutOfRange": "رقم الصفحة {index} خارج النطاق (0-{max}).",
+  "@errorPageIndexOutOfRange": {
+    "placeholders": {
+      "index": {},
+      "max": {}
+    }
+  },
+  "errorWrongPasswordOrNotProtected": "كلمة المرور خاطئة، أو أن ملف PDF هذا غير محمي بكلمة مرور.",
+  "errorUnsupportedImageFormat": "صيغة الصورة هذه غير مدعومة. جرّب JPEG أو PNG بدلًا من ذلك.",
+  "mergeTitle": "دمج ملفات PDF",
+  "mergeDescription": "ادمج عدة ملفات PDF في مستند واحد، بالترتيب الذي تريده.",
+  "mergeStepAdd": "إضافة ملفات",
+  "mergeStepReorder": "إعادة الترتيب",
+  "mergeStepMerge": "دمج",
+  "mergeStepSave": "حفظ",
+  "mergeAddFiles": "إضافة ملفات PDF",
+  "mergeAddFilesHint": "يمكنك اختيار عدة ملفات في وقت واحد",
+  "mergeFileCount": "{count, plural, one{ملف واحد} other{{count} ملفات}} — اسحب لإعادة الترتيب",
+  "@mergeFileCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "addMore": "إضافة المزيد",
+  "mergeButtonNeedsMore": "أضف ملفين على الأقل للدمج",
+  "mergeButtonReady": "دمج {count} ملفات",
+  "@mergeButtonReady": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "mergeSuccess": "تم الدمج بنجاح",
+  "splitTitle": "تقسيم PDF",
+  "splitDescription": "قسّم ملف PDF إلى ملفات منفصلة — حسب الصفحة أو نطاقات مخصصة.",
+  "splitStepSelect": "اختيار PDF",
+  "splitStepChoose": "اختيار الصفحات",
+  "splitStepSplit": "تقسيم",
+  "splitStepSave": "حفظ",
+  "splitPageCountHint": "{count} صفحات — اضغط لتغيير الملف",
+  "@splitPageCountHint": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "splitOneFilePerPage": "التقسيم إلى ملف واحد لكل صفحة",
+  "splitPageRanges": "نطاقات الصفحات",
+  "splitPageRangesHint": "مثال: 1-3، 5، 7-9",
+  "splitButton": "تقسيم",
+  "splitFilesCreated": "{count, plural, one{تم إنشاء ملف واحد} other{تم إنشاء {count} ملفات}}",
+  "@splitFilesCreated": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "shareZip": "مشاركة ZIP",
+  "downloadZip": "تنزيل ZIP",
+  "compressTitle": "ضغط PDF",
+  "compressDescription": "قلّل حجم ملف PDF لمشاركة أسهل، مع ثلاثة مستويات جودة للاختيار من بينها.",
+  "compressStepSelect": "اختيار PDF",
+  "compressStepLevel": "اختيار المستوى",
+  "compressStepCompress": "ضغط",
+  "compressStepSave": "حفظ",
+  "compressOriginalSizeHint": "الحجم الأصلي: {size} — اضغط لتغيير الملف",
+  "@compressOriginalSizeHint": {
+    "placeholders": {
+      "size": {}
+    }
+  },
+  "compressLow": "منخفض",
+  "compressMedium": "متوسط",
+  "compressHigh": "عالٍ",
+  "compressHighWarning": "يعيد المستوى «عالٍ» بناء كل صفحة كصورة — أفضل تقليل للحجم للمستندات الممسوحة/الصور، لكن النتيجة تفقد النص القابل للتحديد/البحث. في ملفات PDF كثيفة النص حيث قد يأتي هذا بنتيجة عكسية، يتم التبديل تلقائيًا إلى طريقة أخرى حتى لا تكون النتيجة أبدًا أكبر من الأصل.",
+  "compressButton": "ضغط",
+  "compressReductionPercent": "أصغر بنسبة {percent}٪",
+  "@compressReductionPercent": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "compressBeforeAfter": "قبل: {before}  ←  بعد: {after}",
+  "@compressBeforeAfter": {
+    "placeholders": {
+      "before": {},
+      "after": {}
+    }
+  },
+  "imagePdfTitle": "صورة ⇄ PDF",
+  "imagesToPdfDescription": "حوّل صورة واحدة أو أكثر إلى مستند PDF واحد.",
+  "pdfToImagesDescription": "صدّر كل صفحة من ملف PDF كملف صورة منفصل.",
+  "imagePdfStepAddImages": "إضافة صور",
+  "imagePdfStepConvert": "تحويل",
+  "imagePdfStepSave": "حفظ",
+  "imagePdfStepSelect": "اختيار PDF",
+  "imagePdfStepFormat": "اختيار الصيغة",
+  "imagesToPdfSegment": "صور → PDF",
+  "pdfToImagesSegment": "PDF → صور",
+  "addImages": "إضافة صور",
+  "addImagesHint": "يمكنك اختيار عدة صور في وقت واحد",
+  "imagesSelectedCount": "{count, plural, one{تم اختيار صورة واحدة} other{تم اختيار {count} صور}}",
+  "@imagesSelectedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pdfCreatedSuccess": "تم إنشاء PDF بنجاح",
+  "convertButton": "تحويل",
+  "convertButtonEmpty": "أضف صورًا للتحويل",
+  "convertButtonReady": "{count, plural, one{تحويل صورة واحدة} other{تحويل {count} صور}}",
+  "@convertButtonReady": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "imagesCreatedCount": "{count, plural, one{تم إنشاء صورة واحدة} other{تم إنشاء {count} صور}}",
+  "@imagesCreatedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "scanTitle": "مسح مستند",
+  "scanDescription": "حوّل صور المستندات الورقية إلى ملف PDF نظيف — يتم اكتشاف الحواف والقص تلقائيًا أثناء المسح.",
+  "scanStepScan": "مسح",
+  "scanStepReorder": "إعادة الترتيب",
+  "scanStepCreatePdf": "إنشاء PDF",
+  "scanStepSave": "حفظ",
+  "scanADocument": "مسح مستند",
+  "scanHint": "يستخدم الكاميرا — يتم اكتشاف الحواف وقصها تلقائيًا",
+  "openingCamera": "جارٍ فتح الكاميرا…",
+  "scanMore": "مسح المزيد",
+  "scanPageCount": "{count, plural, one{صفحة واحدة} other{{count} صفحات}} — اسحب لإعادة الترتيب",
+  "@scanPageCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pageNumberLabel": "صفحة {number}",
+  "@pageNumberLabel": {
+    "placeholders": {
+      "number": {}
+    }
+  },
+  "createPdfButton": "إنشاء PDF",
+  "createPdfButtonReady": "{count, plural, one{إنشاء PDF من صفحة واحدة} other{إنشاء PDF من {count} صفحات}}",
+  "@createPdfButtonReady": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pageEditTitle": "تحرير الصفحات",
+  "pageEditDescription": "قم بتدوير صفحات ملف PDF أو إعادة ترتيبها أو إزالتها — تبقى بقية المستند دون تغيير.",
+  "pageEditStepSelect": "اختيار PDF",
+  "pageEditStepEdit": "تحرير الصفحات",
+  "pageEditStepSave": "حفظ التغييرات",
+  "rotate": "تدوير",
+  "removePage": "إزالة الصفحة",
+  "saveChanges": "حفظ التغييرات",
+  "pdfSavedSuccess": "تم حفظ PDF بنجاح",
+  "contentEditTitle": "تحرير PDF",
+  "contentEditDescription": "اضغط على سطر لتصحيحه أو إزالته، أو أضف صورة — تغطي التعديلات المكان الأصلي بدلًا من إعادة تدفق الصفحة.",
+  "contentEditStepSelect": "اختيار PDF",
+  "contentEditStepEdit": "اضغط للتحرير",
+  "contentEditStepSave": "حفظ التغييرات",
+  "editLine": "تحرير السطر",
+  "lineText": "نص السطر",
+  "delete": "حذف",
+  "addImageToPage": "إضافة صورة لهذه الصفحة",
+  "addImage": "إضافة صورة",
+  "thisPdfHasNoPages": "لا يحتوي ملف PDF هذا على صفحات.",
+  "encryptTitle": "الحماية بكلمة مرور",
+  "encryptDescription": "أقفل ملف PDF بكلمة مرور بحيث لا يفتحه إلا من يعرفها.",
+  "addPasswordSegment": "إضافة كلمة مرور",
+  "removePasswordSegment": "إزالة كلمة مرور",
+  "password": "كلمة المرور",
+  "currentPassword": "كلمة المرور الحالية",
+  "confirmPassword": "تأكيد كلمة المرور",
+  "passwordHelperText": "{minLength} أحرف على الأقل، بدون مسافات",
+  "@passwordHelperText": {
+    "placeholders": {
+      "minLength": {}
+    }
+  },
+  "showPassword": "إظهار كلمة المرور",
+  "hidePassword": "إخفاء كلمة المرور",
+  "lockButton": "قفل",
+  "unlockButton": "فتح القفل",
+  "passwordAdded": "تمت إضافة كلمة المرور",
+  "passwordRemoved": "تمت إزالة كلمة المرور",
+  "watermarkTitle": "علامة مائية",
+  "watermarkDescription": "اطبع نصًا بشكل قطري على كل صفحة — رائع لكلمة \"مسودة\" أو \"سري\" أو اسم شركة.",
+  "watermarkStepSelect": "اختيار PDF",
+  "watermarkStepText": "تحديد النص",
+  "watermarkStepStamp": "طباعة",
+  "watermarkStepSave": "حفظ",
+  "watermarkText": "نص العلامة المائية",
+  "watermarkTextHint": "مثال: سري",
+  "color": "اللون",
+  "opacityPercent": "الشفافية: {percent}٪",
+  "@opacityPercent": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "sizeValue": "الحجم: {size}",
+  "@sizeValue": {
+    "placeholders": {
+      "size": {}
+    }
+  },
+  "watermarkButton": "طباعة",
+  "watermarkAdded": "تمت إضافة العلامة المائية",
+  "signatureTitle": "توقيع رقمي",
+  "signatureDescription": "ارسم أو اكتب توقيعًا، ضعه في أي صفحة، ثم احفظ.",
+  "signatureStepSelect": "اختيار PDF",
+  "signatureStepCreate": "تحديد التوقيع",
+  "signatureStepPlace": "وضع",
+  "signatureStepSave": "حفظ PDF الموقّع",
+  "addSignature": "إضافة توقيع",
+  "changeSignature": "تغيير التوقيع",
+  "placeButton": "وضع",
+  "signButton": "توقيع",
+  "pdfSignedSuccess": "تم توقيع PDF بنجاح",
+  "signaturePadDraw": "رسم",
+  "signaturePadType": "كتابة",
+  "signaturePadCreateTitle": "إنشاء توقيع",
+  "signaturePadDrawHint": "وقّع بإصبعك أو بالماوس",
+  "signaturePadClear": "مسح",
+  "signaturePadColor": "اللون",
+  "signaturePadStyle": "النمط",
+  "signaturePadYourName": "اسمك",
+  "signaturePadTypeYourName": "اكتب اسمك",
+  "signaturePadDone": "تم",
+  "signaturePadFontCasual": "غير رسمي",
+  "signaturePadFontElegant": "أنيق",
+  "signaturePadFontBold": "عريض",
+  "colorBlack": "أسود",
+  "colorBlue": "أزرق",
+  "colorRed": "أحمر",
+  "colorGreen": "أخضر",
+  "languagePickerTitle": "اختر لغتك",
+  "languagePickerSubtitle": "يمكنك تغيير هذا لاحقًا من الشاشة الرئيسية.",
+  "languagePickerContinue": "متابعة",
+  "changeFile": "تغيير الملف",
+  "pageOfTotal": "صفحة {current} من {total}",
+  "@pageOfTotal": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "encryptRemoveDescription": "أزل كلمة مرور ملف PDF، بمعرفة كلمة المرور الصحيحة.",
+  "encryptStepSetPassword": "تعيين كلمة المرور",
+  "encryptStepEnterPassword": "إدخال كلمة المرور"
+}

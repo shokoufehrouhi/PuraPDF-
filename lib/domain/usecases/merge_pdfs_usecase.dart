@@ -8,7 +8,7 @@ class MergePdfsUseCase {
 
   Future<String> call(List<String> inputPaths) {
     if (inputPaths.length < 2) {
-      throw ArgumentError('Merge requires at least 2 PDF files.');
+      throw ArgumentError('errorMergeNeedsTwoFiles');
     }
     return repository.mergePdfs(inputPaths);
   }

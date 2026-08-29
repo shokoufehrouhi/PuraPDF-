@@ -122,7 +122,7 @@ class PageEditController extends Notifier<PageEditState> {
     final file = state.sourceFile;
     if (file == null) return;
     if (state.pages.isEmpty) {
-      state = state.copyWith(error: 'At least one page must remain.');
+      state = state.copyWith(error: 'errorAtLeastOnePageMustRemain');
       return;
     }
 

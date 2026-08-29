@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/error_message.dart';
 import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/pdf_file.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
@@ -35,6 +37,7 @@ class MergeScreen extends ConsumerWidget {
     final state = ref.watch(mergeControllerProvider);
     final controller = ref.read(mergeControllerProvider.notifier);
     final ColorScheme scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -46,20 +49,23 @@ class MergeScreen extends ConsumerWidget {
         top: false,
         child: Column(
           children: [
-            const FeatureScreenHeader(
+            FeatureScreenHeader(
               icon: Icons.call_merge,
               color: _color,
-              title: 'Merge PDFs',
-              description:
-                  'Combine multiple PDF files into a single document, in '
-                  'whatever order you like.',
-              steps: ['Add files', 'Reorder', 'Merge', 'Save'],
+              title: l10n.mergeTitle,
+              description: l10n.mergeDescription,
+              steps: [
+                l10n.mergeStepAdd,
+                l10n.mergeStepReorder,
+                l10n.mergeStepMerge,
+                l10n.mergeStepSave,
+              ],
             ),
             if (state.error != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                 child: Text(
-                  state.error!,
+                  localizedError(context, state.error!),
                   style: TextStyle(color: scheme.error),
                 ),
               ),
@@ -72,8 +78,8 @@ class MergeScreen extends ConsumerWidget {
                         child: PickerCard(
                           icon: Icons.add,
                           color: _color,
-                          label: 'Add PDF files',
-                          hint: 'You can select multiple files at once',
+                          label: l10n.mergeAddFiles,
+                          hint: l10n.mergeAddFilesHint,
                           onTap: () => _pickFiles(ref),
                         ),
                       ),
@@ -86,9 +92,7 @@ class MergeScreen extends ConsumerWidget {
                             children: [
                               Expanded(
                                 child: Text(
-                                  '${state.files.length} file'
-                                  '${state.files.length == 1 ? '' : 's'} '
-                                  '— drag to reorder',
+                                  l10n.mergeFileCount(state.files.length),
                                   style: TextStyle(
                                     fontSize: 12.5,
                                     color: scheme.onSurfaceVariant,
@@ -98,7 +102,7 @@ class MergeScreen extends ConsumerWidget {
                               TextButton.icon(
                                 onPressed: () => _pickFiles(ref),
                                 icon: const Icon(Icons.add, size: 18),
-                                label: const Text('Add more'),
+                                label: Text(l10n.addMore),
                                 style: TextButton.styleFrom(
                                   foregroundColor: _color,
                                   padding: EdgeInsets.zero,
@@ -152,7 +156,7 @@ class MergeScreen extends ConsumerWidget {
                                     children: [
                                       IconButton(
                                         icon: const Icon(Icons.close),
-                                        tooltip: 'Remove',
+                                        tooltip: l10n.remove,
                                         onPressed: () =>
                                             controller.removeAt(index),
                                       ),
@@ -171,7 +175,7 @@ class MergeScreen extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                 child: _ResultCard(
-                  message: 'Merged successfully',
+                  message: l10n.mergeSuccess,
                   path: state.resultPath!,
                 ),
               ),
@@ -200,8 +204,8 @@ class MergeScreen extends ConsumerWidget {
                               : const Icon(Icons.call_merge),
                           label: Text(
                             state.files.length < 2
-                                ? 'Add at least 2 files to merge'
-                                : 'Merge ${state.files.length} files',
+                                ? l10n.mergeButtonNeedsMore
+                                : l10n.mergeButtonReady(state.files.length),
                           ),
                           onPressed: state.isMerging || state.files.length < 2
                               ? null
@@ -255,7 +259,7 @@ class _ResultCard extends StatelessWidget {
                     foregroundColor: Colors.white,
                   ),
                   icon: const Icon(Icons.ios_share),
-                  label: const Text('Share'),
+                  label: Text(AppLocalizations.of(context).share),
                   onPressed: () => SharePlus.instance.share(
                     ShareParams(files: [XFile(path)]),
                   ),
@@ -269,7 +273,7 @@ class _ResultCard extends StatelessWidget {
                     side: BorderSide(color: _color.withValues(alpha: 0.5)),
                   ),
                   icon: const Icon(Icons.download_outlined),
-                  label: const Text('Download'),
+                  label: Text(AppLocalizations.of(context).download),
                   onPressed: () => downloadFile(context, path),
                 ),
               ),

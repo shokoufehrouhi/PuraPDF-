@@ -7,7 +7,7 @@ class RenameHistoryFileUseCase {
 
   Future<String> call(String path, String newName) {
     if (newName.trim().isEmpty) {
-      throw ArgumentError('New name cannot be empty.');
+      throw ArgumentError('errorNewNameEmpty');
     }
     return repository.renameFile(path, newName.trim());
   }

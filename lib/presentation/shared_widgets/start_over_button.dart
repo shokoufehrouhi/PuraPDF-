@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
+
 /// Replaces a feature's primary action button once it has produced a
 /// result. Leaving the original action re-clickable there would just redo
 /// the same work on the same input — this instead clears the feature's
@@ -25,7 +27,7 @@ class StartOverButton extends StatelessWidget {
           side: BorderSide(color: color.withValues(alpha: 0.5)),
         ),
         icon: const Icon(Icons.refresh),
-        label: const Text('Start over'),
+        label: Text(AppLocalizations.of(context).startOver),
         onPressed: onPressed,
       ),
     );

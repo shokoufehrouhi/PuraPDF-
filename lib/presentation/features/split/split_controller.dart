@@ -106,7 +106,7 @@ class SplitController extends Notifier<SplitState> {
   Future<void> split() async {
     final file = state.sourceFile;
     if (file == null) {
-      state = state.copyWith(error: 'Avval ye PDF entekhab kon.');
+      state = state.copyWith(error: 'errorSelectPdfFirst');
       return;
     }
 

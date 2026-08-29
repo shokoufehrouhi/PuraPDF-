@@ -9,7 +9,7 @@ class WatermarkPdfUseCase {
 
   Future<String> call(String inputPath, WatermarkOptions options) async {
     if (options.text.trim().isEmpty) {
-      throw ArgumentError('Enter watermark text.');
+      throw ArgumentError('errorEnterWatermarkText');
     }
     return repository.watermarkPdf(inputPath, options);
   }

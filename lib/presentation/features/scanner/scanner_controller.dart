@@ -87,7 +87,7 @@ class ScannerController extends Notifier<ScannerState> {
 
   Future<void> createPdf() async {
     if (state.pages.isEmpty) {
-      state = state.copyWith(error: 'Scan at least one page first.');
+      state = state.copyWith(error: 'errorScanAtLeastOnePageFirst');
       return;
     }
     await AdsService.instance.interstitial.showBeforeOperation();

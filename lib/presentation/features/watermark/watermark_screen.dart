@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/error_message.dart';
 import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/pdf_file.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
@@ -31,6 +33,7 @@ class WatermarkScreen extends ConsumerWidget {
     final state = ref.watch(watermarkControllerProvider);
     final controller = ref.read(watermarkControllerProvider.notifier);
     final ColorScheme scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,14 +47,17 @@ class WatermarkScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const FeatureScreenHeader(
+              FeatureScreenHeader(
                 icon: Icons.branding_watermark_outlined,
                 color: _color,
-                title: 'Watermark',
-                description:
-                    'Stamp text diagonally across every page — great for '
-                    '"DRAFT", "CONFIDENTIAL", or a company name.',
-                steps: ['Select PDF', 'Set text', 'Stamp', 'Save'],
+                title: l10n.watermarkTitle,
+                description: l10n.watermarkDescription,
+                steps: [
+                  l10n.watermarkStepSelect,
+                  l10n.watermarkStepText,
+                  l10n.watermarkStepStamp,
+                  l10n.watermarkStepSave,
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -61,24 +67,24 @@ class WatermarkScreen extends ConsumerWidget {
                     PickerCard(
                       icon: Icons.upload_file,
                       color: _color,
-                      label: state.sourceFile?.name ?? 'Select a PDF',
+                      label: state.sourceFile?.name ?? l10n.selectAPdf,
                       hint: state.sourceFile == null
-                          ? 'Tap to browse your files'
-                          : 'Tap to change file',
+                          ? l10n.tapToBrowseFiles
+                          : l10n.tapToChangeFile,
                       onTap: () => _pickFile(ref),
                     ),
                     if (state.sourceFile != null) ...[
                       const SizedBox(height: 16),
                       TextField(
                         onChanged: controller.setText,
-                        decoration: const InputDecoration(
-                          labelText: 'Watermark text',
-                          hintText: 'e.g. CONFIDENTIAL',
+                        decoration: InputDecoration(
+                          labelText: l10n.watermarkText,
+                          hintText: l10n.watermarkTextHint,
                         ),
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Color',
+                        l10n.color,
                         style: TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
@@ -118,7 +124,7 @@ class WatermarkScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Opacity: ${(state.opacity * 100).round()}%',
+                        l10n.opacityPercent((state.opacity * 100).round()),
                         style: TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
@@ -133,7 +139,7 @@ class WatermarkScreen extends ConsumerWidget {
                         onChanged: controller.setOpacity,
                       ),
                       Text(
-                        'Size: ${state.fontSize.round()}',
+                        l10n.sizeValue(state.fontSize.round()),
                         style: TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
@@ -169,7 +175,7 @@ class WatermarkScreen extends ConsumerWidget {
                                   ),
                                 )
                               : const Icon(Icons.branding_watermark_outlined),
-                          label: const Text('Add Watermark'),
+                          label: Text(l10n.watermarkButton),
                           onPressed: state.isProcessing
                               ? null
                               : controller.submit,
@@ -177,7 +183,10 @@ class WatermarkScreen extends ConsumerWidget {
                     ],
                     if (state.error != null) ...[
                       const SizedBox(height: 12),
-                      Text(state.error!, style: TextStyle(color: scheme.error)),
+                      Text(
+                        localizedError(context, state.error!),
+                        style: TextStyle(color: scheme.error),
+                      ),
                     ],
                     if (state.resultPath != null) ...[
                       const SizedBox(height: 20),
@@ -189,14 +198,14 @@ class WatermarkScreen extends ConsumerWidget {
                         ),
                         child: Column(
                           children: [
-                            const Row(
+                            Row(
                               children: [
-                                Icon(Icons.check_circle, color: _color),
-                                SizedBox(width: 8),
+                                const Icon(Icons.check_circle, color: _color),
+                                const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    'Watermark added',
-                                    style: TextStyle(
+                                    l10n.watermarkAdded,
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -213,7 +222,7 @@ class WatermarkScreen extends ConsumerWidget {
                                       foregroundColor: Colors.white,
                                     ),
                                     icon: const Icon(Icons.ios_share),
-                                    label: const Text('Share'),
+                                    label: Text(l10n.share),
                                     onPressed: () => SharePlus.instance.share(
                                       ShareParams(
                                         files: [XFile(state.resultPath!)],
@@ -231,7 +240,7 @@ class WatermarkScreen extends ConsumerWidget {
                                       ),
                                     ),
                                     icon: const Icon(Icons.download_outlined),
-                                    label: const Text('Download'),
+                                    label: Text(l10n.download),
                                     onPressed: () =>
                                         downloadFile(context, state.resultPath!),
                                   ),

@@ -1,0 +1,366 @@
+{
+  "@@locale": "tr",
+  "appName": "PuraPDF+",
+  "appTagline": "PDF araç setiniz — birleştirin, bölün, sıkıştırın ve dönüştürün, hepsi cihazınızda.",
+  "categoryOrganize": "Düzenle",
+  "categoryEditProtect": "Düzenle ve Koru",
+  "recentsTooltip": "Son öğeler",
+  "backToToolsTooltip": "Araçlara dön",
+  "themeLightTooltip": "Açık tema",
+  "themeDarkTooltip": "Koyu tema",
+  "languageTooltip": "Dil",
+  "featureMergeTitle": "PDF'leri Birleştir",
+  "featureMergeSubtitle": "Birden fazla belgeyi birleştir",
+  "featureSplitTitle": "PDF Böl",
+  "featureSplitSubtitle": "Sayfalara veya bölümlere ayır",
+  "featureCompressTitle": "PDF Sıkıştır",
+  "featureCompressSubtitle": "Paylaşım için dosya boyutunu optimize et",
+  "featureImagePdfTitle": "Görsel ⇄ PDF",
+  "featureImagePdfSubtitle": "Formatlar arasında dönüştür",
+  "featureScanTitle": "Belge Tara",
+  "featureScanSubtitle": "Kamerayla kağıt belgeleri yakala",
+  "featurePageEditTitle": "Sayfaları Düzenle",
+  "featurePageEditSubtitle": "Sayfaları döndür, yeniden sırala veya kaldır",
+  "featureContentEditTitle": "PDF Düzenle",
+  "featureContentEditSubtitle": "Metni düzelt, satır kaldır, görsel ekle",
+  "featureEncryptTitle": "Parola Koruması",
+  "featureEncryptSubtitle": "PDF parolası ekle veya kaldır",
+  "featureWatermarkTitle": "Filigran",
+  "featureWatermarkSubtitle": "Her sayfaya metin damgala",
+  "featureSignatureTitle": "Dijital İmza",
+  "featureSignatureSubtitle": "İmza çiz veya yaz, yerleştir, kaydet",
+  "recentsEmptyTitle": "Henüz dosya yok",
+  "recentsEmptyBody": "Birleştir, Böl, Sıkıştır veya Görsel ⇄ PDF ile oluşturduğunuz dosyalar burada görünecek.",
+  "browseTools": "Araçlara göz at",
+  "clear": "Temizle",
+  "clearAllTitle": "Tüm son öğeler temizlensin mi?",
+  "clearAllBody": "Bu, burada listelenen tüm dosyaları cihazınızdan siler. Bu işlem geri alınamaz.",
+  "cancel": "İptal",
+  "clearAllConfirm": "Tümünü temizle",
+  "opUnknown": "Dosya",
+  "opMerge": "Birleştirme",
+  "opSplit": "Bölme",
+  "opCompress": "Sıkıştırma",
+  "opImageToPdf": "Görsel → PDF",
+  "opPdfToImage": "PDF → Görsel",
+  "opScan": "Tarama",
+  "opPageEdit": "Sayfa Düzenleme",
+  "opContentEdit": "PDF Düzenleme",
+  "opLocked": "Kilitli",
+  "opUnlocked": "Kilit Açıldı",
+  "opWatermark": "Filigran",
+  "opSigned": "İmzalandı",
+  "share": "Paylaş",
+  "download": "İndir",
+  "startOver": "Yeniden başla",
+  "save": "Kaydet",
+  "remove": "Kaldır",
+  "selectAPdf": "Bir PDF seçin",
+  "selectPdf": "PDF Seç",
+  "tapToBrowseFiles": "Dosyalara göz atmak için dokunun",
+  "tapToChangeFile": "Dosyayı değiştirmek için dokunun",
+  "previousPage": "Önceki sayfa",
+  "nextPage": "Sonraki sayfa",
+  "downloadSavedToDownloads": "İndirilenler'e kaydedildi: {fileName}",
+  "@downloadSavedToDownloads": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "downloadSaved": "Kaydedildi: {fileName}",
+  "@downloadSaved": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "downloadCancelled": "İptal edildi",
+  "downloadNoDirectory": "İndirilenler klasörü kullanılamıyor",
+  "errorGeneric": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
+  "errorSelectPdfFirst": "Önce bir PDF seçin.",
+  "errorEnterPassword": "Bir parola girin.",
+  "errorEnterPdfPassword": "PDF'nin parolasını girin.",
+  "errorPasswordNoSpaces": "Parola boşluk içeremez.",
+  "errorPasswordTooShort": "Parola en az {minLength} karakter olmalıdır.",
+  "@errorPasswordTooShort": {
+    "placeholders": {
+      "minLength": {}
+    }
+  },
+  "errorPasswordsDontMatch": "Parolalar eşleşmiyor.",
+  "errorAtLeastOnePageMustRemain": "En az bir sayfa kalmalıdır.",
+  "errorAtLeastOnePageMustRemainInPdf": "PDF'de en az bir sayfa kalmalıdır.",
+  "errorMakeAChangeBeforeSaving": "Kaydetmeden önce en az bir değişiklik yapın.",
+  "errorSelectAtLeastOneImage": "En az bir görsel seçin.",
+  "errorMergeNeedsTwoFiles": "Birleştirme için en az 2 PDF dosyası gerekir.",
+  "errorNewNameEmpty": "Yeni ad boş olamaz.",
+  "errorScanAtLeastOnePage": "En az bir sayfa tarayın.",
+  "errorScanAtLeastOnePageFirst": "Önce en az bir sayfa tarayın.",
+  "errorProvideAtLeastOneRange": "Bölmek için en az bir sayfa aralığı belirtin.",
+  "errorInvalidPageRange": "Geçersiz sayfa aralığı: {range}",
+  "@errorInvalidPageRange": {
+    "placeholders": {
+      "range": {}
+    }
+  },
+  "errorRangeExceedsPageCount": "{range} aralığı belge sayfa sayısını ({pageCount}) aşıyor.",
+  "@errorRangeExceedsPageCount": {
+    "placeholders": {
+      "range": {},
+      "pageCount": {}
+    }
+  },
+  "errorEnterWatermarkText": "Filigran metni girin.",
+  "errorAddSignatureFirst": "Önce bir imza ekleyin.",
+  "errorPageIndexOutOfRange": "Sayfa dizini {index} aralık dışında (0-{max}).",
+  "@errorPageIndexOutOfRange": {
+    "placeholders": {
+      "index": {},
+      "max": {}
+    }
+  },
+  "errorWrongPasswordOrNotProtected": "Yanlış parola veya bu PDF parola korumalı değil.",
+  "errorUnsupportedImageFormat": "Bu görsel formatı desteklenmiyor. Bunun yerine bir JPEG veya PNG deneyin.",
+  "mergeTitle": "PDF'leri Birleştir",
+  "mergeDescription": "Birden fazla PDF dosyasını istediğiniz sırayla tek bir belgede birleştirin.",
+  "mergeStepAdd": "Dosya ekle",
+  "mergeStepReorder": "Yeniden sırala",
+  "mergeStepMerge": "Birleştir",
+  "mergeStepSave": "Kaydet",
+  "mergeAddFiles": "PDF dosyaları ekle",
+  "mergeAddFilesHint": "Birden fazla dosyayı aynı anda seçebilirsiniz",
+  "mergeFileCount": "{count, plural, one{1 dosya} other{{count} dosya}} — sıralamak için sürükleyin",
+  "@mergeFileCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "addMore": "Daha fazla ekle",
+  "mergeButtonNeedsMore": "Birleştirmek için en az 2 dosya ekleyin",
+  "mergeButtonReady": "{count} dosyayı birleştir",
+  "@mergeButtonReady": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "mergeSuccess": "Başarıyla birleştirildi",
+  "splitTitle": "PDF Böl",
+  "splitDescription": "Bir PDF'yi ayrı dosyalara bölün — sayfaya veya özel aralıklara göre.",
+  "splitStepSelect": "PDF seç",
+  "splitStepChoose": "Sayfaları seç",
+  "splitStepSplit": "Böl",
+  "splitStepSave": "Kaydet",
+  "splitPageCountHint": "{count} sayfa — dosyayı değiştirmek için dokunun",
+  "@splitPageCountHint": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "splitOneFilePerPage": "Her sayfa için bir dosyaya böl",
+  "splitPageRanges": "Sayfa aralıkları",
+  "splitPageRangesHint": "örn. 1-3, 5, 7-9",
+  "splitButton": "Böl",
+  "splitFilesCreated": "{count, plural, one{1 dosya oluşturuldu} other{{count} dosya oluşturuldu}}",
+  "@splitFilesCreated": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "shareZip": "ZIP Paylaş",
+  "downloadZip": "ZIP İndir",
+  "compressTitle": "PDF Sıkıştır",
+  "compressDescription": "Daha kolay paylaşım için PDF dosya boyutunu üç kalite seviyesiyle küçültün.",
+  "compressStepSelect": "PDF seç",
+  "compressStepLevel": "Seviye seç",
+  "compressStepCompress": "Sıkıştır",
+  "compressStepSave": "Kaydet",
+  "compressOriginalSizeHint": "Orijinal boyut: {size} — dosyayı değiştirmek için dokunun",
+  "@compressOriginalSizeHint": {
+    "placeholders": {
+      "size": {}
+    }
+  },
+  "compressLow": "Düşük",
+  "compressMedium": "Orta",
+  "compressHigh": "Yüksek",
+  "compressHighWarning": "Yüksek, her sayfayı görsel olarak yeniden oluşturur — taramalar/fotoğraflar için en iyi boyut küçültmesidir, ancak sonuç seçilebilir/aranabilir metni kaybeder. Bunun ters teper olacağı metin ağırlıklı PDF'lerde, sonucun asla orijinalden büyük olmaması için otomatik olarak başka bir yönteme geçilir.",
+  "compressButton": "Sıkıştır",
+  "compressReductionPercent": "%{percent} daha küçük",
+  "@compressReductionPercent": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "compressBeforeAfter": "Önce: {before}  →  Sonra: {after}",
+  "@compressBeforeAfter": {
+    "placeholders": {
+      "before": {},
+      "after": {}
+    }
+  },
+  "imagePdfTitle": "Görsel ⇄ PDF",
+  "imagesToPdfDescription": "Bir veya daha fazla fotoğrafı tek bir PDF belgesine dönüştürün.",
+  "pdfToImagesDescription": "Bir PDF'nin her sayfasını ayrı bir görsel dosyası olarak dışa aktarın.",
+  "imagePdfStepAddImages": "Görsel ekle",
+  "imagePdfStepConvert": "Dönüştür",
+  "imagePdfStepSave": "Kaydet",
+  "imagePdfStepSelect": "PDF seç",
+  "imagePdfStepFormat": "Format seç",
+  "imagesToPdfSegment": "Görsel → PDF",
+  "pdfToImagesSegment": "PDF → Görsel",
+  "addImages": "Görsel ekle",
+  "addImagesHint": "Birden fazla fotoğrafı aynı anda seçebilirsiniz",
+  "imagesSelectedCount": "{count, plural, one{1 görsel seçildi} other{{count} görsel seçildi}}",
+  "@imagesSelectedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pdfCreatedSuccess": "PDF başarıyla oluşturuldu",
+  "convertButton": "Dönüştür",
+  "convertButtonEmpty": "Dönüştürmek için görsel ekleyin",
+  "convertButtonReady": "{count, plural, one{1 görseli dönüştür} other{{count} görseli dönüştür}}",
+  "@convertButtonReady": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "imagesCreatedCount": "{count, plural, one{1 görsel oluşturuldu} other{{count} görsel oluşturuldu}}",
+  "@imagesCreatedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "scanTitle": "Belge Tara",
+  "scanDescription": "Kağıt belgelerin fotoğraflarını temiz bir PDF'ye dönüştürün — kenar algılama ve kırpma tarama sırasında otomatik olarak yapılır.",
+  "scanStepScan": "Tara",
+  "scanStepReorder": "Yeniden sırala",
+  "scanStepCreatePdf": "PDF oluştur",
+  "scanStepSave": "Kaydet",
+  "scanADocument": "Bir belge tara",
+  "scanHint": "Kameranızı kullanır — kenarlar otomatik olarak algılanır ve kırpılır",
+  "openingCamera": "Kamera açılıyor…",
+  "scanMore": "Daha fazla tara",
+  "scanPageCount": "{count, plural, one{1 sayfa} other{{count} sayfa}} — sıralamak için sürükleyin",
+  "@scanPageCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pageNumberLabel": "Sayfa {number}",
+  "@pageNumberLabel": {
+    "placeholders": {
+      "number": {}
+    }
+  },
+  "createPdfButton": "PDF oluştur",
+  "createPdfButtonReady": "{count, plural, one{1 sayfadan PDF oluştur} other{{count} sayfadan PDF oluştur}}",
+  "@createPdfButtonReady": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pageEditTitle": "Sayfaları Düzenle",
+  "pageEditDescription": "Bir PDF'nin sayfalarını döndürün, yeniden sıralayın veya kaldırın — belgenin geri kalanı değişmeden kalır.",
+  "pageEditStepSelect": "PDF seç",
+  "pageEditStepEdit": "Sayfaları düzenle",
+  "pageEditStepSave": "Değişiklikleri kaydet",
+  "rotate": "Döndür",
+  "removePage": "Sayfayı kaldır",
+  "saveChanges": "Değişiklikleri kaydet",
+  "pdfSavedSuccess": "PDF başarıyla kaydedildi",
+  "contentEditTitle": "PDF Düzenle",
+  "contentEditDescription": "Düzeltmek veya kaldırmak için bir satıra dokunun ya da bir görsel ekleyin — düzenlemeler sayfayı yeniden akıtmak yerine orijinal konumu kaplar.",
+  "contentEditStepSelect": "PDF seç",
+  "contentEditStepEdit": "Düzenlemek için dokunun",
+  "contentEditStepSave": "Değişiklikleri kaydet",
+  "editLine": "Satırı düzenle",
+  "lineText": "Satır metni",
+  "delete": "Sil",
+  "addImageToPage": "Bu sayfaya görsel ekle",
+  "addImage": "Görsel ekle",
+  "thisPdfHasNoPages": "Bu PDF'nin sayfası yok.",
+  "encryptTitle": "Parola Koruması",
+  "encryptDescription": "Bir PDF'yi yalnızca bilenlerin açabilmesi için parolayla kilitleyin.",
+  "addPasswordSegment": "Parola Ekle",
+  "removePasswordSegment": "Parolayı Kaldır",
+  "password": "Parola",
+  "currentPassword": "Mevcut parola",
+  "confirmPassword": "Parolayı onayla",
+  "passwordHelperText": "En az {minLength} karakter, boşluk yok",
+  "@passwordHelperText": {
+    "placeholders": {
+      "minLength": {}
+    }
+  },
+  "showPassword": "Parolayı göster",
+  "hidePassword": "Parolayı gizle",
+  "lockButton": "Kilitle",
+  "unlockButton": "Kilidi aç",
+  "passwordAdded": "Parola eklendi",
+  "passwordRemoved": "Parola kaldırıldı",
+  "watermarkTitle": "Filigran",
+  "watermarkDescription": "Metni her sayfaya çapraz olarak damgalayın — \"TASLAK\", \"GİZLİ\" veya bir şirket adı için harika.",
+  "watermarkStepSelect": "PDF seç",
+  "watermarkStepText": "Metni ayarla",
+  "watermarkStepStamp": "Damgala",
+  "watermarkStepSave": "Kaydet",
+  "watermarkText": "Filigran metni",
+  "watermarkTextHint": "örn. GİZLİ",
+  "color": "Renk",
+  "opacityPercent": "Opaklık: %{percent}",
+  "@opacityPercent": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "sizeValue": "Boyut: {size}",
+  "@sizeValue": {
+    "placeholders": {
+      "size": {}
+    }
+  },
+  "watermarkButton": "Damgala",
+  "watermarkAdded": "Filigran eklendi",
+  "signatureTitle": "Dijital İmza",
+  "signatureDescription": "Bir imza çizin veya yazın, herhangi bir sayfaya yerleştirin ve kaydedin.",
+  "signatureStepSelect": "PDF seç",
+  "signatureStepCreate": "İmza ayarla",
+  "signatureStepPlace": "Yerleştir",
+  "signatureStepSave": "İmzalı PDF'yi kaydet",
+  "addSignature": "İmza Ekle",
+  "changeSignature": "İmzayı Değiştir",
+  "placeButton": "Yerleştir",
+  "signButton": "İmzala",
+  "pdfSignedSuccess": "PDF başarıyla imzalandı",
+  "signaturePadDraw": "Çiz",
+  "signaturePadType": "Yaz",
+  "signaturePadCreateTitle": "İmza Oluştur",
+  "signaturePadDrawHint": "Parmağınızla veya fareyle imzalayın",
+  "signaturePadClear": "Temizle",
+  "signaturePadColor": "Renk",
+  "signaturePadStyle": "Stil",
+  "signaturePadYourName": "Adınız",
+  "signaturePadTypeYourName": "Adınızı yazın",
+  "signaturePadDone": "Tamam",
+  "signaturePadFontCasual": "Rahat",
+  "signaturePadFontElegant": "Zarif",
+  "signaturePadFontBold": "Kalın",
+  "colorBlack": "Siyah",
+  "colorBlue": "Mavi",
+  "colorRed": "Kırmızı",
+  "colorGreen": "Yeşil",
+  "languagePickerTitle": "Dilinizi seçin",
+  "languagePickerSubtitle": "Bunu daha sonra ana ekrandan değiştirebilirsiniz.",
+  "languagePickerContinue": "Devam et",
+  "changeFile": "Dosyayı değiştir",
+  "pageOfTotal": "Sayfa {current} / {total}",
+  "@pageOfTotal": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "encryptRemoveDescription": "Doğru parolayı bilerek bir PDF'nin parolasını kaldırın.",
+  "encryptStepSetPassword": "Parola belirle",
+  "encryptStepEnterPassword": "Parolayı gir"
+}

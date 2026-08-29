@@ -182,7 +182,7 @@ class ContentEditController extends Notifier<ContentEditState> {
     final file = state.sourceFile;
     if (file == null) return;
     if (!state.hasEdits) {
-      state = state.copyWith(error: 'Make at least one change before saving.');
+      state = state.copyWith(error: 'errorMakeAChangeBeforeSaving');
       return;
     }
 

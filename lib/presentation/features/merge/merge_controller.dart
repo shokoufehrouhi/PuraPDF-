@@ -69,7 +69,7 @@ class MergeController extends Notifier<MergeState> {
 
   Future<void> merge() async {
     if (state.files.length < 2) {
-      state = state.copyWith(error: 'Hadde aghal 2 file PDF entekhab kon.');
+      state = state.copyWith(error: 'errorMergeNeedsTwoFiles');
       return;
     }
     await AdsService.instance.interstitial.showBeforeOperation();

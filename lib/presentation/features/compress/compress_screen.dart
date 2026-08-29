@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/error_message.dart';
 import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/compression_level.dart';
 import '../../../domain/entities/pdf_file.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
@@ -38,6 +40,7 @@ class CompressScreen extends ConsumerWidget {
     final state = ref.watch(compressControllerProvider);
     final controller = ref.read(compressControllerProvider.notifier);
     final ColorScheme scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -51,14 +54,17 @@ class CompressScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const FeatureScreenHeader(
+              FeatureScreenHeader(
                 icon: Icons.compress,
                 color: _color,
-                title: 'Compress PDF',
-                description:
-                    "Shrink a PDF's file size for easier sharing, with "
-                    'three quality levels to choose from.',
-                steps: ['Select PDF', 'Pick level', 'Compress', 'Save'],
+                title: l10n.compressTitle,
+                description: l10n.compressDescription,
+                steps: [
+                  l10n.compressStepSelect,
+                  l10n.compressStepLevel,
+                  l10n.compressStepCompress,
+                  l10n.compressStepSave,
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -68,14 +74,14 @@ class CompressScreen extends ConsumerWidget {
                     PickerCard(
                       icon: Icons.upload_file,
                       color: _color,
-                      label: state.sourceFile?.name ?? 'Select a PDF',
+                      label: state.sourceFile?.name ?? l10n.selectAPdf,
                       hint: state.sourceFile == null
-                          ? 'Tap to browse your files'
+                          ? l10n.tapToBrowseFiles
                           : state.originalSizeBytes != null
-                          ? 'Original size: '
-                                '${_formatSize(state.originalSizeBytes!)} — '
-                                'tap to change file'
-                          : 'Tap to change file',
+                          ? l10n.compressOriginalSizeHint(
+                              _formatSize(state.originalSizeBytes!),
+                            )
+                          : l10n.tapToChangeFile,
                       onTap: () => _pickFile(ref),
                     ),
                     if (state.sourceFile != null) ...[
@@ -87,18 +93,18 @@ class CompressScreen extends ConsumerWidget {
                           ),
                           selectedForegroundColor: _color,
                         ),
-                        segments: const [
+                        segments: [
                           ButtonSegment(
                             value: CompressionLevel.low,
-                            label: Text('Low'),
+                            label: Text(l10n.compressLow),
                           ),
                           ButtonSegment(
                             value: CompressionLevel.medium,
-                            label: Text('Medium'),
+                            label: Text(l10n.compressMedium),
                           ),
                           ButtonSegment(
                             value: CompressionLevel.high,
-                            label: Text('High'),
+                            label: Text(l10n.compressHigh),
                           ),
                         ],
                         selected: {state.level},
@@ -108,12 +114,7 @@ class CompressScreen extends ConsumerWidget {
                       if (state.level == CompressionLevel.high) ...[
                         const SizedBox(height: 8),
                         Text(
-                          'High rebuilds every page as an image — best size '
-                          'reduction for scans/photos, but the result loses '
-                          'selectable/searchable text. On text-heavy PDFs '
-                          'where that would backfire, it automatically '
-                          'falls back so the result is never bigger than '
-                          'the original.',
+                          l10n.compressHighWarning,
                           style: TextStyle(
                             fontSize: 12,
                             color: scheme.onSurfaceVariant,
@@ -142,7 +143,7 @@ class CompressScreen extends ConsumerWidget {
                                   ),
                                 )
                               : const Icon(Icons.compress),
-                          label: const Text('Compress'),
+                          label: Text(l10n.compressButton),
                           onPressed: state.isCompressing
                               ? null
                               : controller.compress,
@@ -150,7 +151,10 @@ class CompressScreen extends ConsumerWidget {
                     ],
                     if (state.error != null) ...[
                       const SizedBox(height: 12),
-                      Text(state.error!, style: TextStyle(color: scheme.error)),
+                      Text(
+                        localizedError(context, state.error!),
+                        style: TextStyle(color: scheme.error),
+                      ),
                     ],
                     if (state.result != null) ...[
                       const SizedBox(height: 20),
@@ -168,8 +172,10 @@ class CompressScreen extends ConsumerWidget {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    '${state.result!.reductionPercent.toStringAsFixed(1)}'
-                                    '% smaller',
+                                    l10n.compressReductionPercent(
+                                      state.result!.reductionPercent
+                                          .toStringAsFixed(1),
+                                    ),
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -179,10 +185,12 @@ class CompressScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Before: '
-                              '${_formatSize(state.result!.originalSizeBytes)}'
-                              '  →  After: '
-                              '${_formatSize(state.result!.compressedSizeBytes)}',
+                              l10n.compressBeforeAfter(
+                                _formatSize(state.result!.originalSizeBytes),
+                                _formatSize(
+                                  state.result!.compressedSizeBytes,
+                                ),
+                              ),
                               style: TextStyle(
                                 fontSize: 12.5,
                                 color: scheme.onSurfaceVariant,
@@ -198,7 +206,7 @@ class CompressScreen extends ConsumerWidget {
                                       foregroundColor: Colors.white,
                                     ),
                                     icon: const Icon(Icons.ios_share),
-                                    label: const Text('Share'),
+                                    label: Text(l10n.share),
                                     onPressed: () => SharePlus.instance.share(
                                       ShareParams(
                                         files: [
@@ -218,7 +226,7 @@ class CompressScreen extends ConsumerWidget {
                                       ),
                                     ),
                                     icon: const Icon(Icons.download_outlined),
-                                    label: const Text('Download'),
+                                    label: Text(l10n.download),
                                     onPressed: () => downloadFile(
                                       context,
                                       state.result!.outputPath,

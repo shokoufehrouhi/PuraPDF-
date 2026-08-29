@@ -134,7 +134,7 @@ class SignatureController extends Notifier<SignatureState> {
     final Uint8List? signature = state.signatureBytes;
     if (file == null || state.pages.isEmpty) return;
     if (signature == null) {
-      state = state.copyWith(error: 'Add a signature first.');
+      state = state.copyWith(error: 'errorAddSignatureFirst');
       return;
     }
 
