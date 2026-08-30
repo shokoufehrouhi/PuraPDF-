@@ -10,6 +10,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
+import '../../shared_widgets/picking_overlay.dart';
 import '../../shared_widgets/start_over_button.dart';
 import 'signature_controller.dart';
 import 'signature_pad_sheet.dart';
@@ -19,10 +20,13 @@ const Color _color = FeatureColors.signatureIcon;
 class SignatureScreen extends ConsumerWidget {
   const SignatureScreen({super.key});
 
-  Future<void> _pickFile(WidgetRef ref) async {
-    final List<PlatformFile> picked = await FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
+  Future<void> _pickFile(BuildContext context, WidgetRef ref) async {
+    final List<PlatformFile> picked = await withPickingOverlay(
+      context,
+      () => FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      ),
     );
     if (picked.isEmpty || picked.first.path == null) return;
     final file = PdfFile(path: picked.first.path!, name: picked.first.name);
@@ -84,7 +88,7 @@ class SignatureScreen extends ConsumerWidget {
                           color: _color,
                           label: l10n.selectAPdf,
                           hint: l10n.tapToBrowseFiles,
-                          onTap: () => _pickFile(ref),
+                          onTap: () => _pickFile(context, ref),
                         ),
                       ),
                     )

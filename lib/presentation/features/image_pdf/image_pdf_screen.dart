@@ -12,6 +12,7 @@ import '../../shared_widgets/direction_label.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
+import '../../shared_widgets/picking_overlay.dart';
 import '../../shared_widgets/start_over_button.dart';
 import 'image_pdf_controller.dart';
 
@@ -20,9 +21,10 @@ const Color _color = FeatureColors.imagePdfIcon;
 class ImagePdfScreen extends ConsumerWidget {
   const ImagePdfScreen({super.key});
 
-  Future<void> _pickImages(WidgetRef ref) async {
-    final List<PlatformFile> picked = await FilePicker.pickFiles(
-      type: FileType.image,
+  Future<void> _pickImages(BuildContext context, WidgetRef ref) async {
+    final List<PlatformFile> picked = await withPickingOverlay(
+      context,
+      () => FilePicker.pickFiles(type: FileType.image),
     );
     final files = picked
         .where((f) => f.path != null)
@@ -33,10 +35,13 @@ class ImagePdfScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _pickPdf(WidgetRef ref) async {
-    final List<PlatformFile> picked = await FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
+  Future<void> _pickPdf(BuildContext context, WidgetRef ref) async {
+    final List<PlatformFile> picked = await withPickingOverlay(
+      context,
+      () => FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      ),
     );
     if (picked.isEmpty || picked.first.path == null) return;
     final file = PdfFile(path: picked.first.path!, name: picked.first.name);
@@ -108,12 +113,12 @@ class ImagePdfScreen extends ConsumerWidget {
                       state: state,
                       controller: controller,
                       ref: ref,
-                      pickImages: () => _pickImages(ref),
+                      pickImages: () => _pickImages(context, ref),
                     )
                   : _PdfToImagesPane(
                       state: state,
                       controller: controller,
-                      pickPdf: () => _pickPdf(ref),
+                      pickPdf: () => _pickPdf(context, ref),
                     ),
             ),
           ],

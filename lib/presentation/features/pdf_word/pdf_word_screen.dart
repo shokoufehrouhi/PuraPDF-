@@ -11,6 +11,7 @@ import '../../shared_widgets/direction_label.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
+import '../../shared_widgets/picking_overlay.dart';
 import '../../shared_widgets/start_over_button.dart';
 import 'pdf_word_controller.dart';
 
@@ -19,12 +20,19 @@ const Color _color = FeatureColors.pdfWordIcon;
 class PdfWordScreen extends ConsumerWidget {
   const PdfWordScreen({super.key});
 
-  Future<void> _pickFile(WidgetRef ref, PdfWordDirection direction) async {
-    final List<PlatformFile> picked = await FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: [
-        direction == PdfWordDirection.pdfToWord ? 'pdf' : 'docx',
-      ],
+  Future<void> _pickFile(
+    BuildContext context,
+    WidgetRef ref,
+    PdfWordDirection direction,
+  ) async {
+    final List<PlatformFile> picked = await withPickingOverlay(
+      context,
+      () => FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: [
+          direction == PdfWordDirection.pdfToWord ? 'pdf' : 'docx',
+        ],
+      ),
     );
     if (picked.isEmpty || picked.first.path == null) return;
     final file = PdfFile(path: picked.first.path!, name: picked.first.name);
@@ -102,7 +110,7 @@ class PdfWordScreen extends ConsumerWidget {
                       hint: state.sourceFile == null
                           ? l10n.tapToBrowseFiles
                           : l10n.tapToChangeFile,
-                      onTap: () => _pickFile(ref, state.direction),
+                      onTap: () => _pickFile(context, ref, state.direction),
                     ),
                     const SizedBox(height: 16),
                     if (state.resultPath != null)

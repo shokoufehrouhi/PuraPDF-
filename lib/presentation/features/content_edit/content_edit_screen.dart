@@ -13,6 +13,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
+import '../../shared_widgets/picking_overlay.dart';
 import '../../shared_widgets/start_over_button.dart';
 import 'content_edit_controller.dart';
 
@@ -21,19 +22,23 @@ const Color _color = FeatureColors.contentEditIcon;
 class ContentEditScreen extends ConsumerWidget {
   const ContentEditScreen({super.key});
 
-  Future<void> _pickFile(WidgetRef ref) async {
-    final List<PlatformFile> picked = await FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
+  Future<void> _pickFile(BuildContext context, WidgetRef ref) async {
+    final List<PlatformFile> picked = await withPickingOverlay(
+      context,
+      () => FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      ),
     );
     if (picked.isEmpty || picked.first.path == null) return;
     final file = PdfFile(path: picked.first.path!, name: picked.first.name);
     await ref.read(contentEditControllerProvider.notifier).setSourceFile(file);
   }
 
-  Future<void> _pickImage(WidgetRef ref) async {
-    final List<PlatformFile> picked = await FilePicker.pickFiles(
-      type: FileType.image,
+  Future<void> _pickImage(BuildContext context, WidgetRef ref) async {
+    final List<PlatformFile> picked = await withPickingOverlay(
+      context,
+      () => FilePicker.pickFiles(type: FileType.image),
     );
     if (picked.isEmpty || picked.first.path == null) return;
     final bytes = await File(picked.first.path!).readAsBytes();
@@ -133,7 +138,7 @@ class ContentEditScreen extends ConsumerWidget {
                           color: _color,
                           label: l10n.selectAPdf,
                           hint: l10n.tapToBrowseFiles,
-                          onTap: () => _pickFile(ref),
+                          onTap: () => _pickFile(context, ref),
                         ),
                       ),
                     )
@@ -290,7 +295,7 @@ class ContentEditScreen extends ConsumerWidget {
                             ),
                             icon: const Icon(Icons.add_photo_alternate_outlined),
                             label: Text(l10n.addImageToPage),
-                            onPressed: () => _pickImage(ref),
+                            onPressed: () => _pickImage(context, ref),
                           ),
                         ),
                       ],

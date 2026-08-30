@@ -10,6 +10,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
 import '../../shared_widgets/picker_card.dart';
+import '../../shared_widgets/picking_overlay.dart';
 import '../../shared_widgets/start_over_button.dart';
 import 'merge_controller.dart';
 
@@ -18,10 +19,13 @@ const Color _color = FeatureColors.mergeIcon;
 class MergeScreen extends ConsumerWidget {
   const MergeScreen({super.key});
 
-  Future<void> _pickFiles(WidgetRef ref) async {
-    final List<PlatformFile> picked = await FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
+  Future<void> _pickFiles(BuildContext context, WidgetRef ref) async {
+    final List<PlatformFile> picked = await withPickingOverlay(
+      context,
+      () => FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      ),
     );
     final files = picked
         .where((f) => f.path != null)
@@ -80,7 +84,7 @@ class MergeScreen extends ConsumerWidget {
                           color: _color,
                           label: l10n.mergeAddFiles,
                           hint: l10n.mergeAddFilesHint,
-                          onTap: () => _pickFiles(ref),
+                          onTap: () => _pickFiles(context, ref),
                         ),
                       ),
                     )
@@ -100,7 +104,7 @@ class MergeScreen extends ConsumerWidget {
                                 ),
                               ),
                               TextButton.icon(
-                                onPressed: () => _pickFiles(ref),
+                                onPressed: () => _pickFiles(context, ref),
                                 icon: const Icon(Icons.add, size: 18),
                                 label: Text(l10n.addMore),
                                 style: TextButton.styleFrom(
