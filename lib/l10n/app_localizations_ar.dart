@@ -161,6 +161,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get opRedact => 'الحجب';
 
   @override
+  String get opFillSign => 'معبأ';
+
+  @override
   String get opLocked => 'مقفل';
 
   @override
@@ -260,6 +263,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get errorMarkAtLeastOneLineToRedact =>
       'حدد سطرًا واحدًا على الأقل لإخفائه.';
+
+  @override
+  String get errorFillAtLeastOneFieldFirst =>
+      'عبّئ حقلًا واحدًا على الأقل أولًا.';
 
   @override
   String get errorSelectAtLeastOneImage => 'اختر صورة واحدة على الأقل.';
@@ -721,6 +728,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get thisPdfHasNoPages => 'لا يحتوي ملف PDF هذا على صفحات.';
 
   @override
+  String get thisPdfHasNoFormFields =>
+      'لا يحتوي ملف PDF هذا على حقول نموذج قابلة للتعبئة.';
+
+  @override
   String get encryptTitle => 'الحماية بكلمة مرور';
 
   @override
@@ -959,5 +970,29 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String redactButtonLabel(Object count) {
     return 'حجب ($count)';
+  }
+
+  @override
+  String get featureFillSignTitle => 'التعبئة والتوقيع';
+
+  @override
+  String get featureFillSignSubtitle => 'تعبئة حقول النموذج الفعلية';
+
+  @override
+  String get fillSignDescription =>
+      'اضغط على حقول النص وخانات الاختيار الفعلية في النموذج لتعبئتها، ثم احفظ — يتم دمج القيم المعبأة نهائيًا في الصفحة، وليست طبقة منفصلة قابلة للتعديل.';
+
+  @override
+  String get fillSignStepSelect => 'اختر ملف PDF';
+
+  @override
+  String get fillSignStepFill => 'اضغط للتعبئة';
+
+  @override
+  String get fillSignStepConfirm => 'حفظ نهائي';
+
+  @override
+  String fillSignButtonLabel(Object count) {
+    return 'تعبئة وتوقيع ($count)';
   }
 }

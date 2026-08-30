@@ -400,6 +400,12 @@ abstract class AppLocalizations {
   /// **'Redact'**
   String get opRedact;
 
+  /// No description provided for @opFillSign.
+  ///
+  /// In en, this message translates to:
+  /// **'Filled'**
+  String get opFillSign;
+
   /// No description provided for @opLocked.
   ///
   /// In en, this message translates to:
@@ -579,6 +585,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mark at least one line to redact.'**
   String get errorMarkAtLeastOneLineToRedact;
+
+  /// No description provided for @errorFillAtLeastOneFieldFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in at least one field first.'**
+  String get errorFillAtLeastOneFieldFirst;
 
   /// No description provided for @errorSelectAtLeastOneImage.
   ///
@@ -1318,6 +1330,12 @@ abstract class AppLocalizations {
   /// **'This PDF has no pages.'**
   String get thisPdfHasNoPages;
 
+  /// No description provided for @thisPdfHasNoFormFields.
+  ///
+  /// In en, this message translates to:
+  /// **'This PDF has no fillable form fields.'**
+  String get thisPdfHasNoFormFields;
+
   /// No description provided for @encryptTitle.
   ///
   /// In en, this message translates to:
@@ -1761,6 +1779,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Redact ({count})'**
   String redactButtonLabel(Object count);
+
+  /// No description provided for @featureFillSignTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill & Sign'**
+  String get featureFillSignTitle;
+
+  /// No description provided for @featureFillSignSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in real form fields'**
+  String get featureFillSignSubtitle;
+
+  /// No description provided for @fillSignDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a form\'s actual text fields and checkboxes to fill them in, then save — the filled values are permanently flattened into the page, not left as a separate editable layer.'**
+  String get fillSignDescription;
+
+  /// No description provided for @fillSignStepSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select PDF'**
+  String get fillSignStepSelect;
+
+  /// No description provided for @fillSignStepFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to fill'**
+  String get fillSignStepFill;
+
+  /// No description provided for @fillSignStepConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Save permanently'**
+  String get fillSignStepConfirm;
+
+  /// No description provided for @fillSignButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill & Sign ({count})'**
+  String fillSignButtonLabel(Object count);
 }
 
 class _AppLocalizationsDelegate

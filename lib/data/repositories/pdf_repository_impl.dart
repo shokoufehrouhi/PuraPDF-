@@ -41,6 +41,8 @@ import '../../domain/entities/history_file.dart';
 import '../../domain/entities/image_output_format.dart';
 import '../../domain/entities/page_range.dart';
 import '../../domain/entities/pdf_content_edit.dart';
+import '../../domain/entities/pdf_form_field.dart';
+import '../../domain/entities/pdf_form_fill.dart';
 import '../../domain/entities/pdf_page_edit.dart';
 import '../../domain/entities/pdf_page_image.dart';
 import '../../domain/entities/pdf_redact_area.dart';
@@ -1474,6 +1476,99 @@ class PdfRepositoryImpl implements PdfRepository {
     return _writeOutput(
       doc,
       'purapdf_signed_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
+  }
+
+  @override
+  Future<List<PdfFormField>> extractFormFields(String path) async {
+    final PdfDocument doc = await _loadDocument(path);
+    final List<PdfFormField> result = [];
+    final PdfFormFieldCollection fields = doc.form.fields;
+    for (int i = 0; i < fields.count; i++) {
+      final PdfField f = fields[i];
+      if (f.page == null) continue; // no widget on any page - nothing to draw
+      final int pageIndex = doc.pages.indexOf(f.page!);
+      final Rect bounds = f.bounds;
+      if (f is PdfTextBoxField) {
+        result.add(
+          PdfFormField(
+            fieldIndex: i,
+            pageIndex: pageIndex,
+            kind: PdfFormFieldKind.text,
+            left: bounds.left,
+            top: bounds.top,
+            width: bounds.width,
+            height: bounds.height,
+            initialText: f.text,
+            multiline: f.multiline,
+            maxLength: f.maxLength,
+          ),
+        );
+      } else if (f is PdfCheckBoxField) {
+        result.add(
+          PdfFormField(
+            fieldIndex: i,
+            pageIndex: pageIndex,
+            kind: PdfFormFieldKind.checkbox,
+            left: bounds.left,
+            top: bounds.top,
+            width: bounds.width,
+            height: bounds.height,
+            initialChecked: f.isChecked,
+          ),
+        );
+      } else {
+        // Radio groups, combo/list boxes, signature fields, buttons - not
+        // fillable in this pass (see PdfFormFieldKind.unsupported's doc
+        // comment). Still reported so the screen can draw a plain
+        // non-interactive outline instead of leaving an unexplained dead
+        // spot on the form.
+        result.add(
+          PdfFormField(
+            fieldIndex: i,
+            pageIndex: pageIndex,
+            kind: PdfFormFieldKind.unsupported,
+            left: bounds.left,
+            top: bounds.top,
+            width: bounds.width,
+            height: bounds.height,
+          ),
+        );
+      }
+    }
+    doc.dispose();
+    return result;
+  }
+
+  @override
+  Future<String> fillAndSignPdf(
+    String inputPath,
+    List<PdfFormFill> fills,
+  ) async {
+    final PdfDocument doc = await _loadDocument(inputPath);
+    final Map<int, PdfFormFill> byIndex = {
+      for (final PdfFormFill fill in fills) fill.fieldIndex: fill,
+    };
+    final PdfForm form = doc.form;
+    for (int i = 0; i < form.fields.count; i++) {
+      final PdfFormFill? fill = byIndex[i];
+      if (fill == null) continue; // left at whatever value it loaded with
+      final PdfField f = form.fields[i];
+      if (f is PdfTextBoxField && fill.text != null) {
+        f.text = fill.text!;
+      } else if (f is PdfCheckBoxField && fill.checked != null) {
+        f.isChecked = fill.checked!;
+      }
+    }
+    // Bakes every field's current value (edited or not) into ordinary page
+    // content and removes the AcroForm itself - the result is a plain PDF,
+    // not a still-fillable one (per the user's explicit choice for this
+    // feature).
+    form.flattenAllFields();
+
+    return _writeOutput(
+      doc,
+      'purapdf_filled_${DateTime.now().millisecondsSinceEpoch}.pdf',
     );
   }
 

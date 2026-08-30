@@ -14,6 +14,7 @@ import '../l10n/app_localizations.dart';
 import 'features/compress/compress_screen.dart';
 import 'features/content_edit/content_edit_screen.dart';
 import 'features/encrypt/encrypt_screen.dart';
+import 'features/fill_sign/fill_sign_screen.dart';
 import 'features/history/history_controller.dart';
 import 'features/image_pdf/image_pdf_screen.dart';
 import 'features/merge/merge_screen.dart';
@@ -357,6 +358,17 @@ class _ToolsTabState extends State<_ToolsTab> {
             subtitle: l10n.featureSignatureSubtitle,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const SignatureScreen()),
+            ),
+          ),
+          _FeatureRowCard(
+            icon: Icons.edit_document,
+            color: FeatureColors.fillSign,
+            colorDark: FeatureColors.fillSignDark,
+            iconColor: FeatureColors.fillSignIcon,
+            title: l10n.featureFillSignTitle,
+            subtitle: l10n.featureFillSignSubtitle,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const FillSignScreen()),
             ),
           ),
         ];
@@ -788,6 +800,13 @@ _OperationInfo _operationFor(String fileName, AppLocalizations l10n) {
       Icons.draw_outlined,
       FeatureColors.signatureIcon,
       Text(l10n.opSigned),
+    );
+  }
+  if (fileName.startsWith('purapdf_filled_')) {
+    return _OperationInfo(
+      Icons.edit_document,
+      FeatureColors.fillSignIcon,
+      Text(l10n.opFillSign),
     );
   }
   return _OperationInfo(

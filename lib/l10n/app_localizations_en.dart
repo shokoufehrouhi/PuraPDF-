@@ -162,6 +162,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get opRedact => 'Redact';
 
   @override
+  String get opFillSign => 'Filled';
+
+  @override
   String get opLocked => 'Locked';
 
   @override
@@ -259,6 +262,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorMarkAtLeastOneLineToRedact =>
       'Mark at least one line to redact.';
+
+  @override
+  String get errorFillAtLeastOneFieldFirst =>
+      'Fill in at least one field first.';
 
   @override
   String get errorSelectAtLeastOneImage => 'Select at least one image.';
@@ -720,6 +727,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get thisPdfHasNoPages => 'This PDF has no pages.';
 
   @override
+  String get thisPdfHasNoFormFields => 'This PDF has no fillable form fields.';
+
+  @override
   String get encryptTitle => 'Password Protect';
 
   @override
@@ -958,5 +968,29 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String redactButtonLabel(Object count) {
     return 'Redact ($count)';
+  }
+
+  @override
+  String get featureFillSignTitle => 'Fill & Sign';
+
+  @override
+  String get featureFillSignSubtitle => 'Fill in real form fields';
+
+  @override
+  String get fillSignDescription =>
+      'Tap a form\'s actual text fields and checkboxes to fill them in, then save — the filled values are permanently flattened into the page, not left as a separate editable layer.';
+
+  @override
+  String get fillSignStepSelect => 'Select PDF';
+
+  @override
+  String get fillSignStepFill => 'Tap to fill';
+
+  @override
+  String get fillSignStepConfirm => 'Save permanently';
+
+  @override
+  String fillSignButtonLabel(Object count) {
+    return 'Fill & Sign ($count)';
   }
 }

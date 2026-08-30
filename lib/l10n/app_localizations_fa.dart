@@ -160,6 +160,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get opRedact => 'حذف اطلاعات';
 
   @override
+  String get opFillSign => 'پرشده';
+
+  @override
   String get opLocked => 'قفل‌شده';
 
   @override
@@ -257,6 +260,9 @@ class AppLocalizationsFa extends AppLocalizations {
   @override
   String get errorMarkAtLeastOneLineToRedact =>
       'حداقل یک خط را برای حذف دائمی علامت بزنید.';
+
+  @override
+  String get errorFillAtLeastOneFieldFirst => 'اول حداقل یک فیلد را پر کنید.';
 
   @override
   String get errorSelectAtLeastOneImage => 'حداقل یک تصویر انتخاب کنید.';
@@ -718,6 +724,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get thisPdfHasNoPages => 'این PDF صفحه‌ای ندارد.';
 
   @override
+  String get thisPdfHasNoFormFields => 'این PDF فیلد فرم قابل پرکردنی ندارد.';
+
+  @override
   String get encryptTitle => 'محافظت با رمز';
 
   @override
@@ -956,5 +965,29 @@ class AppLocalizationsFa extends AppLocalizations {
   @override
   String redactButtonLabel(Object count) {
     return 'حذف ($count)';
+  }
+
+  @override
+  String get featureFillSignTitle => 'پر کردن و امضا';
+
+  @override
+  String get featureFillSignSubtitle => 'پر کردن فیلدهای واقعی فرم';
+
+  @override
+  String get fillSignDescription =>
+      'روی فیلدهای متنی و چک‌باکس‌های واقعی فرم ضربه بزنید تا پر شوند، سپس ذخیره کنید — مقادیر واردشده برای همیشه در صفحه ادغام می‌شوند، نه اینکه یک لایه‌ی جداگانه و قابل‌ویرایش باقی بمانند.';
+
+  @override
+  String get fillSignStepSelect => 'انتخاب PDF';
+
+  @override
+  String get fillSignStepFill => 'برای پر کردن ضربه بزنید';
+
+  @override
+  String get fillSignStepConfirm => 'ذخیره دائمی';
+
+  @override
+  String fillSignButtonLabel(Object count) {
+    return 'پر کردن و امضا ($count)';
   }
 }

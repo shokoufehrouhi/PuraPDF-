@@ -6,6 +6,8 @@ import '../entities/history_file.dart';
 import '../entities/image_output_format.dart';
 import '../entities/page_range.dart';
 import '../entities/pdf_content_edit.dart';
+import '../entities/pdf_form_field.dart';
+import '../entities/pdf_form_fill.dart';
 import '../entities/pdf_page_edit.dart';
 import '../entities/pdf_page_image.dart';
 import '../entities/pdf_redact_area.dart';
@@ -126,4 +128,17 @@ abstract class PdfRepository {
   /// Extracts the text of the .docx at [inputPath] into a new PDF and
   /// returns its path. Same text-only fidelity as [pdfToWord].
   Future<String> wordToPdf(String inputPath);
+
+  /// Reads every AcroForm field out of the PDF at [path] (see
+  /// [PdfFormField]) - an empty list means the PDF has no fillable form at
+  /// all. Used by Fill & Sign to overlay a tappable/editable region per
+  /// field on the rendered page.
+  Future<List<PdfFormField>> extractFormFields(String path);
+
+  /// Writes [fills] onto the PDF at [inputPath]'s matching AcroForm fields
+  /// (matched by [PdfFormFill.fieldIndex] - see its doc comment), then
+  /// permanently flattens every field on the form (edited or not) so the
+  /// result is ordinary page content, not a still-editable form. Returns
+  /// the new file's path.
+  Future<String> fillAndSignPdf(String inputPath, List<PdfFormFill> fills);
 }

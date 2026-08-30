@@ -49,6 +49,7 @@
   "opPageEdit": "ویرایش صفحات",
   "opContentEdit": "ویرایش PDF",
   "opRedact": "حذف اطلاعات",
+  "opFillSign": "پرشده",
   "opLocked": "قفل‌شده",
   "opUnlocked": "بازشده",
   "opWatermark": "واترمارک",
@@ -94,6 +95,7 @@
   "errorAtLeastOnePageMustRemainInPdf": "حداقل یک صفحه باید در PDF باقی بماند.",
   "errorMakeAChangeBeforeSaving": "قبل از ذخیره حداقل یک تغییر ایجاد کنید.",
   "errorMarkAtLeastOneLineToRedact": "حداقل یک خط را برای حذف دائمی علامت بزنید.",
+  "errorFillAtLeastOneFieldFirst": "اول حداقل یک فیلد را پر کنید.",
   "errorSelectAtLeastOneImage": "حداقل یک تصویر انتخاب کنید.",
   "errorMergeNeedsTwoFiles": "برای ادغام حداقل به ۲ فایل PDF نیاز است.",
   "errorNewNameEmpty": "نام جدید نمی‌تواند خالی باشد.",
@@ -300,6 +302,7 @@
   "addImageToPage": "افزودن تصویر به این صفحه",
   "addImage": "افزودن تصویر",
   "thisPdfHasNoPages": "این PDF صفحه‌ای ندارد.",
+  "thisPdfHasNoFormFields": "این PDF فیلد فرم قابل پرکردنی ندارد.",
   "encryptTitle": "محافظت با رمز",
   "encryptDescription": "یک PDF را با رمز عبور قفل کنید تا فقط افرادی که رمز را می‌دانند بتوانند آن را باز کنند.",
   "addPasswordSegment": "افزودن رمز",
@@ -401,6 +404,18 @@
   "redactConfirmAction": "حذف",
   "redactButtonLabel": "حذف ({count})",
   "@redactButtonLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "featureFillSignTitle": "پر کردن و امضا",
+  "featureFillSignSubtitle": "پر کردن فیلدهای واقعی فرم",
+  "fillSignDescription": "روی فیلدهای متنی و چک‌باکس‌های واقعی فرم ضربه بزنید تا پر شوند، سپس ذخیره کنید — مقادیر واردشده برای همیشه در صفحه ادغام می‌شوند، نه اینکه یک لایه‌ی جداگانه و قابل‌ویرایش باقی بمانند.",
+  "fillSignStepSelect": "انتخاب PDF",
+  "fillSignStepFill": "برای پر کردن ضربه بزنید",
+  "fillSignStepConfirm": "ذخیره دائمی",
+  "fillSignButtonLabel": "پر کردن و امضا ({count})",
+  "@fillSignButtonLabel": {
     "placeholders": {
       "count": {}
     }

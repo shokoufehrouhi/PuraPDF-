@@ -49,6 +49,7 @@
   "opPageEdit": "تحرير الصفحات",
   "opContentEdit": "تحرير PDF",
   "opRedact": "الحجب",
+  "opFillSign": "معبأ",
   "opLocked": "مقفل",
   "opUnlocked": "غير مقفل",
   "opWatermark": "علامة مائية",
@@ -94,6 +95,7 @@
   "errorAtLeastOnePageMustRemainInPdf": "يجب أن تبقى صفحة واحدة على الأقل في ملف PDF.",
   "errorMakeAChangeBeforeSaving": "قم بإجراء تغيير واحد على الأقل قبل الحفظ.",
   "errorMarkAtLeastOneLineToRedact": "حدد سطرًا واحدًا على الأقل لإخفائه.",
+  "errorFillAtLeastOneFieldFirst": "عبّئ حقلًا واحدًا على الأقل أولًا.",
   "errorSelectAtLeastOneImage": "اختر صورة واحدة على الأقل.",
   "errorMergeNeedsTwoFiles": "يتطلب الدمج ملفي PDF على الأقل.",
   "errorNewNameEmpty": "لا يمكن أن يكون الاسم الجديد فارغًا.",
@@ -300,6 +302,7 @@
   "addImageToPage": "إضافة صورة لهذه الصفحة",
   "addImage": "إضافة صورة",
   "thisPdfHasNoPages": "لا يحتوي ملف PDF هذا على صفحات.",
+  "thisPdfHasNoFormFields": "لا يحتوي ملف PDF هذا على حقول نموذج قابلة للتعبئة.",
   "encryptTitle": "الحماية بكلمة مرور",
   "encryptDescription": "أقفل ملف PDF بكلمة مرور بحيث لا يفتحه إلا من يعرفها.",
   "addPasswordSegment": "إضافة كلمة مرور",
@@ -401,6 +404,18 @@
   "redactConfirmAction": "حجب",
   "redactButtonLabel": "حجب ({count})",
   "@redactButtonLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "featureFillSignTitle": "التعبئة والتوقيع",
+  "featureFillSignSubtitle": "تعبئة حقول النموذج الفعلية",
+  "fillSignDescription": "اضغط على حقول النص وخانات الاختيار الفعلية في النموذج لتعبئتها، ثم احفظ — يتم دمج القيم المعبأة نهائيًا في الصفحة، وليست طبقة منفصلة قابلة للتعديل.",
+  "fillSignStepSelect": "اختر ملف PDF",
+  "fillSignStepFill": "اضغط للتعبئة",
+  "fillSignStepConfirm": "حفظ نهائي",
+  "fillSignButtonLabel": "تعبئة وتوقيع ({count})",
+  "@fillSignButtonLabel": {
     "placeholders": {
       "count": {}
     }

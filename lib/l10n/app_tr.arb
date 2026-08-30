@@ -49,6 +49,7 @@
   "opPageEdit": "Sayfa Düzenleme",
   "opContentEdit": "PDF Düzenleme",
   "opRedact": "Karart",
+  "opFillSign": "Dolduruldu",
   "opLocked": "Kilitli",
   "opUnlocked": "Kilit Açıldı",
   "opWatermark": "Filigran",
@@ -94,6 +95,7 @@
   "errorAtLeastOnePageMustRemainInPdf": "PDF'de en az bir sayfa kalmalıdır.",
   "errorMakeAChangeBeforeSaving": "Kaydetmeden önce en az bir değişiklik yapın.",
   "errorMarkAtLeastOneLineToRedact": "Karartmak için en az bir satır işaretleyin.",
+  "errorFillAtLeastOneFieldFirst": "Önce en az bir alanı doldurun.",
   "errorSelectAtLeastOneImage": "En az bir görsel seçin.",
   "errorMergeNeedsTwoFiles": "Birleştirme için en az 2 PDF dosyası gerekir.",
   "errorNewNameEmpty": "Yeni ad boş olamaz.",
@@ -300,6 +302,7 @@
   "addImageToPage": "Bu sayfaya görsel ekle",
   "addImage": "Görsel ekle",
   "thisPdfHasNoPages": "Bu PDF'nin sayfası yok.",
+  "thisPdfHasNoFormFields": "Bu PDF'de doldurulabilir form alanı yok.",
   "encryptTitle": "Parola Koruması",
   "encryptDescription": "Bir PDF'yi yalnızca bilenlerin açabilmesi için parolayla kilitleyin.",
   "addPasswordSegment": "Parola Ekle",
@@ -401,6 +404,18 @@
   "redactConfirmAction": "Karart",
   "redactButtonLabel": "Karart ({count})",
   "@redactButtonLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "featureFillSignTitle": "Doldur ve İmzala",
+  "featureFillSignSubtitle": "Gerçek form alanlarını doldur",
+  "fillSignDescription": "Bir formun gerçek metin alanlarına ve onay kutularına dokunarak doldurun, ardından kaydedin — doldurulan değerler kalıcı olarak sayfaya işlenir, ayrı düzenlenebilir bir katman olarak kalmaz.",
+  "fillSignStepSelect": "PDF seç",
+  "fillSignStepFill": "Doldurmak için dokun",
+  "fillSignStepConfirm": "Kalıcı olarak kaydet",
+  "fillSignButtonLabel": "Doldur ve İmzala ({count})",
+  "@fillSignButtonLabel": {
     "placeholders": {
       "count": {}
     }

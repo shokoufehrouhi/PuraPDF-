@@ -49,6 +49,7 @@
   "opPageEdit": "Edit Pages",
   "opContentEdit": "Edit PDF",
   "opRedact": "Redact",
+  "opFillSign": "Filled",
   "opLocked": "Locked",
   "opUnlocked": "Unlocked",
   "opWatermark": "Watermark",
@@ -94,6 +95,7 @@
   "errorAtLeastOnePageMustRemainInPdf": "At least one page must remain in the PDF.",
   "errorMakeAChangeBeforeSaving": "Make at least one change before saving.",
   "errorMarkAtLeastOneLineToRedact": "Mark at least one line to redact.",
+  "errorFillAtLeastOneFieldFirst": "Fill in at least one field first.",
   "errorSelectAtLeastOneImage": "Select at least one image.",
   "errorMergeNeedsTwoFiles": "Merge requires at least 2 PDF files.",
   "errorNewNameEmpty": "New name cannot be empty.",
@@ -300,6 +302,7 @@
   "addImageToPage": "Add image to this page",
   "addImage": "Add image",
   "thisPdfHasNoPages": "This PDF has no pages.",
+  "thisPdfHasNoFormFields": "This PDF has no fillable form fields.",
   "encryptTitle": "Password Protect",
   "encryptDescription": "Lock a PDF with a password so only people who know it can open it.",
   "addPasswordSegment": "Add Password",
@@ -401,6 +404,18 @@
   "redactConfirmAction": "Redact",
   "redactButtonLabel": "Redact ({count})",
   "@redactButtonLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "featureFillSignTitle": "Fill & Sign",
+  "featureFillSignSubtitle": "Fill in real form fields",
+  "fillSignDescription": "Tap a form's actual text fields and checkboxes to fill them in, then save — the filled values are permanently flattened into the page, not left as a separate editable layer.",
+  "fillSignStepSelect": "Select PDF",
+  "fillSignStepFill": "Tap to fill",
+  "fillSignStepConfirm": "Save permanently",
+  "fillSignButtonLabel": "Fill & Sign ({count})",
+  "@fillSignButtonLabel": {
     "placeholders": {
       "count": {}
     }

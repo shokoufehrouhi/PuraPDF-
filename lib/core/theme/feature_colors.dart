@@ -58,4 +58,8 @@ class FeatureColors {
   static const Color redact = Color(0xFFDEE1E6);
   static const Color redactDark = Color(0xFFC9CDD5);
   static const Color redactIcon = Color(0xFF334155); // slate, not pure black
+
+  static const Color fillSign = Color(0xFFD1F0E4);
+  static const Color fillSignDark = Color(0xFFB4E6D2);
+  static const Color fillSignIcon = Color(0xFF0D9488); // teal - "approved"
 }

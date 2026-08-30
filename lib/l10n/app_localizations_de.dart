@@ -164,6 +164,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get opRedact => 'Schwärzen';
 
   @override
+  String get opFillSign => 'Ausgefüllt';
+
+  @override
   String get opLocked => 'Gesperrt';
 
   @override
@@ -264,6 +267,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get errorMarkAtLeastOneLineToRedact =>
       'Markieren Sie mindestens eine Zeile zum Schwärzen.';
+
+  @override
+  String get errorFillAtLeastOneFieldFirst =>
+      'Füllen Sie zuerst mindestens ein Feld aus.';
 
   @override
   String get errorSelectAtLeastOneImage =>
@@ -733,6 +740,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get thisPdfHasNoPages => 'Dieses PDF hat keine Seiten.';
 
   @override
+  String get thisPdfHasNoFormFields =>
+      'Dieses PDF hat keine ausfüllbaren Formularfelder.';
+
+  @override
   String get encryptTitle => 'Passwortschutz';
 
   @override
@@ -973,5 +984,29 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String redactButtonLabel(Object count) {
     return 'Schwärzen ($count)';
+  }
+
+  @override
+  String get featureFillSignTitle => 'Ausfüllen & Signieren';
+
+  @override
+  String get featureFillSignSubtitle => 'Echte Formularfelder ausfüllen';
+
+  @override
+  String get fillSignDescription =>
+      'Tippen Sie die echten Textfelder und Kontrollkästchen eines Formulars an, um sie auszufüllen, und speichern Sie dann — die ausgefüllten Werte werden dauerhaft in die Seite eingebettet, nicht als separate bearbeitbare Ebene belassen.';
+
+  @override
+  String get fillSignStepSelect => 'PDF auswählen';
+
+  @override
+  String get fillSignStepFill => 'Zum Ausfüllen tippen';
+
+  @override
+  String get fillSignStepConfirm => 'Dauerhaft speichern';
+
+  @override
+  String fillSignButtonLabel(Object count) {
+    return 'Ausfüllen & Signieren ($count)';
   }
 }

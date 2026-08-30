@@ -49,6 +49,7 @@
   "opPageEdit": "Seiten bearbeiten",
   "opContentEdit": "PDF bearbeiten",
   "opRedact": "Schwärzen",
+  "opFillSign": "Ausgefüllt",
   "opLocked": "Gesperrt",
   "opUnlocked": "Entsperrt",
   "opWatermark": "Wasserzeichen",
@@ -94,6 +95,7 @@
   "errorAtLeastOnePageMustRemainInPdf": "Mindestens eine Seite muss im PDF erhalten bleiben.",
   "errorMakeAChangeBeforeSaving": "Nehmen Sie vor dem Speichern mindestens eine Änderung vor.",
   "errorMarkAtLeastOneLineToRedact": "Markieren Sie mindestens eine Zeile zum Schwärzen.",
+  "errorFillAtLeastOneFieldFirst": "Füllen Sie zuerst mindestens ein Feld aus.",
   "errorSelectAtLeastOneImage": "Wählen Sie mindestens ein Bild aus.",
   "errorMergeNeedsTwoFiles": "Zum Zusammenführen sind mindestens 2 PDF-Dateien erforderlich.",
   "errorNewNameEmpty": "Der neue Name darf nicht leer sein.",
@@ -300,6 +302,7 @@
   "addImageToPage": "Bild zu dieser Seite hinzufügen",
   "addImage": "Bild hinzufügen",
   "thisPdfHasNoPages": "Dieses PDF hat keine Seiten.",
+  "thisPdfHasNoFormFields": "Dieses PDF hat keine ausfüllbaren Formularfelder.",
   "encryptTitle": "Passwortschutz",
   "encryptDescription": "Schützen Sie ein PDF mit einem Passwort, sodass es nur von Personen geöffnet werden kann, die es kennen.",
   "addPasswordSegment": "Passwort hinzufügen",
@@ -401,6 +404,18 @@
   "redactConfirmAction": "Schwärzen",
   "redactButtonLabel": "Schwärzen ({count})",
   "@redactButtonLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "featureFillSignTitle": "Ausfüllen & Signieren",
+  "featureFillSignSubtitle": "Echte Formularfelder ausfüllen",
+  "fillSignDescription": "Tippen Sie die echten Textfelder und Kontrollkästchen eines Formulars an, um sie auszufüllen, und speichern Sie dann — die ausgefüllten Werte werden dauerhaft in die Seite eingebettet, nicht als separate bearbeitbare Ebene belassen.",
+  "fillSignStepSelect": "PDF auswählen",
+  "fillSignStepFill": "Zum Ausfüllen tippen",
+  "fillSignStepConfirm": "Dauerhaft speichern",
+  "fillSignButtonLabel": "Ausfüllen & Signieren ({count})",
+  "@fillSignButtonLabel": {
     "placeholders": {
       "count": {}
     }

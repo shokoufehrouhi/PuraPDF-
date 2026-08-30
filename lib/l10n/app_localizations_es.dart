@@ -162,6 +162,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get opRedact => 'Ocultar texto';
 
   @override
+  String get opFillSign => 'Rellenado';
+
+  @override
   String get opLocked => 'Bloqueado';
 
   @override
@@ -261,6 +264,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get errorMarkAtLeastOneLineToRedact =>
       'Marca al menos una línea para tachar.';
+
+  @override
+  String get errorFillAtLeastOneFieldFirst =>
+      'Rellena al menos un campo primero.';
 
   @override
   String get errorSelectAtLeastOneImage => 'Selecciona al menos una imagen.';
@@ -727,6 +734,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get thisPdfHasNoPages => 'Este PDF no tiene páginas.';
 
   @override
+  String get thisPdfHasNoFormFields =>
+      'Este PDF no tiene campos de formulario rellenables.';
+
+  @override
   String get encryptTitle => 'Proteger con contraseña';
 
   @override
@@ -966,5 +977,29 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String redactButtonLabel(Object count) {
     return 'Ocultar ($count)';
+  }
+
+  @override
+  String get featureFillSignTitle => 'Rellenar y firmar';
+
+  @override
+  String get featureFillSignSubtitle => 'Rellena campos reales del formulario';
+
+  @override
+  String get fillSignDescription =>
+      'Toca los campos de texto y casillas reales de un formulario para rellenarlos y luego guarda — los valores rellenados se integran de forma permanente en la página, no quedan como una capa editable aparte.';
+
+  @override
+  String get fillSignStepSelect => 'Selecciona un PDF';
+
+  @override
+  String get fillSignStepFill => 'Toca para rellenar';
+
+  @override
+  String get fillSignStepConfirm => 'Guardar de forma permanente';
+
+  @override
+  String fillSignButtonLabel(Object count) {
+    return 'Rellenar y firmar ($count)';
   }
 }

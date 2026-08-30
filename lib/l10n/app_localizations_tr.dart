@@ -163,6 +163,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get opRedact => 'Karart';
 
   @override
+  String get opFillSign => 'Dolduruldu';
+
+  @override
   String get opLocked => 'Kilitli';
 
   @override
@@ -260,6 +263,9 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errorMarkAtLeastOneLineToRedact =>
       'Karartmak için en az bir satır işaretleyin.';
+
+  @override
+  String get errorFillAtLeastOneFieldFirst => 'Önce en az bir alanı doldurun.';
 
   @override
   String get errorSelectAtLeastOneImage => 'En az bir görsel seçin.';
@@ -725,6 +731,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get thisPdfHasNoPages => 'Bu PDF\'nin sayfası yok.';
 
   @override
+  String get thisPdfHasNoFormFields =>
+      'Bu PDF\'de doldurulabilir form alanı yok.';
+
+  @override
   String get encryptTitle => 'Parola Koruması';
 
   @override
@@ -963,5 +973,29 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String redactButtonLabel(Object count) {
     return 'Karart ($count)';
+  }
+
+  @override
+  String get featureFillSignTitle => 'Doldur ve İmzala';
+
+  @override
+  String get featureFillSignSubtitle => 'Gerçek form alanlarını doldur';
+
+  @override
+  String get fillSignDescription =>
+      'Bir formun gerçek metin alanlarına ve onay kutularına dokunarak doldurun, ardından kaydedin — doldurulan değerler kalıcı olarak sayfaya işlenir, ayrı düzenlenebilir bir katman olarak kalmaz.';
+
+  @override
+  String get fillSignStepSelect => 'PDF seç';
+
+  @override
+  String get fillSignStepFill => 'Doldurmak için dokun';
+
+  @override
+  String get fillSignStepConfirm => 'Kalıcı olarak kaydet';
+
+  @override
+  String fillSignButtonLabel(Object count) {
+    return 'Doldur ve İmzala ($count)';
   }
 }

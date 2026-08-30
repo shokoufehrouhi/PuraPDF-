@@ -49,6 +49,7 @@
   "opPageEdit": "Editar páginas",
   "opContentEdit": "Editar PDF",
   "opRedact": "Ocultar texto",
+  "opFillSign": "Rellenado",
   "opLocked": "Bloqueado",
   "opUnlocked": "Desbloqueado",
   "opWatermark": "Marca de agua",
@@ -94,6 +95,7 @@
   "errorAtLeastOnePageMustRemainInPdf": "Debe quedar al menos una página en el PDF.",
   "errorMakeAChangeBeforeSaving": "Haz al menos un cambio antes de guardar.",
   "errorMarkAtLeastOneLineToRedact": "Marca al menos una línea para tachar.",
+  "errorFillAtLeastOneFieldFirst": "Rellena al menos un campo primero.",
   "errorSelectAtLeastOneImage": "Selecciona al menos una imagen.",
   "errorMergeNeedsTwoFiles": "Combinar requiere al menos 2 archivos PDF.",
   "errorNewNameEmpty": "El nuevo nombre no puede estar vacío.",
@@ -300,6 +302,7 @@
   "addImageToPage": "Añadir imagen a esta página",
   "addImage": "Añadir imagen",
   "thisPdfHasNoPages": "Este PDF no tiene páginas.",
+  "thisPdfHasNoFormFields": "Este PDF no tiene campos de formulario rellenables.",
   "encryptTitle": "Proteger con contraseña",
   "encryptDescription": "Bloquea un PDF con una contraseña para que solo quienes la conozcan puedan abrirlo.",
   "addPasswordSegment": "Añadir contraseña",
@@ -401,6 +404,18 @@
   "redactConfirmAction": "Ocultar",
   "redactButtonLabel": "Ocultar ({count})",
   "@redactButtonLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "featureFillSignTitle": "Rellenar y firmar",
+  "featureFillSignSubtitle": "Rellena campos reales del formulario",
+  "fillSignDescription": "Toca los campos de texto y casillas reales de un formulario para rellenarlos y luego guarda — los valores rellenados se integran de forma permanente en la página, no quedan como una capa editable aparte.",
+  "fillSignStepSelect": "Selecciona un PDF",
+  "fillSignStepFill": "Toca para rellenar",
+  "fillSignStepConfirm": "Guardar de forma permanente",
+  "fillSignButtonLabel": "Rellenar y firmar ({count})",
+  "@fillSignButtonLabel": {
     "placeholders": {
       "count": {}
     }
