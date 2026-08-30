@@ -152,7 +152,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get opPdfToImage => 'PDF → Bild';
 
   @override
-  String get opScan => 'Scan';
+  String get opScan => 'Scannen';
 
   @override
   String get opPageEdit => 'Seiten bearbeiten';
@@ -732,6 +732,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get addImageToPage => 'Bild zu dieser Seite hinzufügen';
+
+  @override
+  String get addCheckmarkToPage => 'Häkchen hinzufügen';
 
   @override
   String get addImage => 'Bild hinzufügen';

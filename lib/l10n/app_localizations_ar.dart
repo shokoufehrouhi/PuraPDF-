@@ -722,6 +722,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addImageToPage => 'إضافة صورة لهذه الصفحة';
 
   @override
+  String get addCheckmarkToPage => 'إضافة علامة صح';
+
+  @override
   String get addImage => 'إضافة صورة';
 
   @override

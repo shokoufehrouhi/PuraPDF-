@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +45,70 @@ class ContentEditScreen extends ConsumerWidget {
     if (picked.isEmpty || picked.first.path == null) return;
     final bytes = await File(picked.first.path!).readAsBytes();
     ref.read(contentEditControllerProvider.notifier).addImage(bytes);
+  }
+
+  /// Drops a plain checkmark on the page - for forms that draw their own
+  /// blank checkbox squares as page content rather than a real AcroForm
+  /// field (so there's no widget for Fill & Sign to tick), this is the
+  /// quickest way to mark one without leaving the app to find an image.
+  Future<void> _addCheckmark(WidgetRef ref) async {
+    final Uint8List bytes = await _renderCheckmarkPng();
+    final state = ref.read(contentEditControllerProvider);
+    final page = state.pages[state.currentPageIndex];
+    // A fixed fraction of page width alone would come out non-square on a
+    // non-A4-shaped page, since width/height fractions scale against
+    // different page dimensions - scale height by the page's own aspect
+    // ratio so the mark reads as a small square regardless of page shape.
+    // Guards a zero/degenerate pointsHeight (a malformed source PDF) from
+    // producing an Infinity/NaN fraction that would carry through to save.
+    const double widthFrac = 0.07;
+    final double heightFrac = page.pointsHeight > 0
+        ? widthFrac * page.pointsWidth / page.pointsHeight
+        : widthFrac;
+    ref
+        .read(contentEditControllerProvider.notifier)
+        .addImage(
+          bytes,
+          leftFrac: 0.5 - widthFrac / 2,
+          topFrac: 0.5 - heightFrac / 2,
+          widthFrac: widthFrac,
+          heightFrac: heightFrac,
+          isCheckmark: true,
+          // Matches _renderCheckmarkPng's own stroke color (_color) so the
+          // saved vector stamp doesn't silently diverge from the on-screen
+          // preview - see PendingImage's doc comment.
+          checkmarkColorRed: (_color.r * 255).round(),
+          checkmarkColorGreen: (_color.g * 255).round(),
+          checkmarkColorBlue: (_color.b * 255).round(),
+        );
+  }
+
+  Future<Uint8List> _renderCheckmarkPng() async {
+    const double size = 64;
+    final ui.PictureRecorder recorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(
+      recorder,
+      const Rect.fromLTWH(0, 0, size, size),
+    );
+    final Paint paint = Paint()
+      ..color = _color
+      ..strokeWidth = 9
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke;
+    final Path path = Path()
+      ..moveTo(size * 0.16, size * 0.54)
+      ..lineTo(size * 0.42, size * 0.80)
+      ..lineTo(size * 0.86, size * 0.22);
+    canvas.drawPath(path, paint);
+    final ui.Image image = await recorder.endRecording().toImage(
+      size.toInt(),
+      size.toInt(),
+    );
+    final ByteData? byteData = await image.toByteData(
+      format: ui.ImageByteFormat.png,
+    );
+    return byteData!.buffer.asUint8List();
   }
 
   Future<void> _editLine(
@@ -286,16 +352,46 @@ class ContentEditScreen extends ConsumerWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                          child: OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: _color,
-                              side: BorderSide(
-                                color: _color.withValues(alpha: 0.5),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: _color,
+                                    side: BorderSide(
+                                      color: _color.withValues(alpha: 0.5),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.check_box_outlined),
+                                  label: Text(
+                                    l10n.addCheckmarkToPage,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  onPressed: () => _addCheckmark(ref),
+                                ),
                               ),
-                            ),
-                            icon: const Icon(Icons.add_photo_alternate_outlined),
-                            label: Text(l10n.addImageToPage),
-                            onPressed: () => _pickImage(context, ref),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: _color,
+                                    side: BorderSide(
+                                      color: _color.withValues(alpha: 0.5),
+                                    ),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.add_photo_alternate_outlined,
+                                  ),
+                                  label: Text(
+                                    l10n.addImageToPage,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  onPressed: () => _pickImage(context, ref),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],

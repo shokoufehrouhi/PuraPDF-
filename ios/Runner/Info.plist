@@ -24,9 +24,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<!-- AdMob: Google's public TEST App ID. Swap for the real App ID (from
-	     the AdMob console, after registering this app) before release -
-	     see lib/core/ads/ad_ids.dart. -->
+	<!-- AdMob App ID (registered in the AdMob console) - see
+	     lib/core/ads/ad_ids.dart for the per-format ad unit IDs. -->
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-6967597025156397~9910149144</string>
 	<!-- App Tracking Transparency: shown once, before ads are requested, so
@@ -49,6 +48,21 @@
 	<string>PuraPDF+ uses the camera to scan documents into a PDF.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>PuraPDF+ can import a photo from your library to scan into a PDF.</string>
+	<!-- ShareExtension.swift's openHostAppAndFinish() opens this to bring
+	     Runner to the foreground after handing a shared file off through
+	     the App Group container - the app never needs to parse the URL
+	     itself, see ShareIntentService.takePendingShare's doc comment. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.purapdf.purapdf.share</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>purapdf</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

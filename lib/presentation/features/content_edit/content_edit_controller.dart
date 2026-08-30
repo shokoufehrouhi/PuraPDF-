@@ -20,6 +20,15 @@ final editPdfContentUseCaseProvider = Provider(
 /// Position/size are fractions (0..1) of the page, not PDF points, so
 /// dragging it around the on-screen canvas doesn't need to know the
 /// render scale.
+///
+/// [isCheckmark] marks the "Add checkmark" quick stamp specifically: [bytes]
+/// still holds a rendered PNG for the on-screen drag handle, but on save
+/// that bitmap is discarded in favor of drawing the mark as native vector
+/// content (see [PdfCheckmarkStamp]'s doc comment for why a bitmap
+/// round-trip isn't worth it for a two-stroke mark). [checkmarkColor*] carry
+/// the same RGB the on-screen [bytes] preview was drawn with, so the saved
+/// vector stroke matches it instead of falling back to
+/// [PdfCheckmarkStamp]'s own default color - null for a non-checkmark image.
 class PendingImage {
   final int pageIndex;
   final Uint8List bytes;
@@ -27,6 +36,10 @@ class PendingImage {
   final double topFrac;
   final double widthFrac;
   final double heightFrac;
+  final bool isCheckmark;
+  final int? checkmarkColorRed;
+  final int? checkmarkColorGreen;
+  final int? checkmarkColorBlue;
 
   const PendingImage({
     required this.pageIndex,
@@ -35,6 +48,10 @@ class PendingImage {
     required this.topFrac,
     required this.widthFrac,
     required this.heightFrac,
+    this.isCheckmark = false,
+    this.checkmarkColorRed,
+    this.checkmarkColorGreen,
+    this.checkmarkColorBlue,
   });
 
   PendingImage copyWith({double? leftFrac, double? topFrac}) => PendingImage(
@@ -44,6 +61,10 @@ class PendingImage {
     topFrac: topFrac ?? this.topFrac,
     widthFrac: widthFrac,
     heightFrac: heightFrac,
+    isCheckmark: isCheckmark,
+    checkmarkColorRed: checkmarkColorRed,
+    checkmarkColorGreen: checkmarkColorGreen,
+    checkmarkColorBlue: checkmarkColorBlue,
   );
 }
 
@@ -144,17 +165,35 @@ class ContentEditController extends Notifier<ContentEditState> {
     state = state.copyWith(textEdits: updated);
   }
 
-  void addImage(Uint8List bytes) {
+  /// The default box (roughly centered, half the page wide) suits a photo
+  /// dropped in from the gallery. A small fixed mark like a checkmark
+  /// stamp wants a small square instead - callers pass their own fractions
+  /// for that case rather than stretching the default box over it.
+  void addImage(
+    Uint8List bytes, {
+    double leftFrac = 0.25,
+    double topFrac = 0.35,
+    double widthFrac = 0.5,
+    double heightFrac = 0.25,
+    bool isCheckmark = false,
+    int? checkmarkColorRed,
+    int? checkmarkColorGreen,
+    int? checkmarkColorBlue,
+  }) {
     state = state.copyWith(
       pendingImages: [
         ...state.pendingImages,
         PendingImage(
           pageIndex: state.currentPageIndex,
           bytes: bytes,
-          leftFrac: 0.25,
-          topFrac: 0.35,
-          widthFrac: 0.5,
-          heightFrac: 0.25,
+          leftFrac: leftFrac,
+          topFrac: topFrac,
+          widthFrac: widthFrac,
+          heightFrac: heightFrac,
+          isCheckmark: isCheckmark,
+          checkmarkColorRed: checkmarkColorRed,
+          checkmarkColorGreen: checkmarkColorGreen,
+          checkmarkColorBlue: checkmarkColorBlue,
         ),
       ],
       clearResult: true,
@@ -211,14 +250,29 @@ class ContentEditController extends Notifier<ContentEditState> {
         for (final img in state.pendingImages)
           () {
             final page = state.pages[img.pageIndex];
-            return PdfImageInsert(
-              pageIndex: img.pageIndex,
-              imageBytes: img.bytes,
-              left: img.leftFrac * page.pointsWidth,
-              top: img.topFrac * page.pointsHeight,
-              width: img.widthFrac * page.pointsWidth,
-              height: img.heightFrac * page.pointsHeight,
-            );
+            final double left = img.leftFrac * page.pointsWidth;
+            final double top = img.topFrac * page.pointsHeight;
+            final double width = img.widthFrac * page.pointsWidth;
+            final double height = img.heightFrac * page.pointsHeight;
+            return img.isCheckmark
+                ? PdfCheckmarkStamp(
+                    pageIndex: img.pageIndex,
+                    left: left,
+                    top: top,
+                    width: width,
+                    height: height,
+                    colorRed: img.checkmarkColorRed ?? 22,
+                    colorGreen: img.checkmarkColorGreen ?? 163,
+                    colorBlue: img.checkmarkColorBlue ?? 74,
+                  )
+                : PdfImageInsert(
+                    pageIndex: img.pageIndex,
+                    imageBytes: img.bytes,
+                    left: left,
+                    top: top,
+                    width: width,
+                    height: height,
+                  );
           }(),
       ];
 

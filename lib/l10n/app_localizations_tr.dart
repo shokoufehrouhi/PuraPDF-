@@ -725,6 +725,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get addImageToPage => 'Bu sayfaya görsel ekle';
 
   @override
+  String get addCheckmarkToPage => 'Onay işareti ekle';
+
+  @override
   String get addImage => 'Görsel ekle';
 
   @override

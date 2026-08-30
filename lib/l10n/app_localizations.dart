@@ -1318,6 +1318,12 @@ abstract class AppLocalizations {
   /// **'Add image to this page'**
   String get addImageToPage;
 
+  /// No description provided for @addCheckmarkToPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add checkmark'**
+  String get addCheckmarkToPage;
+
   /// No description provided for @addImage.
   ///
   /// In en, this message translates to:

@@ -300,6 +300,7 @@
   "lineText": "Line text",
   "delete": "Delete",
   "addImageToPage": "Add image to this page",
+  "addCheckmarkToPage": "Add checkmark",
   "addImage": "Add image",
   "thisPdfHasNoPages": "This PDF has no pages.",
   "thisPdfHasNoFormFields": "This PDF has no fillable form fields.",

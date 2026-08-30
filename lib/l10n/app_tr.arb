@@ -300,6 +300,7 @@
   "lineText": "Satır metni",
   "delete": "Sil",
   "addImageToPage": "Bu sayfaya görsel ekle",
+  "addCheckmarkToPage": "Onay işareti ekle",
   "addImage": "Görsel ekle",
   "thisPdfHasNoPages": "Bu PDF'nin sayfası yok.",
   "thisPdfHasNoFormFields": "Bu PDF'de doldurulabilir form alanı yok.",

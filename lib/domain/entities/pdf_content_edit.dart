@@ -60,3 +60,31 @@ class PdfImageInsert extends PdfContentEdit {
     required this.height,
   }) : super(pageIndex);
 }
+
+/// Draws a checkmark stroke (two line segments, not a bitmap) into the box
+/// at ([left], [top], [width], [height]) on [pageIndex] — for the "tick a
+/// blank checkbox" case specifically, drawn as native PDF vector content
+/// rather than routed through [PdfImageInsert]'s bitmap round-trip (PNG
+/// encode on the UI side, decode+re-encode in [PdfImageInsert]'s handler),
+/// which is unnecessary for a two-stroke mark and was an extra place for a
+/// platform-specific image quirk to hide.
+class PdfCheckmarkStamp extends PdfContentEdit {
+  final double left;
+  final double top;
+  final double width;
+  final double height;
+  final int colorRed;
+  final int colorGreen;
+  final int colorBlue;
+
+  const PdfCheckmarkStamp({
+    required int pageIndex,
+    required this.left,
+    required this.top,
+    required this.width,
+    required this.height,
+    this.colorRed = 22,
+    this.colorGreen = 163,
+    this.colorBlue = 74,
+  }) : super(pageIndex);
+}

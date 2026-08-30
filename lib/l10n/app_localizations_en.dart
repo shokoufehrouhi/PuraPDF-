@@ -721,6 +721,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addImageToPage => 'Add image to this page';
 
   @override
+  String get addCheckmarkToPage => 'Add checkmark';
+
+  @override
   String get addImage => 'Add image';
 
   @override

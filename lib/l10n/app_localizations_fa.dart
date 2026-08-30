@@ -718,6 +718,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get addImageToPage => 'افزودن تصویر به این صفحه';
 
   @override
+  String get addCheckmarkToPage => 'افزودن علامت تیک';
+
+  @override
   String get addImage => 'افزودن تصویر';
 
   @override

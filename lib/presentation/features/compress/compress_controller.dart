@@ -57,8 +57,13 @@ class CompressController extends Notifier<CompressState> {
   CompressState build() => const CompressState();
 
   Future<void> setSourceFile(PdfFile file) async {
-    final size = await File(file.path).length();
-    state = CompressState(sourceFile: file, originalSizeBytes: size);
+    state = CompressState(sourceFile: file);
+    try {
+      final size = await File(file.path).length();
+      state = state.copyWith(originalSizeBytes: size);
+    } catch (e) {
+      state = state.copyWith(error: friendlyErrorMessage(e));
+    }
   }
 
   void setLevel(CompressionLevel level) {

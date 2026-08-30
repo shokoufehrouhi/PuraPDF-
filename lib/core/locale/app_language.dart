@@ -20,10 +20,10 @@ class AppLanguage {
 
 const List<AppLanguage> supportedAppLanguages = [
   AppLanguage(locale: Locale('en'), flag: '🇺🇸', nativeName: 'English'),
-  AppLanguage(locale: Locale('fa'), flag: '🇮🇷', nativeName: 'فارسی'),
   AppLanguage(locale: Locale('de'), flag: '🇩🇪', nativeName: 'Deutsch'),
-  AppLanguage(locale: Locale('tr'), flag: '🇹🇷', nativeName: 'Türkçe'),
   AppLanguage(locale: Locale('es'), flag: '🇪🇸', nativeName: 'Español'),
+  AppLanguage(locale: Locale('tr'), flag: '🇹🇷', nativeName: 'Türkçe'),
+  AppLanguage(locale: Locale('fa'), flag: '🇮🇷', nativeName: 'فارسی'),
   AppLanguage(locale: Locale('ar'), flag: '🇸🇦', nativeName: 'العربية'),
 ];
 

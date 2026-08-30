@@ -832,6 +832,12 @@ class PdfRepositoryImpl implements PdfRepository {
             bitmap,
             Rect.fromLTWH(e.left, e.top, e.width, e.height),
           );
+        case PdfCheckmarkStamp e:
+          _drawCheckmark(
+            page,
+            Rect.fromLTWH(e.left, e.top, e.width, e.height),
+            color: PdfColor(e.colorRed, e.colorGreen, e.colorBlue),
+          );
       }
     }
 
@@ -1550,6 +1556,9 @@ class PdfRepositoryImpl implements PdfRepository {
       for (final PdfFormFill fill in fills) fill.fieldIndex: fill,
     };
     final PdfForm form = doc.form;
+    // Checked boxes to re-stroke after flatten (see below) - bounds captured
+    // now, before flattenAllFields() removes the AcroForm these came from.
+    final List<({int pageIndex, Rect bounds})> checkedBoxes = [];
     for (int i = 0; i < form.fields.count; i++) {
       final PdfFormFill? fill = byIndex[i];
       if (fill == null) continue; // left at whatever value it loaded with
@@ -1558,6 +1567,16 @@ class PdfRepositoryImpl implements PdfRepository {
         f.text = fill.text!;
       } else if (f is PdfCheckBoxField && fill.checked != null) {
         f.isChecked = fill.checked!;
+        if (fill.checked! && f.page != null) {
+          // indexOf resolves by identity - falls back to skipping the
+          // re-stroke (not crashing the whole save) on the off chance a
+          // field's own `.page` getter ever resolves to an instance that
+          // isn't `==` the one `doc.pages` hands back for that page.
+          final int resolvedIndex = doc.pages.indexOf(f.page!);
+          if (resolvedIndex >= 0) {
+            checkedBoxes.add((pageIndex: resolvedIndex, bounds: f.bounds));
+          }
+        }
       }
     }
     // Bakes every field's current value (edited or not) into ordinary page
@@ -1566,10 +1585,49 @@ class PdfRepositoryImpl implements PdfRepository {
     // feature).
     form.flattenAllFields();
 
+    // Some PDFs (seen in the wild - forms exported by third-party/no-code
+    // tools) ship a checkbox whose "on" appearance stream is byte-identical
+    // to its "off" one - a defect in the source file, not in isChecked or
+    // flattenAllFields: /V and /AS do get set to /Yes correctly, but that
+    // state's own appearance simply has no visible check. flatten has
+    // nothing better to draw in that case, so it's baked in "invisibly
+    // checked". Stroking our own mark over every box we just checked (same
+    // vector approach as Edit PDF's checkmark stamp - see
+    // PdfCheckmarkStamp's doc comment) makes checking a box visible
+    // regardless of whether the source file's own appearance is trustworthy.
+    for (final box in checkedBoxes) {
+      _drawCheckmark(doc.pages[box.pageIndex], box.bounds);
+    }
+
     return _writeOutput(
       doc,
       'purapdf_filled_${DateTime.now().millisecondsSinceEpoch}.pdf',
     );
+  }
+
+  /// Strokes a checkmark (two line segments, not a filled glyph - reliable
+  /// across viewers with no font dependency) inside [bounds] on [page].
+  /// Shared by [fillAndSignPdf] (over a just-checked checkbox) and
+  /// [editPdfContent]'s [PdfCheckmarkStamp] handler (a user-placed stamp).
+  void _drawCheckmark(PdfPage page, Rect bounds, {PdfColor? color}) {
+    final PdfPen pen = PdfPen(
+      color ?? PdfColor(22, 163, 74),
+      width: bounds.width * 0.14,
+    )..lineCap = PdfLineCap.round;
+    final Offset start = Offset(
+      bounds.left + bounds.width * 0.16,
+      bounds.top + bounds.height * 0.54,
+    );
+    final Offset mid = Offset(
+      bounds.left + bounds.width * 0.42,
+      bounds.top + bounds.height * 0.80,
+    );
+    final Offset end = Offset(
+      bounds.left + bounds.width * 0.86,
+      bounds.top + bounds.height * 0.22,
+    );
+    page.graphics.drawLine(pen, start, mid);
+    page.graphics.drawLine(pen, mid, end);
   }
 
   /// Best-effort match from an extracted font name to one of the PDF

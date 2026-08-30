@@ -300,6 +300,7 @@
   "lineText": "متن خط",
   "delete": "حذف",
   "addImageToPage": "افزودن تصویر به این صفحه",
+  "addCheckmarkToPage": "افزودن علامت تیک",
   "addImage": "افزودن تصویر",
   "thisPdfHasNoPages": "این PDF صفحه‌ای ندارد.",
   "thisPdfHasNoFormFields": "این PDF فیلد فرم قابل پرکردنی ندارد.",

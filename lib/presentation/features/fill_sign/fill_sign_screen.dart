@@ -90,7 +90,25 @@ class FillSignScreen extends ConsumerWidget {
                   : state.pages.isEmpty
                   ? Center(child: Text(l10n.thisPdfHasNoPages))
                   : state.fields.isEmpty
-                  ? Center(child: Text(l10n.thisPdfHasNoFormFields))
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              l10n.thisPdfHasNoFormFields,
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            StartOverButton(
+                              color: _color,
+                              onPressed: controller.reset,
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
                   : Column(
                       children: [
                         Padding(

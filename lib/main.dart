@@ -8,6 +8,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'core/ads/ads_service.dart';
 import 'core/locale/app_language.dart';
 import 'core/locale/locale_controller.dart';
+import 'core/share_intent/share_intent_router.dart';
+import 'core/share_intent/share_intent_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_mode_controller.dart';
 import 'l10n/app_localizations.dart';
@@ -43,11 +45,52 @@ Future<void> main() async {
   );
 }
 
-class PuraPdfApp extends ConsumerWidget {
+/// Lets `_ShareIntentGate` push a route from a lifecycle callback, which
+/// has no `BuildContext` of its own to work with.
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
+class PuraPdfApp extends ConsumerStatefulWidget {
   const PuraPdfApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PuraPdfApp> createState() => _PuraPdfAppState();
+}
+
+class _PuraPdfAppState extends ConsumerState<PuraPdfApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // Covers the cold-launch case (the Share Extension's
+    // `extensionContext.open()` foregrounds - or launches - Runner fresh).
+    _checkPendingShare();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Covers the already-running case: the app was merely backgrounded
+    // when the share extension ran, so there's no fresh launch to hook -
+    // resuming is the only signal available that a share might be waiting.
+    if (state == AppLifecycleState.resumed) _checkPendingShare();
+  }
+
+  Future<void> _checkPendingShare() async {
+    final share = await ShareIntentService.takePendingShare();
+    if (share == null) return;
+    final context = rootNavigatorKey.currentContext;
+    if (context == null || !context.mounted) return;
+    openSharedFile(context, path: share.path, tool: share.tool);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final ThemeMode themeMode = ref.watch(themeModeControllerProvider);
     // null means "not chosen yet" (see LocaleController) - MaterialApp's
     // own `locale` stays unset in that case so it falls back to matching
@@ -57,6 +100,7 @@ class PuraPdfApp extends ConsumerWidget {
     final Locale? locale = ref.watch(localeControllerProvider);
 
     return MaterialApp(
+      navigatorKey: rootNavigatorKey,
       title: 'PuraPDF+',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,

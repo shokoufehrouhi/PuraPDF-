@@ -122,8 +122,18 @@ class _StepStrip extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 18),
               color: color.withValues(alpha: 0.35),
             ),
-          SizedBox(
-            width: 68,
+          Expanded(
+            // Was a fixed SizedBox(width: 68) - fine for a 4-step screen,
+            // but too narrow for the longest single word across every
+            // screen's step list ("permanently", in Fill & Sign/Redact's
+            // 3-step flow): Flutter's line-breaker then splits the word
+            // mid-letter instead of at a word boundary (confirmed on a
+            // real device: "Save permanently" rendered as "Save perm" /
+            // "anently"). A fixed width can't win for both a 3-step and a
+            // 4-step screen on the same device - Expanded instead gives
+            // each step its fair share of whatever width the Row actually
+            // has, so a 3-step screen's steps get more room than a
+            // 4-step screen's automatically.
             child: Column(
               children: [
                 Container(
