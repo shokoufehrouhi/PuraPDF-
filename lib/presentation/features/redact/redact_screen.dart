@@ -190,9 +190,18 @@ class RedactScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                          child: _BarStylePicker(
+                            color: state.barColor,
+                            opacity: state.barOpacity,
+                            onColorChanged: controller.setBarColor,
+                            onOpacityChanged: controller.setBarOpacity,
+                          ),
+                        ),
                         if (state.markedLines.isNotEmpty)
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                            padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
                             child: Text(
                               l10n.redactMarkedCount(state.markedLines.length),
                               style: TextStyle(
@@ -260,6 +269,95 @@ class RedactScreen extends ConsumerWidget {
   }
 }
 
+/// A redaction bar color choice - same swatch-row pattern as the
+/// Signature feature's ink color picker.
+class _ColorOption {
+  final String label;
+  final Color color;
+  const _ColorOption(this.label, this.color);
+}
+
+const List<_ColorOption> _barColorOptions = [
+  _ColorOption('Black', Colors.black),
+  _ColorOption('Red', Color(0xFFDC2626)),
+  _ColorOption('Blue', Color(0xFF2563EB)),
+  _ColorOption('Gray', Color(0xFF64748B)),
+];
+
+/// Color + opacity controls for the redaction bar - purely a *look*
+/// choice (see [PdfRedactArea]'s doc comment): the underlying text is
+/// gone from the content stream no matter what this is set to, so a
+/// lower opacity only affects whether something drawn underneath (a
+/// background image, say) shows through the bar.
+class _BarStylePicker extends StatelessWidget {
+  final Color color;
+  final double opacity;
+  final ValueChanged<Color> onColorChanged;
+  final ValueChanged<double> onOpacityChanged;
+
+  const _BarStylePicker({
+    required this.color,
+    required this.opacity,
+    required this.onColorChanged,
+    required this.onOpacityChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            for (final option in _barColorOptions)
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: GestureDetector(
+                  onTap: () => onColorChanged(option.color),
+                  child: Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: option.color,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: color == option.color
+                            ? _color
+                            : scheme.outlineVariant,
+                        width: color == option.color ? 3 : 1,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            Expanded(
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.opacity,
+                    size: 18,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                  Expanded(
+                    child: Slider(
+                      value: opacity,
+                      min: 0.3,
+                      max: 1.0,
+                      activeColor: _color,
+                      onChanged: onOpacityChanged,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 /// Renders the current page at its natural aspect ratio, with a tappable
 /// box over each extracted text line that toggles into/out of the "marked
 /// for redaction" set.
@@ -306,6 +404,8 @@ class _PageCanvas extends StatelessWidget {
               height: entry.line.height / page.pointsHeight * dispHeight,
               child: _LineOverlay(
                 marked: state.markedLines.contains(entry.index),
+                barColor: state.barColor,
+                barOpacity: state.barOpacity,
                 onTap: () => onTapLine(entry.index),
               ),
             ),
@@ -317,20 +417,28 @@ class _PageCanvas extends StatelessWidget {
 
 class _LineOverlay extends StatelessWidget {
   final bool marked;
+  final Color barColor;
+  final double barOpacity;
   final VoidCallback onTap;
 
-  const _LineOverlay({required this.marked, required this.onTap});
+  const _LineOverlay({
+    required this.marked,
+    required this.barColor,
+    required this.barOpacity,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      // Solid, near-opaque fill once marked - previews the actual black
-      // redaction bar this line will become, not just a selection hint.
+      // Fill matches the chosen bar color/opacity once marked - previews
+      // the actual redaction bar this line will become, not just a
+      // selection hint.
       child: Container(
         decoration: BoxDecoration(
           color: marked
-              ? Colors.black.withValues(alpha: 0.85)
+              ? barColor.withValues(alpha: barOpacity)
               : _color.withValues(alpha: 0.0),
           border: Border.all(
             color: _color.withValues(alpha: marked ? 0.9 : 0.28),

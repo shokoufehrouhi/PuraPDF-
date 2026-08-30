@@ -831,13 +831,23 @@ class PdfRepositoryImpl implements PdfRepository {
       // Visual cover on top of the now-actually-empty area - handles any
       // background graphic/image still there (see the method doc comment
       // on why images aren't content-stream-redacted) and gives the
-      // expected solid-black-bar look. Black, not Edit PDF's white erase
-      // box, so the two features are visually distinguishable.
+      // expected bar look. Defaults to black (not Edit PDF's white erase
+      // box), but color/opacity are per-area - opacity is NOT PdfColor's
+      // 4th arg (that has no effect on a fill brush), it's
+      // graphics.setTransparency() between save()/restore() (same trick
+      // as the watermark stamp) - see PdfRedactArea's doc comment for why
+      // a non-1.0 opacity here is a look choice, not a privacy one.
+      final PdfGraphics g = page.graphics;
       for (final PdfRedactArea area in entry.value) {
-        page.graphics.drawRectangle(
-          brush: PdfSolidBrush(PdfColor(0, 0, 0)),
+        g.save();
+        g.setTransparency(area.opacity.clamp(0, 1).toDouble());
+        g.drawRectangle(
+          brush: PdfSolidBrush(
+            PdfColor(area.colorR, area.colorG, area.colorB),
+          ),
           bounds: Rect.fromLTWH(area.left, area.top, area.width, area.height),
         );
+        g.restore();
       }
     }
 

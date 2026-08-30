@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,6 +24,8 @@ class RedactState {
   final List<PdfTextLine> textLines;
   final int currentPageIndex;
   final Set<int> markedLines;
+  final Color barColor;
+  final double barOpacity; // 0..1 - see PdfRedactArea's doc comment on why
   final String? resultPath;
   final String? error;
 
@@ -34,6 +37,8 @@ class RedactState {
     this.textLines = const [],
     this.currentPageIndex = 0,
     this.markedLines = const {},
+    this.barColor = const Color(0xFF000000),
+    this.barOpacity = 1.0,
     this.resultPath,
     this.error,
   });
@@ -46,6 +51,8 @@ class RedactState {
     List<PdfTextLine>? textLines,
     int? currentPageIndex,
     Set<int>? markedLines,
+    Color? barColor,
+    double? barOpacity,
     String? resultPath,
     String? error,
     bool clearResult = false,
@@ -59,6 +66,8 @@ class RedactState {
       textLines: textLines ?? this.textLines,
       currentPageIndex: currentPageIndex ?? this.currentPageIndex,
       markedLines: markedLines ?? this.markedLines,
+      barColor: barColor ?? this.barColor,
+      barOpacity: barOpacity ?? this.barOpacity,
       resultPath: clearResult ? null : (resultPath ?? this.resultPath),
       error: clearError ? null : (error ?? this.error),
     );
@@ -99,6 +108,17 @@ class RedactController extends Notifier<RedactState> {
     state = state.copyWith(markedLines: updated, clearResult: true);
   }
 
+  void setBarColor(Color color) {
+    state = state.copyWith(barColor: color, clearResult: true);
+  }
+
+  void setBarOpacity(double opacity) {
+    state = state.copyWith(
+      barOpacity: opacity.clamp(0, 1),
+      clearResult: true,
+    );
+  }
+
   Future<void> redact() async {
     final file = state.sourceFile;
     if (file == null) return;
@@ -122,6 +142,10 @@ class RedactController extends Notifier<RedactState> {
             top: state.textLines[i].top,
             width: state.textLines[i].width,
             height: state.textLines[i].height,
+            colorR: (state.barColor.r * 255.0).round().clamp(0, 255),
+            colorG: (state.barColor.g * 255.0).round().clamp(0, 255),
+            colorB: (state.barColor.b * 255.0).round().clamp(0, 255),
+            opacity: state.barOpacity,
           ),
       ];
 
