@@ -133,4 +133,74 @@ void main() {
       expect(extracted, contains('Paragraph number 79 -'));
     },
   );
+
+  // testWidgets, not test() - loading the bundled Arabic-script font goes
+  // through rootBundle, which needs a real Flutter test binding. That
+  // binding runs the test body in a fake-async zone, so any *real*
+  // asynchronous dart:io work (temp dirs, file writes - anything not driven
+  // by widget-test pumping) has to go through tester.runAsync(), or it just
+  // hangs forever instead of erroring (confirmed by reproducing it: the
+  // exact same await Directory.systemTemp.createTemp() that works fine in a
+  // plain test() never returned here without runAsync).
+  testWidgets(
+    'WordToPdfUseCase handles Persian/Arabic-script text (regression - used '
+    'to crash: PdfStandardFont only supports WinAnsi/Latin-1)',
+    (tester) async {
+      late String extracted;
+      await tester.runAsync(() async {
+        final farsiTempDir = await Directory.systemTemp.createTemp(
+          'purapdf_pdf_word_farsi_test_',
+        );
+        PathProviderPlatform.instance = _FakePathProvider(farsiTempDir);
+        addTearDown(() {
+          if (farsiTempDir.existsSync()) {
+            farsiTempDir.deleteSync(recursive: true);
+          }
+        });
+
+        final docxPath = '${farsiTempDir.path}/farsi.docx';
+        final bytes = DocxWriter.write(const [
+          DocxParagraph(text: 'یادداشت جلسه', headingLevel: 1),
+          DocxParagraph(text: 'این یک متن فارسی است که باید تبدیل شود.'),
+          // Mixed script in one paragraph - a Latin acronym embedded in a
+          // Farsi sentence, the realistic common case.
+          DocxParagraph(text: 'این یک PDF است.'),
+        ]);
+        await File(docxPath).writeAsBytes(bytes);
+
+        final useCase = WordToPdfUseCase(PdfRepositoryImpl());
+        final outPath = await useCase(docxPath);
+
+        final doc = PdfDocument(inputBytes: File(outPath).readAsBytesSync());
+        extracted = PdfTextExtractor(doc).extractText();
+        doc.dispose();
+      });
+
+      // Not expect(extracted, contains('یادداشت جلسه')): Arabic-script
+      // paragraphs are drawn through a hand-rolled shape+bidi+multi-font
+      // pipeline (see _drawMixedScriptParagraph), and extraction reads
+      // back what was actually drawn - shaped presentation-form glyphs
+      // (a different, but equally valid, set of codepoints than the
+      // original base letters), in visual (reversed) order, one extracted
+      // "line" per script run rather than per paragraph. So the original
+      // literal Farsi string never round-trips through extraction even
+      // when the PDF renders perfectly - confirmed by rendering this
+      // exact case to a PNG during development and inspecting it
+      // (correct letter joining, correct RTL order, "PDF" visible and
+      // properly spaced). What extraction *can* verify: real Arabic-script
+      // glyphs were actually drawn (not skipped/crashed past), and the
+      // embedded Latin word survived (the regression this test was
+      // originally written to catch, and the one the shape/bidi pipeline
+      // re-introduced before the run-splitting fix - see git history).
+      expect(extracted, contains('PDF'));
+      expect(extracted.runes.any(_isArabicScriptRune), isTrue);
+    },
+  );
 }
+
+bool _isArabicScriptRune(int c) =>
+    (c >= 0x0600 && c <= 0x06FF) ||
+    (c >= 0x0750 && c <= 0x077F) ||
+    (c >= 0x08A0 && c <= 0x08FF) ||
+    (c >= 0xFB50 && c <= 0xFDFF) ||
+    (c >= 0xFE70 && c <= 0xFEFF);

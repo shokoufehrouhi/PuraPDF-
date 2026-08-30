@@ -5,10 +5,16 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:archive/archive_io.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfrx/pdfrx.dart' as rx;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
+// Not a public export - see _drawMixedScriptParagraph's doc comment for why
+// this reaches into Syncfusion's src/ for its Arabic shaper and bidi
+// reorderer anyway.
+import 'package:syncfusion_flutter_pdf/src/pdf/implementation/graphics/fonts/rtl/arabic_shape_renderer.dart';
+import 'package:syncfusion_flutter_pdf/src/pdf/implementation/graphics/fonts/rtl/bidi.dart';
 
 import '../../core/docx/docx_paragraph.dart';
 import '../../core/docx/docx_reader.dart';
@@ -1038,6 +1044,18 @@ class PdfRepositoryImpl implements PdfRepository {
         y = 0;
       }
 
+      if (_containsArabicScript(p.text)) {
+        // Farsi/Arabic paragraphs get their own manual layout below - see
+        // _drawMixedScriptParagraph's doc comment for why PdfTextElement
+        // alone can't do this.
+        final (PdfPage newPage, Size newClientSize, double newY) =
+            await _drawMixedScriptParagraph(doc, page, clientSize, y, p);
+        page = newPage;
+        clientSize = newClientSize;
+        y = newY + (p.headingLevel > 0 ? 14 : 10);
+        continue;
+      }
+
       final List<PdfFontStyle> styles = [
         if (p.bold || p.headingLevel > 0) PdfFontStyle.bold,
         if (p.italic) PdfFontStyle.italic,
@@ -1089,4 +1107,207 @@ class PdfRepositoryImpl implements PdfRepository {
     await _recordGenerated(outPath);
     return outPath;
   }
+
+  /// Arabic script (Arabic, Persian, Urdu, ...) — checked by numeric
+  /// codepoint range rather than a regex of literal RTL characters, so this
+  /// file stays bidi-neutral and the ranges stay checkable at a glance:
+  /// Arabic (0600-06FF), Arabic Supplement (0750-077F), Arabic Extended-A
+  /// (08A0-08FF), Arabic Presentation Forms A/B (FB50-FDFF, FE70-FEFF) - the
+  /// latter block is what shaped Arabic letters land in (see
+  /// _drawMixedScriptParagraph), so this doubles as the post-shaping check.
+  bool _isArabicScriptRune(int c) =>
+      (c >= 0x0600 && c <= 0x06FF) ||
+      (c >= 0x0750 && c <= 0x077F) ||
+      (c >= 0x08A0 && c <= 0x08FF) ||
+      (c >= 0xFB50 && c <= 0xFDFF) ||
+      (c >= 0xFE70 && c <= 0xFEFF);
+
+  bool _containsArabicScript(String text) => text.runes.any(_isArabicScriptRune);
+
+  Uint8List? _arabicFontBytes;
+
+  /// Loads the bundled Unicode font once (bytes are cheap to reuse; a fresh
+  /// [PdfTrueTypeFont] is still built per size since the size is baked into
+  /// the font object itself).
+  Future<PdfFont> _arabicFont(double size) async {
+    final Uint8List bytes = _arabicFontBytes ??= (await rootBundle.load(
+      'assets/fonts/NotoNaskhArabic-Regular.ttf',
+    )).buffer.asUint8List();
+    return PdfTrueTypeFont(bytes, size);
+  }
+
+  /// Draws a paragraph that mixes Arabic-script (RTL) and Latin/other (LTR)
+  /// text - a plain [PdfTextElement] can't do this correctly:
+  ///
+  /// 1. The bundled Arabic font (assets/fonts/NotoNaskhArabic-Regular.ttf)
+  ///    has *no* Latin glyphs at all (confirmed via font inspection - not
+  ///    just unhinted, genuinely absent from its cmap). Syncfusion's own
+  ///    TtfReader silently drops any character it can't find a glyph for,
+  ///    so a single PdfTrueTypeFont call on "این یک PDF است." renders with
+  ///    "PDF" missing entirely - no error, just gone. One font per script
+  ///    is the norm for complex scripts (it's why Noto ships this way);
+  ///    the fix is drawing each script run with its own font, not finding
+  ///    a mythical font that covers both.
+  /// 2. PdfStringFormat.textDirection does turn on Syncfusion's real
+  ///    Arabic shaper + bidi reorderer (PdfGraphics._drawUnicodeLine), but
+  ///    only for a single font/single line at a time - there's no public
+  ///    API to hand it a line of mixed-font runs.
+  ///
+  /// So this reimplements just enough of that pipeline by hand:
+  /// shape the whole paragraph once (shaping is per-character, order never
+  /// matters for it), word-wrap in *logical* order (line-breaking is
+  /// direction-agnostic - only the words placed within an already-decided
+  /// line need reordering), then bidi-reorder each finished line
+  /// independently and draw its script runs left to right at manually
+  /// tracked x/y coordinates, right-aligned to read as RTL.
+  ///
+  /// Reuses Syncfusion's own shaper/bidi classes (ArabicShapeRenderer,
+  /// Bidi) via their `src/` implementation path since there's no public
+  /// export for them - not a supported import, so a Syncfusion upgrade
+  /// could move or remove them; if this throws a "not found" import error
+  /// after a version bump, that's why.
+  Future<(PdfPage, Size, double)> _drawMixedScriptParagraph(
+    PdfDocument doc,
+    PdfPage page,
+    Size clientSize,
+    double y,
+    DocxParagraph p,
+  ) async {
+    final double fontSize = _wordToPdfFontSize(p.headingLevel);
+    final PdfFont arabicFont = await _arabicFont(fontSize);
+    final List<PdfFontStyle> latinStyles = [
+      if (p.bold || p.headingLevel > 0) PdfFontStyle.bold,
+      if (p.italic) PdfFontStyle.italic,
+    ];
+    final PdfFont latinFont = PdfStandardFont(
+      PdfFontFamily.helvetica,
+      fontSize,
+      style: latinStyles.isEmpty ? PdfFontStyle.regular : null,
+      multiStyle: latinStyles.isEmpty ? null : latinStyles,
+    );
+    final double lineHeight = math.max(arabicFont.height, latinFont.height);
+    PdfFont fontFor(bool arabic) => arabic ? arabicFont : latinFont;
+
+    // Shape once up front - shape() maps each character to its contextual
+    // glyph form independently of its neighbors' *order*, so re-slicing
+    // this per line below doesn't need to re-shape.
+    final String shaped = ArabicShapeRenderer().shape(p.text.split(''), 0);
+    // measureString(' ') comes back 0 - a standalone whitespace-only
+    // string measures as empty (confirmed by reproducing it: every run
+    // boundary collapsed to zero gap, including plain Arabic-to-Arabic
+    // ones, tracing back to this exact call) - so the space width is
+    // Helvetica's own fixed AFM advance (278/1000 em, the same constant
+    // for every base-14 standard font size) rather than measured.
+    final double spaceWidth = fontSize * 0.278;
+
+    double wordWidth(String word) => _splitScriptRuns(word).fold(
+      0.0,
+      (sum, r) => sum + (r.arabic == null
+          ? spaceWidth
+          : fontFor(r.arabic!).measureString(r.text).width),
+    );
+
+    // Greedy word-wrap in logical (unreordered) order - wrapping decisions
+    // are direction-agnostic; only reorder *within* a line once its words
+    // are fixed, or a long paragraph's later lines end up scrambled to the
+    // top (reordering the whole paragraph as one unit first would reverse
+    // line order too, not just word order within a line).
+    final List<List<String>> lines = [];
+    List<String> currentLine = [];
+    double currentWidth = 0;
+    for (final String word in shaped.split(' ')) {
+      if (word.isEmpty) continue;
+      final double w = wordWidth(word);
+      final double candidate =
+          currentWidth + (currentLine.isEmpty ? 0 : spaceWidth) + w;
+      if (candidate > clientSize.width && currentLine.isNotEmpty) {
+        lines.add(currentLine);
+        currentLine = [word];
+        currentWidth = w;
+      } else {
+        currentLine.add(word);
+        currentWidth = candidate;
+      }
+    }
+    if (currentLine.isNotEmpty) lines.add(currentLine);
+
+    final Bidi bidi = Bidi()..isVisualOrder = false;
+    for (final List<String> lineWords in lines) {
+      if (y + lineHeight > clientSize.height) {
+        page = doc.pages.add();
+        clientSize = page.getClientSize();
+        y = 0;
+      }
+
+      final String lineVisual =
+          bidi.getLogicalToVisualString(lineWords.join(' '), true)['rtlText']
+              as String;
+      final List<_ScriptRun> runs = _splitScriptRuns(lineVisual);
+      final double lineWidth = runs.fold(
+        0.0,
+        (sum, r) => sum + (r.arabic == null
+            ? spaceWidth
+            : fontFor(r.arabic!).measureString(r.text).width),
+      );
+
+      double x = (clientSize.width - lineWidth).clamp(0, clientSize.width);
+      for (final _ScriptRun run in runs) {
+        if (run.arabic == null) {
+          // A space between runs is never drawn with either font - just
+          // skip over spaceWidth by hand (see its own comment for why).
+          x += spaceWidth;
+          continue;
+        }
+        final PdfFont runFont = fontFor(run.arabic!);
+        page.graphics.drawString(
+          run.text,
+          runFont,
+          bounds: Rect.fromLTWH(x, y, clientSize.width - x, lineHeight),
+        );
+        x += runFont.measureString(run.text).width;
+      }
+      y += lineHeight;
+    }
+
+    return (page, clientSize, y);
+  }
+
+  /// Splits already-shaped text into runs of consecutive Arabic-script vs.
+  /// Latin/other characters, in whatever order it's given (callers pass
+  /// already visually-ordered text). Spaces are their own runs (arabic:
+  /// null) rather than attached to either neighbor, so a run's text is
+  /// never anything drawString has to render a space glyph within - see
+  /// the space-handling comment where these runs get drawn.
+  List<_ScriptRun> _splitScriptRuns(String text) {
+    final List<_ScriptRun> runs = [];
+    final StringBuffer buf = StringBuffer();
+    bool? currentArabic;
+    for (final int c in text.runes) {
+      if (c == 0x20) {
+        if (currentArabic != null) {
+          runs.add(_ScriptRun(buf.toString(), currentArabic));
+          buf.clear();
+          currentArabic = null;
+        }
+        runs.add(const _ScriptRun(' ', null));
+        continue;
+      }
+      final bool isArabic = _isArabicScriptRune(c);
+      if (currentArabic != null && isArabic != currentArabic) {
+        runs.add(_ScriptRun(buf.toString(), currentArabic));
+        buf.clear();
+      }
+      currentArabic = isArabic;
+      buf.writeCharCode(c);
+    }
+    if (buf.isNotEmpty) runs.add(_ScriptRun(buf.toString(), currentArabic));
+    return runs;
+  }
+}
+
+class _ScriptRun {
+  final String text;
+  /// null marks a space run (see _splitScriptRuns).
+  final bool? arabic;
+  const _ScriptRun(this.text, this.arabic);
 }
