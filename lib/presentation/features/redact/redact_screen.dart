@@ -163,14 +163,7 @@ class RedactScreen extends ConsumerWidget {
                             padding: const EdgeInsets.symmetric(
                               horizontal: 20,
                             ),
-                            // Word selection needs a real drag gesture (a
-                            // range is "press on one word, drag across
-                            // more"), which conflicts with
-                            // InteractiveViewer's own ScaleGestureRecognizer
-                            // the same way Edit PDF's image-drag does - so
-                            // this screen never turns pinch-zoom on at all,
-                            // rather than only conditionally like Edit PDF.
-                            child: SingleChildScrollView(
+                            child: ClipRect(
                               child: LayoutBuilder(
                                 builder: (context, constraints) {
                                   final page =
@@ -188,10 +181,13 @@ class RedactScreen extends ConsumerWidget {
                                         page.pointsHeight;
                                   }
                                   return _PageCanvas(
+                                    key: ValueKey(state.currentPageIndex),
                                     width: fitWidth,
                                     state: state,
                                     onCommitSelection:
                                         controller.commitSelection,
+                                    onRemoveSelection:
+                                        controller.removeSelection,
                                   );
                                 },
                               ),
@@ -200,9 +196,20 @@ class RedactScreen extends ConsumerWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                          child: _OpacitySlider(
-                            opacity: state.barOpacity,
-                            onChanged: controller.setBarOpacity,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: _OpacitySlider(
+                                  opacity: state.barOpacity,
+                                  onChanged: controller.setBarOpacity,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              _NextColorSwatch(
+                                color: redactPalette[state.nextColorIndex %
+                                    redactPalette.length],
+                              ),
+                            ],
                           ),
                         ),
                         if (selectedWordCount > 0)
@@ -300,21 +307,55 @@ class _OpacitySlider extends StatelessWidget {
   }
 }
 
-/// Renders the current page at its natural aspect ratio, with a box over
-/// each extracted word. A single canvas-level pan gesture handles both a
-/// plain tap (press+release without moving off the starting word) and a
-/// drag across a range - hit-testing which word boxes the pointer has
-/// passed over as it moves, committing the touched set as one selection
-/// on release. No per-word `GestureDetector` needed.
+/// A small swatch previewing which color the *next* selection will get
+/// (see [redactPalette]/[RedactState.nextColorIndex]) - otherwise there's
+/// no way to know in advance what shade a new tap/drag is about to become.
+class _NextColorSwatch extends StatelessWidget {
+  final Color color;
+
+  const _NextColorSwatch({required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
+      ),
+    );
+  }
+}
+
+/// Renders the current page at its natural aspect ratio. A single
+/// `onScale*` gesture handles three things at once, branching on
+/// `details.pointerCount`:
+/// - **Two+ fingers**: pinch-zoom/pan the page (a hand-rolled equivalent of
+///   `InteractiveViewer` - that widget's own `ScaleGestureRecognizer` wins
+///   the gesture arena for *any* pointer movement, single-finger included,
+///   so it can't sit alongside the single-finger drag below; using one
+///   `onScale*` recognizer for both, differentiated by pointer count, is
+///   the way to get real pinch-zoom back without that conflict).
+/// - **One finger starting on empty space or an unmarked word**: drag-select
+///   - hit-tests every word box the pointer passes over, committing the
+///   touched set as one new selection on release.
+/// - **One finger starting on an already-marked word**: removes that whole
+///   selection on release, ignoring any further movement - a plain way to
+///   undo a mistaken mark without a separate delete button.
 class _PageCanvas extends StatefulWidget {
   final double width;
   final RedactState state;
   final void Function(Set<int> wordIndices) onCommitSelection;
+  final void Function(RedactSelection selection) onRemoveSelection;
 
   const _PageCanvas({
+    super.key,
     required this.width,
     required this.state,
     required this.onCommitSelection,
+    required this.onRemoveSelection,
   });
 
   @override
@@ -323,6 +364,14 @@ class _PageCanvas extends StatefulWidget {
 
 class _PageCanvasState extends State<_PageCanvas> {
   Set<int> _dragIndices = {};
+  RedactSelection? _removingSelection;
+
+  double _scale = 1.0;
+  Offset _panOffset = Offset.zero;
+  double _scaleStart = 1.0;
+  Offset _panOffsetStart = Offset.zero;
+  Offset _focalStart = Offset.zero;
+  bool _isZooming = false;
 
   List<({int index, PdfTextWord word, Rect displayRect})> _wordsOnPage(
     double dispWidth,
@@ -345,6 +394,28 @@ class _PageCanvasState extends State<_PageCanvas> {
     ];
   }
 
+  /// Merges a set of word indices into one bounding [Rect] per line they
+  /// touch on the current page - the same per-line grouping
+  /// [RedactController.redact] uses to build the actual redact areas, done
+  /// here purely for display so a multi-word selection reads as one solid
+  /// bar instead of visibly-seamed boxes per word.
+  List<Rect> _mergedRects(
+    Iterable<int> indices,
+    List<({int index, PdfTextWord word, Rect displayRect})> words,
+  ) {
+    final Map<int, Rect> byLine = {};
+    for (final int i in indices) {
+      final entry = words.where((w) => w.index == i);
+      if (entry.isEmpty) continue;
+      final Rect r = entry.first.displayRect;
+      final int lineIndex = entry.first.word.lineIndex;
+      byLine[lineIndex] = byLine.containsKey(lineIndex)
+          ? byLine[lineIndex]!.expandToInclude(r)
+          : r;
+    }
+    return byLine.values.toList();
+  }
+
   int? _hitTest(
     List<({int index, PdfTextWord word, Rect displayRect})> words,
     Offset position,
@@ -355,25 +426,66 @@ class _PageCanvasState extends State<_PageCanvas> {
     return null;
   }
 
-  void _onPanDown(
+  void _onScaleStart(
     List<({int index, PdfTextWord word, Rect displayRect})> words,
-    DragDownDetails details,
+    ScaleStartDetails details,
   ) {
-    final int? hit = _hitTest(words, details.localPosition);
-    setState(() => _dragIndices = hit == null ? {} : {hit});
+    if (details.pointerCount > 1) {
+      _isZooming = true;
+      _scaleStart = _scale;
+      _panOffsetStart = _panOffset;
+      // details.focalPoint (unlike localFocalPoint) is in *global* screen
+      // coordinates, unaffected by the Transform this gesture itself
+      // drives - avoids a feedback loop between reading the focal point
+      // and the transform changing because of it.
+      _focalStart = details.focalPoint;
+      return;
+    }
+    _isZooming = false;
+    final int? hit = _hitTest(words, details.localFocalPoint);
+    final RedactSelection? existing = hit == null
+        ? null
+        : widget.state.selectionOf(hit);
+    setState(() {
+      if (existing != null) {
+        _removingSelection = existing;
+        _dragIndices = {};
+      } else {
+        _removingSelection = null;
+        _dragIndices = hit == null ? {} : {hit};
+      }
+    });
   }
 
-  void _onPanUpdate(
+  void _onScaleUpdate(
     List<({int index, PdfTextWord word, Rect displayRect})> words,
-    DragUpdateDetails details,
+    ScaleUpdateDetails details,
   ) {
-    final int? hit = _hitTest(words, details.localPosition);
+    if (details.pointerCount > 1 || _isZooming) {
+      setState(() {
+        _isZooming = true;
+        _scale = (_scaleStart * details.scale).clamp(1.0, 4.0);
+        _panOffset = _panOffsetStart + (details.focalPoint - _focalStart);
+      });
+      return;
+    }
+    if (_removingSelection != null) return; // fixed target, ignore movement
+    final int? hit = _hitTest(words, details.localFocalPoint);
     if (hit != null && !_dragIndices.contains(hit)) {
       setState(() => _dragIndices = {..._dragIndices, hit});
     }
   }
 
-  void _onPanEnd(DragEndDetails details) {
+  void _onScaleEnd(ScaleEndDetails details) {
+    if (_isZooming) {
+      _isZooming = false;
+      return;
+    }
+    if (_removingSelection != null) {
+      widget.onRemoveSelection(_removingSelection!);
+      setState(() => _removingSelection = null);
+      return;
+    }
     if (_dragIndices.isNotEmpty) {
       widget.onCommitSelection(_dragIndices);
     }
@@ -390,74 +502,82 @@ class _PageCanvasState extends State<_PageCanvas> {
     final Color previewColor =
         redactPalette[widget.state.nextColorIndex % redactPalette.length];
 
-    return GestureDetector(
-      onPanDown: (details) => _onPanDown(words, details),
-      onPanUpdate: (details) => _onPanUpdate(words, details),
-      onPanEnd: _onPanEnd,
-      child: SizedBox(
-        width: dispWidth,
-        height: dispHeight,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.memory(page.bytes, fit: BoxFit.fill),
-              ),
-            ),
-            for (final entry in words)
-              Positioned.fromRect(
-                rect: entry.displayRect,
-                child: _WordOverlay(
-                  committedColor: widget.state.selectionOf(
-                    entry.index,
-                  )?.color,
-                  pending: _dragIndices.contains(entry.index),
-                  previewColor: previewColor,
-                  barOpacity: widget.state.barOpacity,
+    return Transform(
+      transform: Matrix4.identity()
+        ..translateByDouble(_panOffset.dx, _panOffset.dy, 0, 1)
+        ..scaleByDouble(_scale, _scale, 1, 1),
+      child: GestureDetector(
+        onScaleStart: (details) => _onScaleStart(words, details),
+        onScaleUpdate: (details) => _onScaleUpdate(words, details),
+        onScaleEnd: _onScaleEnd,
+        child: SizedBox(
+          width: dispWidth,
+          height: dispHeight,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.memory(page.bytes, fit: BoxFit.fill),
                 ),
               ),
-          ],
+              // Committed selections - one merged bar per line each
+              // touches, colored per selection.
+              for (final RedactSelection selection in widget.state.selections)
+                for (final Rect r in _mergedRects(
+                  selection.wordIndices,
+                  words,
+                ))
+                  Positioned.fromRect(
+                    rect: r,
+                    child: _RedactBar(
+                      color: selection.color,
+                      opacity: widget.state.barOpacity,
+                      isSelectedForRemoval:
+                          identical(selection, _removingSelection),
+                    ),
+                  ),
+              // In-progress drag preview, before it's committed.
+              if (_dragIndices.isNotEmpty)
+                for (final Rect r in _mergedRects(_dragIndices, words))
+                  Positioned.fromRect(
+                    rect: r,
+                    child: _RedactBar(
+                      color: previewColor,
+                      opacity: 0.4,
+                      isSelectedForRemoval: false,
+                    ),
+                  ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _WordOverlay extends StatelessWidget {
-  /// Non-null once this word belongs to a committed selection - its color.
-  final Color? committedColor;
-  /// True while a drag-in-progress has touched this word but not released
-  /// yet (see [previewColor]).
-  final bool pending;
-  final Color previewColor;
-  final double barOpacity;
+class _RedactBar extends StatelessWidget {
+  final Color color;
+  final double opacity;
+  final bool isSelectedForRemoval;
 
-  const _WordOverlay({
-    required this.committedColor,
-    required this.pending,
-    required this.previewColor,
-    required this.barOpacity,
+  const _RedactBar({
+    required this.color,
+    required this.opacity,
+    required this.isSelectedForRemoval,
   });
 
   @override
   Widget build(BuildContext context) {
-    final Color? fill = committedColor != null
-        ? committedColor!.withValues(alpha: barOpacity)
-        : pending
-        ? previewColor.withValues(alpha: 0.4)
-        : null;
-    final bool marked = committedColor != null || pending;
     return IgnorePointer(
       // Hit-testing happens at the canvas level (see _PageCanvasState) -
-      // these boxes are purely visual.
+      // this box is purely visual.
       child: Container(
         decoration: BoxDecoration(
-          color: fill ?? _color.withValues(alpha: 0.0),
-          border: Border.all(
-            color: _color.withValues(alpha: marked ? 0.9 : 0.22),
-            width: marked ? 1.5 : 1,
-          ),
+          color: color.withValues(alpha: opacity),
+          border: isSelectedForRemoval
+              ? Border.all(color: Colors.white, width: 2)
+              : null,
           borderRadius: BorderRadius.circular(3),
         ),
       ),

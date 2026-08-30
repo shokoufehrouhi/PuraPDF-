@@ -137,28 +137,12 @@ class RedactController extends Notifier<RedactState> {
   }
 
   /// A plain tap passes a single-word set; a drag passes every word index
-  /// the gesture passed over. Either way this becomes one new selection
-  /// with the next palette color - *except* re-committing the exact same
-  /// lone word a second time (a second tap on an already-selected single
-  /// word) removes it instead, the plain toggle-off case.
+  /// the gesture passed over. Becomes one new selection with the next
+  /// palette color. A gesture that *starts* on an already-marked word
+  /// removes that whole selection instead - see [removeSelection], called
+  /// by the screen itself before this ever gets reached in that case.
   void commitSelection(Set<int> wordIndices) {
     if (wordIndices.isEmpty) return;
-
-    if (wordIndices.length == 1) {
-      final int only = wordIndices.first;
-      final bool wasLoneSelection = state.selections.any(
-        (s) => s.wordIndices.length == 1 && s.wordIndices.contains(only),
-      );
-      if (wasLoneSelection) {
-        final List<RedactSelection> updated = [
-          for (final s in state.selections)
-            if (!(s.wordIndices.length == 1 && s.wordIndices.contains(only)))
-              s,
-        ];
-        state = state.copyWith(selections: updated, clearResult: true);
-        return;
-      }
-    }
 
     // Claim these words away from whatever selection (if any) already held
     // them, dropping any selection that's now empty.
@@ -178,6 +162,19 @@ class RedactController extends Notifier<RedactState> {
         RedactSelection(color: color, wordIndices: wordIndices),
       ],
       nextColorIndex: state.nextColorIndex + 1,
+      clearResult: true,
+    );
+  }
+
+  /// Removes one whole selection (by reference - `RedactSelection` has no
+  /// separate id, but the screen always hands back the exact instance from
+  /// [RedactState.selectionOf], so default identity equality is enough).
+  void removeSelection(RedactSelection selection) {
+    state = state.copyWith(
+      selections: [
+        for (final s in state.selections)
+          if (s != selection) s,
+      ],
       clearResult: true,
     );
   }
