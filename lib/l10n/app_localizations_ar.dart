@@ -158,6 +158,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get opContentEdit => 'تحرير PDF';
 
   @override
+  String get opRedact => 'الحجب';
+
+  @override
   String get opLocked => 'مقفل';
 
   @override
@@ -253,6 +256,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get errorMakeAChangeBeforeSaving =>
       'قم بإجراء تغيير واحد على الأقل قبل الحفظ.';
+
+  @override
+  String get errorMarkAtLeastOneLineToRedact =>
+      'حدد سطرًا واحدًا على الأقل لإخفائه.';
 
   @override
   String get errorSelectAtLeastOneImage => 'اختر صورة واحدة على الأقل.';
@@ -914,4 +921,43 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get encryptStepEnterPassword => 'إدخال كلمة المرور';
+
+  @override
+  String get featureRedactTitle => 'الحجب';
+
+  @override
+  String get featureRedactSubtitle => 'إزالة النصوص الحساسة نهائيًا';
+
+  @override
+  String get redactDescription =>
+      'اضغط على الأسطر التي تريد إزالتها نهائيًا، ثم أكّد — على عكس إصلاح \"تعديل PDF\" الذي يكتفي بالتغطية، لا يمكن استرجاع النص المحجوب أو نسخه.';
+
+  @override
+  String get redactStepSelect => 'اختر ملف PDF';
+
+  @override
+  String get redactStepMark => 'اضغط للتحديد';
+
+  @override
+  String get redactStepConfirm => 'حجب نهائي';
+
+  @override
+  String redactMarkedCount(Object count) {
+    return 'تم تحديد $count للحجب';
+  }
+
+  @override
+  String get redactConfirmTitle => 'حجب نهائي؟';
+
+  @override
+  String get redactConfirmBody =>
+      'لا يمكن التراجع عن هذا الإجراء. سيتم حذف النص المحدد بالكامل من ملف PDF، وليس مجرد تغطيته.';
+
+  @override
+  String get redactConfirmAction => 'حجب';
+
+  @override
+  String redactButtonLabel(Object count) {
+    return 'حجب ($count)';
+  }
 }

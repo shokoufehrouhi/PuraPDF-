@@ -48,6 +48,7 @@
   "opScan": "اسکن",
   "opPageEdit": "ویرایش صفحات",
   "opContentEdit": "ویرایش PDF",
+  "opRedact": "حذف اطلاعات",
   "opLocked": "قفل‌شده",
   "opUnlocked": "بازشده",
   "opWatermark": "واترمارک",
@@ -92,6 +93,7 @@
   "errorAtLeastOnePageMustRemain": "حداقل یک صفحه باید باقی بماند.",
   "errorAtLeastOnePageMustRemainInPdf": "حداقل یک صفحه باید در PDF باقی بماند.",
   "errorMakeAChangeBeforeSaving": "قبل از ذخیره حداقل یک تغییر ایجاد کنید.",
+  "errorMarkAtLeastOneLineToRedact": "حداقل یک خط را برای حذف دائمی علامت بزنید.",
   "errorSelectAtLeastOneImage": "حداقل یک تصویر انتخاب کنید.",
   "errorMergeNeedsTwoFiles": "برای ادغام حداقل به ۲ فایل PDF نیاز است.",
   "errorNewNameEmpty": "نام جدید نمی‌تواند خالی باشد.",
@@ -381,5 +383,26 @@
   },
   "encryptRemoveDescription": "رمز عبور یک PDF را حذف کنید، در صورت داشتن رمز درست.",
   "encryptStepSetPassword": "تنظیم رمز عبور",
-  "encryptStepEnterPassword": "وارد کردن رمز عبور"
+  "encryptStepEnterPassword": "وارد کردن رمز عبور",
+  "featureRedactTitle": "حذف اطلاعات",
+  "featureRedactSubtitle": "حذف دائمی متن‌های حساس",
+  "redactDescription": "روی خط‌هایی که می‌خواهید برای همیشه حذف کنید ضربه بزنید، سپس تأیید کنید — برخلاف اصلاح «ویرایش PDF» که فقط روی متن را می‌پوشاند، متن حذف‌شده اینجا قابل بازیابی یا کپی نیست.",
+  "redactStepSelect": "انتخاب PDF",
+  "redactStepMark": "برای علامت‌گذاری ضربه بزنید",
+  "redactStepConfirm": "حذف دائمی",
+  "redactMarkedCount": "{count} خط برای حذف علامت‌گذاری شد",
+  "@redactMarkedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "redactConfirmTitle": "حذف دائمی شود؟",
+  "redactConfirmBody": "این کار قابل بازگشت نیست. متن علامت‌گذاری‌شده کاملاً از PDF حذف می‌شود، نه فقط پوشانده.",
+  "redactConfirmAction": "حذف",
+  "redactButtonLabel": "حذف ({count})",
+  "@redactButtonLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  }
 }

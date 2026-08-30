@@ -48,6 +48,7 @@
   "opScan": "مسح ضوئي",
   "opPageEdit": "تحرير الصفحات",
   "opContentEdit": "تحرير PDF",
+  "opRedact": "الحجب",
   "opLocked": "مقفل",
   "opUnlocked": "غير مقفل",
   "opWatermark": "علامة مائية",
@@ -92,6 +93,7 @@
   "errorAtLeastOnePageMustRemain": "يجب أن تبقى صفحة واحدة على الأقل.",
   "errorAtLeastOnePageMustRemainInPdf": "يجب أن تبقى صفحة واحدة على الأقل في ملف PDF.",
   "errorMakeAChangeBeforeSaving": "قم بإجراء تغيير واحد على الأقل قبل الحفظ.",
+  "errorMarkAtLeastOneLineToRedact": "حدد سطرًا واحدًا على الأقل لإخفائه.",
   "errorSelectAtLeastOneImage": "اختر صورة واحدة على الأقل.",
   "errorMergeNeedsTwoFiles": "يتطلب الدمج ملفي PDF على الأقل.",
   "errorNewNameEmpty": "لا يمكن أن يكون الاسم الجديد فارغًا.",
@@ -381,5 +383,26 @@
   },
   "encryptRemoveDescription": "أزل كلمة مرور ملف PDF، بمعرفة كلمة المرور الصحيحة.",
   "encryptStepSetPassword": "تعيين كلمة المرور",
-  "encryptStepEnterPassword": "إدخال كلمة المرور"
+  "encryptStepEnterPassword": "إدخال كلمة المرور",
+  "featureRedactTitle": "الحجب",
+  "featureRedactSubtitle": "إزالة النصوص الحساسة نهائيًا",
+  "redactDescription": "اضغط على الأسطر التي تريد إزالتها نهائيًا، ثم أكّد — على عكس إصلاح \"تعديل PDF\" الذي يكتفي بالتغطية، لا يمكن استرجاع النص المحجوب أو نسخه.",
+  "redactStepSelect": "اختر ملف PDF",
+  "redactStepMark": "اضغط للتحديد",
+  "redactStepConfirm": "حجب نهائي",
+  "redactMarkedCount": "تم تحديد {count} للحجب",
+  "@redactMarkedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "redactConfirmTitle": "حجب نهائي؟",
+  "redactConfirmBody": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف النص المحدد بالكامل من ملف PDF، وليس مجرد تغطيته.",
+  "redactConfirmAction": "حجب",
+  "redactButtonLabel": "حجب ({count})",
+  "@redactButtonLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  }
 }

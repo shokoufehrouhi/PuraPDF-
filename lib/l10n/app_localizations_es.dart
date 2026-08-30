@@ -159,6 +159,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get opContentEdit => 'Editar PDF';
 
   @override
+  String get opRedact => 'Ocultar texto';
+
+  @override
   String get opLocked => 'Bloqueado';
 
   @override
@@ -254,6 +257,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get errorMakeAChangeBeforeSaving =>
       'Haz al menos un cambio antes de guardar.';
+
+  @override
+  String get errorMarkAtLeastOneLineToRedact =>
+      'Marca al menos una línea para tachar.';
 
   @override
   String get errorSelectAtLeastOneImage => 'Selecciona al menos una imagen.';
@@ -920,4 +927,44 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get encryptStepEnterPassword => 'Introducir contraseña';
+
+  @override
+  String get featureRedactTitle => 'Ocultar texto';
+
+  @override
+  String get featureRedactSubtitle =>
+      'Elimina texto sensible de forma permanente';
+
+  @override
+  String get redactDescription =>
+      'Toca las líneas que quieras eliminar de forma permanente y confirma — a diferencia del arreglo de Editar PDF (que solo cubre), el texto ocultado no se puede recuperar ni copiar.';
+
+  @override
+  String get redactStepSelect => 'Selecciona un PDF';
+
+  @override
+  String get redactStepMark => 'Toca para marcar';
+
+  @override
+  String get redactStepConfirm => 'Ocultar de forma permanente';
+
+  @override
+  String redactMarkedCount(Object count) {
+    return '$count marcada(s) para ocultar';
+  }
+
+  @override
+  String get redactConfirmTitle => '¿Ocultar de forma permanente?';
+
+  @override
+  String get redactConfirmBody =>
+      'Esto no se puede deshacer. El texto marcado se eliminará por completo del PDF, no solo se cubrirá.';
+
+  @override
+  String get redactConfirmAction => 'Ocultar';
+
+  @override
+  String redactButtonLabel(Object count) {
+    return 'Ocultar ($count)';
+  }
 }

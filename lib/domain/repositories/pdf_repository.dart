@@ -8,6 +8,7 @@ import '../entities/page_range.dart';
 import '../entities/pdf_content_edit.dart';
 import '../entities/pdf_page_edit.dart';
 import '../entities/pdf_page_image.dart';
+import '../entities/pdf_redact_area.dart';
 import '../entities/pdf_text_line.dart';
 import '../entities/watermark_options.dart';
 
@@ -88,6 +89,10 @@ abstract class PdfRepository {
   /// Applies [edits] (see [PdfContentEdit]) directly onto the existing
   /// pages of the PDF at [inputPath] and returns the new file's path.
   Future<String> editPdfContent(String inputPath, List<PdfContentEdit> edits);
+
+  /// Permanently removes [areas] (see [PdfRedactArea]) from the PDF at
+  /// [inputPath] and returns the new file's path.
+  Future<String> redactPdf(String inputPath, List<PdfRedactArea> areas);
 
   /// Password-protects the PDF at [inputPath] with [password] (used as both
   /// the open and permissions password) and returns the new file's path.

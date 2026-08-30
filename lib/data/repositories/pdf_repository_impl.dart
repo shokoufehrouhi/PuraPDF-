@@ -15,6 +15,21 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 // reorderer anyway.
 import 'package:syncfusion_flutter_pdf/src/pdf/implementation/graphics/fonts/rtl/arabic_shape_renderer.dart';
 import 'package:syncfusion_flutter_pdf/src/pdf/implementation/graphics/fonts/rtl/bidi.dart';
+// Same situation, for redactPdf: Syncfusion's own content-stream tokenizer
+// (the one PdfTextExtractor uses internally) plus the low-level primitives
+// needed to read/write a page's raw stream bytes - none of it public. Each
+// `show`n to just the one symbol needed so these don't collide with each
+// other or with the public exports above.
+import 'package:syncfusion_flutter_pdf/src/pdf/implementation/exporting/pdf_text_extractor/parser/content_parser.dart'
+    show ContentParser, PdfRecord, PdfRecordCollection;
+import 'package:syncfusion_flutter_pdf/src/pdf/implementation/io/pdf_cross_table.dart'
+    show PdfCrossTable;
+import 'package:syncfusion_flutter_pdf/src/pdf/implementation/pages/pdf_page.dart'
+    show PdfPageHelper;
+import 'package:syncfusion_flutter_pdf/src/pdf/implementation/primitives/pdf_array.dart'
+    show PdfArray;
+import 'package:syncfusion_flutter_pdf/src/pdf/implementation/primitives/pdf_stream.dart'
+    show PdfStream;
 
 import '../../core/docx/docx_paragraph.dart';
 import '../../core/docx/docx_reader.dart';
@@ -28,6 +43,7 @@ import '../../domain/entities/page_range.dart';
 import '../../domain/entities/pdf_content_edit.dart';
 import '../../domain/entities/pdf_page_edit.dart';
 import '../../domain/entities/pdf_page_image.dart';
+import '../../domain/entities/pdf_redact_area.dart';
 import '../../domain/entities/pdf_text_line.dart';
 import '../../domain/entities/watermark_options.dart';
 import '../../domain/repositories/pdf_repository.dart';
@@ -789,6 +805,206 @@ class PdfRepositoryImpl implements PdfRepository {
       doc,
       'purapdf_content_${DateTime.now().millisecondsSinceEpoch}.pdf',
     );
+  }
+
+  @override
+  Future<String> redactPdf(String inputPath, List<PdfRedactArea> areas) async {
+    final PdfDocument doc = await _loadDocument(inputPath);
+    final int pageCount = doc.pages.count;
+    for (final area in areas) {
+      if (area.pageIndex < 0 || area.pageIndex >= pageCount) {
+        doc.dispose();
+        throw ArgumentError(
+          'Page index ${area.pageIndex} out of range (0-${pageCount - 1}).',
+        );
+      }
+    }
+
+    final Map<int, List<PdfRedactArea>> byPage = {};
+    for (final area in areas) {
+      byPage.putIfAbsent(area.pageIndex, () => []).add(area);
+    }
+
+    for (final MapEntry<int, List<PdfRedactArea>> entry in byPage.entries) {
+      final PdfPage page = doc.pages[entry.key];
+      _removeContentInAreas(page, entry.value);
+      // Visual cover on top of the now-actually-empty area - handles any
+      // background graphic/image still there (see the method doc comment
+      // on why images aren't content-stream-redacted) and gives the
+      // expected solid-black-bar look. Black, not Edit PDF's white erase
+      // box, so the two features are visually distinguishable.
+      for (final PdfRedactArea area in entry.value) {
+        page.graphics.drawRectangle(
+          brush: PdfSolidBrush(PdfColor(0, 0, 0)),
+          bounds: Rect.fromLTWH(area.left, area.top, area.width, area.height),
+        );
+      }
+    }
+
+    return _writeOutput(
+      doc,
+      'purapdf_redacted_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
+  }
+
+  /// The actual removal half of redaction: permanently drops
+  /// text-showing operators (`Tj`/`TJ`/`'`/`"`) from [page]'s raw content
+  /// stream wherever they land inside [areas], so the text is gone from
+  /// copy-paste/extraction - not just visually covered (contrast
+  /// [editPdfContent], which only ever draws over existing content).
+  ///
+  /// Syncfusion has no public API for this - reaches into its
+  /// unexported `src/` internals for the same content-stream tokenizer
+  /// [PdfTextExtractor] itself uses (`ContentParser`/`PdfRecordCollection`/
+  /// `PdfRecord`), plus the primitives needed to get a page's raw stream
+  /// bytes and write new ones back (`PdfPageHelper`, `PdfCrossTable`,
+  /// `PdfStream`, `PdfArray`) - not a supported import, a Syncfusion
+  /// version bump could move or remove any of these.
+  ///
+  /// Deliberate scope, matching this feature's `PdfRedactArea` doc
+  /// comment:
+  /// - **Whole text lines only.** Matching is done by each text-showing
+  ///   operator's *y* position (via `Tm`/`Td`/`TD`/`T*`/`TL` - the operators
+  ///   that actually move the text cursor), not per-character/glyph, so an
+  ///   area that only partly overlaps a line still drops that line's
+  ///   entire operator.
+  /// - **`cm`/`q`/`Q` are tracked, but translation-only.** Turns out this
+  ///   isn't optional: Syncfusion's own `PdfGraphics` wraps *every* page's
+  ///   drawing in a `cm` translation to implement its top-left-origin
+  ///   convenience over PDF's native bottom-left space, so ignoring CTM
+  ///   entirely (which is what Syncfusion's own extractor does - confirmed
+  ///   by reading its source) put every redact-candidate line hundreds of
+  ///   points off, on ordinary output from this app's own generator.
+  ///   Rotation/scale (`a`/`b`/`c`/`d`) is still ignored - fine for
+  ///   ordinary axis-aligned text; a page with a rotated/scaled `cm` on its
+  ///   text could still mis-position the match.
+  /// - **Images are never touched.** A `Do` operator is always kept as-is
+  ///   regardless of whether it points at an image inside a redact area -
+  ///   only the visual black bar (drawn by the caller) covers it. True
+  ///   pixel redaction of an embedded photo is a different, rasterize-based
+  ///   feature, not implemented here.
+  /// - **Nested Form XObjects are not recursed into** - text living inside
+  ///   a Form XObject's own content stream won't be found. Uncommon in the
+  ///   single-layer PDFs (scans, Word/PDF conversions, this app's own
+  ///   generated output) this feature targets.
+  void _removeContentInAreas(PdfPage page, List<PdfRedactArea> areas) {
+    final PdfArray contentRefs = PdfPageHelper.getHelper(page).contents;
+    if (contentRefs.count == 0) return;
+
+    final List<PdfStream> streams = [];
+    for (int i = 0; i < contentRefs.count; i++) {
+      final dynamic dereferenced = PdfCrossTable.dereference(contentRefs[i]);
+      if (dereferenced is PdfStream) {
+        dereferenced.decompress();
+        streams.add(dereferenced);
+      }
+    }
+    if (streams.isEmpty) return;
+
+    // TextLine/PdfRedactArea bounds are top-left-origin, full-page-relative
+    // (the same space editPdfContent already draws into directly) - raw
+    // Tm/Td content-stream y is bottom-left-origin, so flip via page
+    // height for every comparison below.
+    final double pageHeight = page.size.height;
+    const double tolerance = 2.0; // baseline sits inside, not at, the box
+    bool hitsArea(double topOriginY) => areas.any(
+      (PdfRedactArea a) =>
+          topOriginY >= a.top - tolerance &&
+          topOriginY <= a.top + a.height + tolerance,
+    );
+
+    double tlmY = 0; // text line matrix y, reset per BT, bottom-left origin
+    double leading = 0; // TL, or the implicit one TD sets
+    // Translation-only CTM y - confirmed necessary by testing, not an
+    // exotic case: Syncfusion's own PdfGraphics wraps *every* page's
+    // drawing in `q ... cm 1 0 0 1 0 <pageHeight> ... cm 1 0 0 1 <x> <y>
+    // ... BT ... ET ... Q` to implement its top-left-origin drawing
+    // convenience over PDF's native bottom-left space - ignoring it (as
+    // Syncfusion's own extractor does) put every line hundreds of points
+    // off. Still deliberately translation-only (`a`/`b`/`c`/`d` ignored) -
+    // fine for ordinary axis-aligned content, wrong for rotated/scaled
+    // `cm`s.
+    double ctmY = 0;
+    final List<double> ctmStack = [];
+    final List<PdfRecord> kept = [];
+    for (final PdfStream stream in streams) {
+      final List<int>? bytes = stream.data;
+      if (bytes == null || bytes.isEmpty) continue;
+      final PdfRecordCollection? records = ContentParser(bytes).readContent();
+      if (records == null) continue;
+
+      for (final PdfRecord record in records.recordCollection) {
+        final String? op = record.operatorName;
+        final List<String> operands = record.operands ?? const <String>[];
+        bool drop = false;
+        if (op == 'q') {
+          ctmStack.add(ctmY);
+        } else if (op == 'Q') {
+          if (ctmStack.isNotEmpty) ctmY = ctmStack.removeLast();
+        } else if (op == 'cm' && operands.length == 6) {
+          ctmY += double.tryParse(operands[5]) ?? 0;
+        } else if (op == 'BT') {
+          tlmY = 0;
+        } else if (op == 'Tm' && operands.length == 6) {
+          tlmY = double.tryParse(operands[5]) ?? tlmY;
+        } else if (op == 'Td' && operands.length == 2) {
+          tlmY += double.tryParse(operands[1]) ?? 0;
+        } else if (op == 'TD' && operands.length == 2) {
+          final double ty = double.tryParse(operands[1]) ?? 0;
+          leading = -ty;
+          tlmY += ty;
+        } else if (op == 'TL' && operands.length == 1) {
+          leading = double.tryParse(operands[0]) ?? leading;
+        } else if (op == 'T*') {
+          tlmY -= leading;
+        } else if (op == "'" || op == '"') {
+          // Both operators move to the next line (T*'s equivalent) *and*
+          // show text - the movement happens before the position check.
+          tlmY -= leading;
+          drop = hitsArea(pageHeight - (ctmY + tlmY));
+        } else if (op == 'Tj' || op == 'TJ') {
+          drop = hitsArea(pageHeight - (ctmY + tlmY));
+        }
+        if (!drop) kept.add(record);
+      }
+    }
+
+    // Re-serialize. The lexer strips a TJ array's brackets when tokenizing
+    // (each string/number inside becomes its own operand), so TJ is the
+    // one operator that needs them added back; every other operand string
+    // already carries whatever delimiters it needs (Tj's `(...)`/`<...>`
+    // literal already includes its own parens/angle-brackets verbatim,
+    // escape sequences untouched - confirmed by reading the lexer).
+    final StringBuffer out = StringBuffer();
+    for (final PdfRecord r in kept) {
+      final List<String>? operands = r.operands;
+      if (operands != null && operands.isNotEmpty) {
+        if (r.operatorName == 'TJ') {
+          out
+            ..write('[')
+            ..write(operands.join(' '))
+            ..write(']');
+        } else {
+          out.write(operands.join(' '));
+        }
+        out.write(' ');
+      }
+      out
+        ..write(r.operatorName)
+        ..write('\n');
+    }
+
+    streams.first.clearStream();
+    final String rewritten = out.toString();
+    // PdfStream.write throws on an empty string - a page redacted down to
+    // nothing is already correctly empty after clearStream(), just don't
+    // call write() on it.
+    if (rewritten.isNotEmpty) {
+      streams.first.write(rewritten);
+    }
+    for (int i = 1; i < streams.length; i++) {
+      streams[i].clearStream();
+    }
   }
 
   /// Re-encodes arbitrary image bytes as PNG via `package:image` (which

@@ -394,6 +394,12 @@ abstract class AppLocalizations {
   /// **'Edit PDF'**
   String get opContentEdit;
 
+  /// No description provided for @opRedact.
+  ///
+  /// In en, this message translates to:
+  /// **'Redact'**
+  String get opRedact;
+
   /// No description provided for @opLocked.
   ///
   /// In en, this message translates to:
@@ -567,6 +573,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Make at least one change before saving.'**
   String get errorMakeAChangeBeforeSaving;
+
+  /// No description provided for @errorMarkAtLeastOneLineToRedact.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark at least one line to redact.'**
+  String get errorMarkAtLeastOneLineToRedact;
 
   /// No description provided for @errorSelectAtLeastOneImage.
   ///
@@ -1683,6 +1695,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter password'**
   String get encryptStepEnterPassword;
+
+  /// No description provided for @featureRedactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Redact'**
+  String get featureRedactTitle;
+
+  /// No description provided for @featureRedactSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently remove sensitive text'**
+  String get featureRedactSubtitle;
+
+  /// No description provided for @redactDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the lines you want to permanently remove, then confirm — unlike Edit PDF\'s cover-only fix, redacted text can\'t be recovered or copied.'**
+  String get redactDescription;
+
+  /// No description provided for @redactStepSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select PDF'**
+  String get redactStepSelect;
+
+  /// No description provided for @redactStepMark.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to mark'**
+  String get redactStepMark;
+
+  /// No description provided for @redactStepConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Redact permanently'**
+  String get redactStepConfirm;
+
+  /// No description provided for @redactMarkedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} marked for redaction'**
+  String redactMarkedCount(Object count);
+
+  /// No description provided for @redactConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Redact permanently?'**
+  String get redactConfirmTitle;
+
+  /// No description provided for @redactConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This can\'t be undone. The marked text will be completely removed from the PDF, not just covered.'**
+  String get redactConfirmBody;
+
+  /// No description provided for @redactConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Redact'**
+  String get redactConfirmAction;
+
+  /// No description provided for @redactButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Redact ({count})'**
+  String redactButtonLabel(Object count);
 }
 
 class _AppLocalizationsDelegate

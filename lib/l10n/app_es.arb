@@ -48,6 +48,7 @@
   "opScan": "Escaneo",
   "opPageEdit": "Editar páginas",
   "opContentEdit": "Editar PDF",
+  "opRedact": "Ocultar texto",
   "opLocked": "Bloqueado",
   "opUnlocked": "Desbloqueado",
   "opWatermark": "Marca de agua",
@@ -92,6 +93,7 @@
   "errorAtLeastOnePageMustRemain": "Debe quedar al menos una página.",
   "errorAtLeastOnePageMustRemainInPdf": "Debe quedar al menos una página en el PDF.",
   "errorMakeAChangeBeforeSaving": "Haz al menos un cambio antes de guardar.",
+  "errorMarkAtLeastOneLineToRedact": "Marca al menos una línea para tachar.",
   "errorSelectAtLeastOneImage": "Selecciona al menos una imagen.",
   "errorMergeNeedsTwoFiles": "Combinar requiere al menos 2 archivos PDF.",
   "errorNewNameEmpty": "El nuevo nombre no puede estar vacío.",
@@ -381,5 +383,26 @@
   },
   "encryptRemoveDescription": "Elimina la contraseña de un PDF, si conoces la correcta.",
   "encryptStepSetPassword": "Definir contraseña",
-  "encryptStepEnterPassword": "Introducir contraseña"
+  "encryptStepEnterPassword": "Introducir contraseña",
+  "featureRedactTitle": "Ocultar texto",
+  "featureRedactSubtitle": "Elimina texto sensible de forma permanente",
+  "redactDescription": "Toca las líneas que quieras eliminar de forma permanente y confirma — a diferencia del arreglo de Editar PDF (que solo cubre), el texto ocultado no se puede recuperar ni copiar.",
+  "redactStepSelect": "Selecciona un PDF",
+  "redactStepMark": "Toca para marcar",
+  "redactStepConfirm": "Ocultar de forma permanente",
+  "redactMarkedCount": "{count} marcada(s) para ocultar",
+  "@redactMarkedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "redactConfirmTitle": "¿Ocultar de forma permanente?",
+  "redactConfirmBody": "Esto no se puede deshacer. El texto marcado se eliminará por completo del PDF, no solo se cubrirá.",
+  "redactConfirmAction": "Ocultar",
+  "redactButtonLabel": "Ocultar ({count})",
+  "@redactButtonLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  }
 }

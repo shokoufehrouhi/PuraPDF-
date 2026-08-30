@@ -159,6 +159,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get opContentEdit => 'Edit PDF';
 
   @override
+  String get opRedact => 'Redact';
+
+  @override
   String get opLocked => 'Locked';
 
   @override
@@ -252,6 +255,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorMakeAChangeBeforeSaving =>
       'Make at least one change before saving.';
+
+  @override
+  String get errorMarkAtLeastOneLineToRedact =>
+      'Mark at least one line to redact.';
 
   @override
   String get errorSelectAtLeastOneImage => 'Select at least one image.';
@@ -913,4 +920,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get encryptStepEnterPassword => 'Enter password';
+
+  @override
+  String get featureRedactTitle => 'Redact';
+
+  @override
+  String get featureRedactSubtitle => 'Permanently remove sensitive text';
+
+  @override
+  String get redactDescription =>
+      'Tap the lines you want to permanently remove, then confirm — unlike Edit PDF\'s cover-only fix, redacted text can\'t be recovered or copied.';
+
+  @override
+  String get redactStepSelect => 'Select PDF';
+
+  @override
+  String get redactStepMark => 'Tap to mark';
+
+  @override
+  String get redactStepConfirm => 'Redact permanently';
+
+  @override
+  String redactMarkedCount(Object count) {
+    return '$count marked for redaction';
+  }
+
+  @override
+  String get redactConfirmTitle => 'Redact permanently?';
+
+  @override
+  String get redactConfirmBody =>
+      'This can\'t be undone. The marked text will be completely removed from the PDF, not just covered.';
+
+  @override
+  String get redactConfirmAction => 'Redact';
+
+  @override
+  String redactButtonLabel(Object count) {
+    return 'Redact ($count)';
+  }
 }

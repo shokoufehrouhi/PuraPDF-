@@ -59,6 +59,8 @@ String localizedError(BuildContext context, String value) {
       return l10n.errorAtLeastOnePageMustRemainInPdf;
     case 'errorMakeAChangeBeforeSaving':
       return l10n.errorMakeAChangeBeforeSaving;
+    case 'errorMarkAtLeastOneLineToRedact':
+      return l10n.errorMarkAtLeastOneLineToRedact;
     case 'errorSelectAtLeastOneImage':
       return l10n.errorSelectAtLeastOneImage;
     case 'errorMergeNeedsTwoFiles':

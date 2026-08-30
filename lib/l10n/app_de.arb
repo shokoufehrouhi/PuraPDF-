@@ -48,6 +48,7 @@
   "opScan": "Scan",
   "opPageEdit": "Seiten bearbeiten",
   "opContentEdit": "PDF bearbeiten",
+  "opRedact": "Schwärzen",
   "opLocked": "Gesperrt",
   "opUnlocked": "Entsperrt",
   "opWatermark": "Wasserzeichen",
@@ -92,6 +93,7 @@
   "errorAtLeastOnePageMustRemain": "Mindestens eine Seite muss erhalten bleiben.",
   "errorAtLeastOnePageMustRemainInPdf": "Mindestens eine Seite muss im PDF erhalten bleiben.",
   "errorMakeAChangeBeforeSaving": "Nehmen Sie vor dem Speichern mindestens eine Änderung vor.",
+  "errorMarkAtLeastOneLineToRedact": "Markieren Sie mindestens eine Zeile zum Schwärzen.",
   "errorSelectAtLeastOneImage": "Wählen Sie mindestens ein Bild aus.",
   "errorMergeNeedsTwoFiles": "Zum Zusammenführen sind mindestens 2 PDF-Dateien erforderlich.",
   "errorNewNameEmpty": "Der neue Name darf nicht leer sein.",
@@ -381,5 +383,26 @@
   },
   "encryptRemoveDescription": "Entfernen Sie das Passwort eines PDFs, wenn Sie das richtige kennen.",
   "encryptStepSetPassword": "Passwort festlegen",
-  "encryptStepEnterPassword": "Passwort eingeben"
+  "encryptStepEnterPassword": "Passwort eingeben",
+  "featureRedactTitle": "Schwärzen",
+  "featureRedactSubtitle": "Sensible Textstellen dauerhaft entfernen",
+  "redactDescription": "Tippen Sie die Zeilen an, die Sie dauerhaft entfernen möchten, und bestätigen Sie dann — anders als bei „PDF bearbeiten“ (nur Abdeckung) kann geschwärzter Text nicht wiederhergestellt oder kopiert werden.",
+  "redactStepSelect": "PDF auswählen",
+  "redactStepMark": "Zum Markieren tippen",
+  "redactStepConfirm": "Dauerhaft schwärzen",
+  "redactMarkedCount": "{count} zum Schwärzen markiert",
+  "@redactMarkedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "redactConfirmTitle": "Dauerhaft schwärzen?",
+  "redactConfirmBody": "Dies kann nicht rückgängig gemacht werden. Der markierte Text wird vollständig aus dem PDF entfernt, nicht nur abgedeckt.",
+  "redactConfirmAction": "Schwärzen",
+  "redactButtonLabel": "Schwärzen ({count})",
+  "@redactButtonLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  }
 }

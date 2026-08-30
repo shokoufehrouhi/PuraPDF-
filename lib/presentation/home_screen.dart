@@ -19,6 +19,7 @@ import 'features/image_pdf/image_pdf_screen.dart';
 import 'features/merge/merge_screen.dart';
 import 'features/page_edit/page_edit_screen.dart';
 import 'features/pdf_word/pdf_word_screen.dart';
+import 'features/redact/redact_screen.dart';
 import 'features/scanner/scanner_screen.dart';
 import 'features/signature/signature_screen.dart';
 import 'features/split/split_screen.dart';
@@ -301,6 +302,17 @@ class _ToolsTabState extends State<_ToolsTab> {
             subtitle: l10n.featureContentEditSubtitle,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ContentEditScreen()),
+            ),
+          ),
+          _FeatureRowCard(
+            icon: Icons.visibility_off_outlined,
+            color: FeatureColors.redact,
+            colorDark: FeatureColors.redactDark,
+            iconColor: FeatureColors.redactIcon,
+            title: l10n.featureRedactTitle,
+            subtitle: l10n.featureRedactSubtitle,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const RedactScreen()),
             ),
           ),
           _FeatureRowCard(
@@ -741,6 +753,13 @@ _OperationInfo _operationFor(String fileName, AppLocalizations l10n) {
       Icons.text_fields,
       FeatureColors.contentEditIcon,
       Text(l10n.opContentEdit),
+    );
+  }
+  if (fileName.startsWith('purapdf_redacted_')) {
+    return _OperationInfo(
+      Icons.visibility_off_outlined,
+      FeatureColors.redactIcon,
+      Text(l10n.opRedact),
     );
   }
   if (fileName.startsWith('purapdf_locked_')) {

@@ -161,6 +161,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get opContentEdit => 'PDF bearbeiten';
 
   @override
+  String get opRedact => 'Schwärzen';
+
+  @override
   String get opLocked => 'Gesperrt';
 
   @override
@@ -257,6 +260,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get errorMakeAChangeBeforeSaving =>
       'Nehmen Sie vor dem Speichern mindestens eine Änderung vor.';
+
+  @override
+  String get errorMarkAtLeastOneLineToRedact =>
+      'Markieren Sie mindestens eine Zeile zum Schwärzen.';
 
   @override
   String get errorSelectAtLeastOneImage =>
@@ -927,4 +934,44 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get encryptStepEnterPassword => 'Passwort eingeben';
+
+  @override
+  String get featureRedactTitle => 'Schwärzen';
+
+  @override
+  String get featureRedactSubtitle =>
+      'Sensible Textstellen dauerhaft entfernen';
+
+  @override
+  String get redactDescription =>
+      'Tippen Sie die Zeilen an, die Sie dauerhaft entfernen möchten, und bestätigen Sie dann — anders als bei „PDF bearbeiten“ (nur Abdeckung) kann geschwärzter Text nicht wiederhergestellt oder kopiert werden.';
+
+  @override
+  String get redactStepSelect => 'PDF auswählen';
+
+  @override
+  String get redactStepMark => 'Zum Markieren tippen';
+
+  @override
+  String get redactStepConfirm => 'Dauerhaft schwärzen';
+
+  @override
+  String redactMarkedCount(Object count) {
+    return '$count zum Schwärzen markiert';
+  }
+
+  @override
+  String get redactConfirmTitle => 'Dauerhaft schwärzen?';
+
+  @override
+  String get redactConfirmBody =>
+      'Dies kann nicht rückgängig gemacht werden. Der markierte Text wird vollständig aus dem PDF entfernt, nicht nur abgedeckt.';
+
+  @override
+  String get redactConfirmAction => 'Schwärzen';
+
+  @override
+  String redactButtonLabel(Object count) {
+    return 'Schwärzen ($count)';
+  }
 }

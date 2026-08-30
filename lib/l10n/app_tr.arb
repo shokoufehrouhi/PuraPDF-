@@ -48,6 +48,7 @@
   "opScan": "Tarama",
   "opPageEdit": "Sayfa Düzenleme",
   "opContentEdit": "PDF Düzenleme",
+  "opRedact": "Karart",
   "opLocked": "Kilitli",
   "opUnlocked": "Kilit Açıldı",
   "opWatermark": "Filigran",
@@ -92,6 +93,7 @@
   "errorAtLeastOnePageMustRemain": "En az bir sayfa kalmalıdır.",
   "errorAtLeastOnePageMustRemainInPdf": "PDF'de en az bir sayfa kalmalıdır.",
   "errorMakeAChangeBeforeSaving": "Kaydetmeden önce en az bir değişiklik yapın.",
+  "errorMarkAtLeastOneLineToRedact": "Karartmak için en az bir satır işaretleyin.",
   "errorSelectAtLeastOneImage": "En az bir görsel seçin.",
   "errorMergeNeedsTwoFiles": "Birleştirme için en az 2 PDF dosyası gerekir.",
   "errorNewNameEmpty": "Yeni ad boş olamaz.",
@@ -381,5 +383,26 @@
   },
   "encryptRemoveDescription": "Doğru parolayı bilerek bir PDF'nin parolasını kaldırın.",
   "encryptStepSetPassword": "Parola belirle",
-  "encryptStepEnterPassword": "Parolayı gir"
+  "encryptStepEnterPassword": "Parolayı gir",
+  "featureRedactTitle": "Karart",
+  "featureRedactSubtitle": "Hassas metni kalıcı olarak kaldır",
+  "redactDescription": "Kalıcı olarak kaldırmak istediğiniz satırlara dokunun, ardından onaylayın — yalnızca üzerini kapatan \"PDF Düzenle\" düzeltmesinin aksine, karartılan metin kurtarılamaz veya kopyalanamaz.",
+  "redactStepSelect": "PDF seç",
+  "redactStepMark": "İşaretlemek için dokun",
+  "redactStepConfirm": "Kalıcı olarak karart",
+  "redactMarkedCount": "{count} satır karartma için işaretlendi",
+  "@redactMarkedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "redactConfirmTitle": "Kalıcı olarak karartılsın mı?",
+  "redactConfirmBody": "Bu işlem geri alınamaz. İşaretlenen metin yalnızca kapatılmaz, PDF'den tamamen kaldırılır.",
+  "redactConfirmAction": "Karart",
+  "redactButtonLabel": "Karart ({count})",
+  "@redactButtonLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  }
 }

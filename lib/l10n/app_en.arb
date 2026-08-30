@@ -48,6 +48,7 @@
   "opScan": "Scan",
   "opPageEdit": "Edit Pages",
   "opContentEdit": "Edit PDF",
+  "opRedact": "Redact",
   "opLocked": "Locked",
   "opUnlocked": "Unlocked",
   "opWatermark": "Watermark",
@@ -92,6 +93,7 @@
   "errorAtLeastOnePageMustRemain": "At least one page must remain.",
   "errorAtLeastOnePageMustRemainInPdf": "At least one page must remain in the PDF.",
   "errorMakeAChangeBeforeSaving": "Make at least one change before saving.",
+  "errorMarkAtLeastOneLineToRedact": "Mark at least one line to redact.",
   "errorSelectAtLeastOneImage": "Select at least one image.",
   "errorMergeNeedsTwoFiles": "Merge requires at least 2 PDF files.",
   "errorNewNameEmpty": "New name cannot be empty.",
@@ -381,5 +383,26 @@
   },
   "encryptRemoveDescription": "Remove a PDF's password, given the correct one.",
   "encryptStepSetPassword": "Set password",
-  "encryptStepEnterPassword": "Enter password"
+  "encryptStepEnterPassword": "Enter password",
+  "featureRedactTitle": "Redact",
+  "featureRedactSubtitle": "Permanently remove sensitive text",
+  "redactDescription": "Tap the lines you want to permanently remove, then confirm — unlike Edit PDF's cover-only fix, redacted text can't be recovered or copied.",
+  "redactStepSelect": "Select PDF",
+  "redactStepMark": "Tap to mark",
+  "redactStepConfirm": "Redact permanently",
+  "redactMarkedCount": "{count} marked for redaction",
+  "@redactMarkedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "redactConfirmTitle": "Redact permanently?",
+  "redactConfirmBody": "This can't be undone. The marked text will be completely removed from the PDF, not just covered.",
+  "redactConfirmAction": "Redact",
+  "redactButtonLabel": "Redact ({count})",
+  "@redactButtonLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  }
 }

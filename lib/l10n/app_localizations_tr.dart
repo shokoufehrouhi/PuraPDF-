@@ -160,6 +160,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get opContentEdit => 'PDF Düzenleme';
 
   @override
+  String get opRedact => 'Karart';
+
+  @override
   String get opLocked => 'Kilitli';
 
   @override
@@ -253,6 +256,10 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errorMakeAChangeBeforeSaving =>
       'Kaydetmeden önce en az bir değişiklik yapın.';
+
+  @override
+  String get errorMarkAtLeastOneLineToRedact =>
+      'Karartmak için en az bir satır işaretleyin.';
 
   @override
   String get errorSelectAtLeastOneImage => 'En az bir görsel seçin.';
@@ -918,4 +925,43 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get encryptStepEnterPassword => 'Parolayı gir';
+
+  @override
+  String get featureRedactTitle => 'Karart';
+
+  @override
+  String get featureRedactSubtitle => 'Hassas metni kalıcı olarak kaldır';
+
+  @override
+  String get redactDescription =>
+      'Kalıcı olarak kaldırmak istediğiniz satırlara dokunun, ardından onaylayın — yalnızca üzerini kapatan \"PDF Düzenle\" düzeltmesinin aksine, karartılan metin kurtarılamaz veya kopyalanamaz.';
+
+  @override
+  String get redactStepSelect => 'PDF seç';
+
+  @override
+  String get redactStepMark => 'İşaretlemek için dokun';
+
+  @override
+  String get redactStepConfirm => 'Kalıcı olarak karart';
+
+  @override
+  String redactMarkedCount(Object count) {
+    return '$count satır karartma için işaretlendi';
+  }
+
+  @override
+  String get redactConfirmTitle => 'Kalıcı olarak karartılsın mı?';
+
+  @override
+  String get redactConfirmBody =>
+      'Bu işlem geri alınamaz. İşaretlenen metin yalnızca kapatılmaz, PDF\'den tamamen kaldırılır.';
+
+  @override
+  String get redactConfirmAction => 'Karart';
+
+  @override
+  String redactButtonLabel(Object count) {
+    return 'Karart ($count)';
+  }
 }

@@ -54,4 +54,8 @@ class FeatureColors {
   static const Color pdfWord = Color(0xFFD6E4FB);
   static const Color pdfWordDark = Color(0xFFBFD4F8);
   static const Color pdfWordIcon = Color(0xFF2B579A); // MS Word's own blue
+
+  static const Color redact = Color(0xFFDEE1E6);
+  static const Color redactDark = Color(0xFFC9CDD5);
+  static const Color redactIcon = Color(0xFF334155); // slate, not pure black
 }

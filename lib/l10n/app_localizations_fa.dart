@@ -157,6 +157,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get opContentEdit => 'ویرایش PDF';
 
   @override
+  String get opRedact => 'حذف اطلاعات';
+
+  @override
   String get opLocked => 'قفل‌شده';
 
   @override
@@ -250,6 +253,10 @@ class AppLocalizationsFa extends AppLocalizations {
   @override
   String get errorMakeAChangeBeforeSaving =>
       'قبل از ذخیره حداقل یک تغییر ایجاد کنید.';
+
+  @override
+  String get errorMarkAtLeastOneLineToRedact =>
+      'حداقل یک خط را برای حذف دائمی علامت بزنید.';
 
   @override
   String get errorSelectAtLeastOneImage => 'حداقل یک تصویر انتخاب کنید.';
@@ -911,4 +918,43 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get encryptStepEnterPassword => 'وارد کردن رمز عبور';
+
+  @override
+  String get featureRedactTitle => 'حذف اطلاعات';
+
+  @override
+  String get featureRedactSubtitle => 'حذف دائمی متن‌های حساس';
+
+  @override
+  String get redactDescription =>
+      'روی خط‌هایی که می‌خواهید برای همیشه حذف کنید ضربه بزنید، سپس تأیید کنید — برخلاف اصلاح «ویرایش PDF» که فقط روی متن را می‌پوشاند، متن حذف‌شده اینجا قابل بازیابی یا کپی نیست.';
+
+  @override
+  String get redactStepSelect => 'انتخاب PDF';
+
+  @override
+  String get redactStepMark => 'برای علامت‌گذاری ضربه بزنید';
+
+  @override
+  String get redactStepConfirm => 'حذف دائمی';
+
+  @override
+  String redactMarkedCount(Object count) {
+    return '$count خط برای حذف علامت‌گذاری شد';
+  }
+
+  @override
+  String get redactConfirmTitle => 'حذف دائمی شود؟';
+
+  @override
+  String get redactConfirmBody =>
+      'این کار قابل بازگشت نیست. متن علامت‌گذاری‌شده کاملاً از PDF حذف می‌شود، نه فقط پوشانده.';
+
+  @override
+  String get redactConfirmAction => 'حذف';
+
+  @override
+  String redactButtonLabel(Object count) {
+    return 'حذف ($count)';
+  }
 }
