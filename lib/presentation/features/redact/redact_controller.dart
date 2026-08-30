@@ -22,12 +22,6 @@ final redactPdfUseCaseProvider = Provider(
 /// blue.
 const HSVColor _defaultHsv = HSVColor.fromAHSV(1, 210, 0.85, 0.85);
 
-/// Consecutive default picks (whenever the user hasn't dragged the
-/// spectrum bar for this particular selection) are spaced by this many
-/// degrees of hue - the "golden angle", the standard trick for generating
-/// a sequence of maximally-distinct hues without ever repeating a cycle.
-const double _goldenAngle = 137.508;
-
 /// One tap (a single word) or one drag (a range of adjacent words) - each
 /// gets its own color, either [RedactState.nextColor] as last left on the
 /// spectrum bar or the next auto-advanced default. [wordIndices] are
@@ -139,13 +133,14 @@ class RedactController extends Notifier<RedactState> {
 
   /// A plain tap passes a single-word set; a drag passes every word index
   /// the gesture passed over. Becomes one new selection using whatever
-  /// color the spectrum bar is currently showing ([RedactState.nextColor]),
-  /// then auto-advances that to a new default (golden-angle hue step) so
-  /// the *following* selection defaults to a visibly different color too,
-  /// unless the user drags the spectrum bar to a specific one first. A
-  /// gesture that *starts* on an already-marked word removes that whole
-  /// selection instead - see [removeSelection], called by the screen
-  /// itself before this ever gets reached in that case.
+  /// color the spectrum bar is currently showing ([RedactState.nextColor]).
+  /// That color then stays put for every following selection too, until the
+  /// user drags the spectrum bar to a different one themselves - no
+  /// auto-advancing here, so "pick a tone once, mark several things with
+  /// it" works the way it visually looks like it should. A gesture that
+  /// *starts* on an already-marked word removes that whole selection
+  /// instead - see [removeSelection], called by the screen itself before
+  /// this ever gets reached in that case.
   void commitSelection(Set<int> wordIndices) {
     if (wordIndices.isEmpty) return;
 
@@ -159,16 +154,11 @@ class RedactController extends Notifier<RedactState> {
             wordIndices: s.wordIndices.difference(wordIndices),
           ),
     ];
-    final HSVColor hsv = HSVColor.fromColor(state.nextColor);
-    final Color advanced = hsv
-        .withHue((hsv.hue + _goldenAngle) % 360)
-        .toColor();
     state = state.copyWith(
       selections: [
         ...claimed,
         RedactSelection(color: state.nextColor, wordIndices: wordIndices),
       ],
-      nextColor: advanced,
       clearResult: true,
     );
   }

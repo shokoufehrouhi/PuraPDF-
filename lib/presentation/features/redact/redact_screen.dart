@@ -520,6 +520,26 @@ class _PageCanvasState extends State<_PageCanvas> {
     return null;
   }
 
+  /// Whether [position] lands inside an *already-marked* selection - checked
+  /// against the same merged (per-line, gap-bridging) rects the bar is
+  /// actually painted with, not the individual per-word rects [_hitTest]
+  /// uses. A merged bar visually reads as one solid rectangle, including the
+  /// small gaps between adjacent words it spans; hit-testing only the raw
+  /// word boxes would miss a tap that lands in one of those gaps, making
+  /// "start a drag on a mark to remove it" fail exactly where it visually
+  /// looks like it should work.
+  RedactSelection? _hitTestSelection(
+    List<({int index, PdfTextWord word, Rect displayRect})> words,
+    Offset position,
+  ) {
+    for (final RedactSelection selection in widget.state.selections) {
+      for (final Rect r in _mergedRects(selection.wordIndices, words)) {
+        if (r.contains(position)) return selection;
+      }
+    }
+    return null;
+  }
+
   void _onScaleStart(
     List<({int index, PdfTextWord word, Rect displayRect})> words,
     ScaleStartDetails details,
@@ -536,10 +556,13 @@ class _PageCanvasState extends State<_PageCanvas> {
       return;
     }
     _isZooming = false;
-    final int? hit = _hitTest(words, details.localFocalPoint);
-    final RedactSelection? existing = hit == null
-        ? null
-        : widget.state.selectionOf(hit);
+    final RedactSelection? existing = _hitTestSelection(
+      words,
+      details.localFocalPoint,
+    );
+    final int? hit = existing == null
+        ? _hitTest(words, details.localFocalPoint)
+        : null;
     setState(() {
       if (existing != null) {
         _removingSelection = existing;
