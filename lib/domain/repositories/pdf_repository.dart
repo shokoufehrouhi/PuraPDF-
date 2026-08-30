@@ -10,6 +10,7 @@ import '../entities/pdf_page_edit.dart';
 import '../entities/pdf_page_image.dart';
 import '../entities/pdf_redact_area.dart';
 import '../entities/pdf_text_line.dart';
+import '../entities/pdf_text_word.dart';
 import '../entities/watermark_options.dart';
 
 /// Abstract contract for PDF operations. Implementations live in the data
@@ -79,6 +80,11 @@ abstract class PdfRepository {
   /// [path] — used by the content editor to overlay a tappable region per
   /// line.
   Future<List<PdfTextLine>> extractTextLines(String path);
+
+  /// Extracts every *word* of text (with position, grouped by the line it
+  /// came from) from the PDF at [path] — used by Redact so the user can
+  /// mark a single word or a dragged range of words, not just a whole line.
+  Future<List<PdfTextWord>> extractTextWords(String path);
 
   /// Renders every page of the PDF at [path] as an in-memory image, paired
   /// with that page's size in PDF points — used by the content editor's

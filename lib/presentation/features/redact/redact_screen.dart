@@ -6,7 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/error_message.dart';
 import '../../../core/theme/feature_colors.dart';
 import '../../../domain/entities/pdf_file.dart';
-import '../../../domain/entities/pdf_text_line.dart';
+import '../../../domain/entities/pdf_text_word.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../shared_widgets/download_file.dart';
 import '../../shared_widgets/feature_screen_header.dart';
@@ -64,6 +64,9 @@ class RedactScreen extends ConsumerWidget {
     final controller = ref.read(redactControllerProvider.notifier);
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
+    final int selectedWordCount = [
+      for (final s in state.selections) ...s.wordIndices,
+    ].length;
 
     return Scaffold(
       appBar: AppBar(
@@ -160,54 +163,53 @@ class RedactScreen extends ConsumerWidget {
                             padding: const EdgeInsets.symmetric(
                               horizontal: 20,
                             ),
-                            // Tapping only (toggling a mark), never dragging,
-                            // so the InteractiveViewer-vs-nested-drag conflict
-                            // Edit PDF has to work around doesn't apply here -
-                            // zoom can just stay on unconditionally.
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                final page =
-                                    state.pages[state.currentPageIndex];
-                                double fitWidth = constraints.maxWidth;
-                                double fitHeight =
-                                    fitWidth *
-                                    page.pointsHeight /
-                                    page.pointsWidth;
-                                if (fitHeight > constraints.maxHeight) {
-                                  fitHeight = constraints.maxHeight;
-                                  fitWidth =
-                                      fitHeight *
-                                      page.pointsWidth /
-                                      page.pointsHeight;
-                                }
-                                return InteractiveViewer(
-                                  constrained: false,
-                                  minScale: 1.0,
-                                  maxScale: 4.0,
-                                  child: _PageCanvas(
+                            // Word selection needs a real drag gesture (a
+                            // range is "press on one word, drag across
+                            // more"), which conflicts with
+                            // InteractiveViewer's own ScaleGestureRecognizer
+                            // the same way Edit PDF's image-drag does - so
+                            // this screen never turns pinch-zoom on at all,
+                            // rather than only conditionally like Edit PDF.
+                            child: SingleChildScrollView(
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final page =
+                                      state.pages[state.currentPageIndex];
+                                  double fitWidth = constraints.maxWidth;
+                                  double fitHeight =
+                                      fitWidth *
+                                      page.pointsHeight /
+                                      page.pointsWidth;
+                                  if (fitHeight > constraints.maxHeight) {
+                                    fitHeight = constraints.maxHeight;
+                                    fitWidth =
+                                        fitHeight *
+                                        page.pointsWidth /
+                                        page.pointsHeight;
+                                  }
+                                  return _PageCanvas(
                                     width: fitWidth,
                                     state: state,
-                                    onTapLine: controller.toggleLine,
-                                  ),
-                                );
-                              },
+                                    onCommitSelection:
+                                        controller.commitSelection,
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                          child: _BarStylePicker(
-                            color: state.barColor,
+                          child: _OpacitySlider(
                             opacity: state.barOpacity,
-                            onColorChanged: controller.setBarColor,
-                            onOpacityChanged: controller.setBarOpacity,
+                            onChanged: controller.setBarOpacity,
                           ),
                         ),
-                        if (state.markedLines.isNotEmpty)
+                        if (selectedWordCount > 0)
                           Padding(
                             padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
                             child: Text(
-                              l10n.redactMarkedCount(state.markedLines.length),
+                              l10n.redactMarkedCount(selectedWordCount),
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 color: _color,
@@ -252,14 +254,11 @@ class RedactScreen extends ConsumerWidget {
                                   )
                                 : const Icon(Icons.visibility_off_outlined),
                             label: Text(
-                              state.markedLines.isEmpty
+                              selectedWordCount == 0
                                   ? l10n.errorMarkAtLeastOneLineToRedact
-                                  : l10n.redactButtonLabel(
-                                      state.markedLines.length,
-                                    ),
+                                  : l10n.redactButtonLabel(selectedWordCount),
                             ),
-                            onPressed:
-                                state.isSaving || state.markedLines.isEmpty
+                            onPressed: state.isSaving || selectedWordCount == 0
                                 ? null
                                 : () => _confirmAndRedact(context, ref),
                           ),
@@ -273,179 +272,190 @@ class RedactScreen extends ConsumerWidget {
   }
 }
 
-/// A redaction bar color choice - same swatch-row pattern as the
-/// Signature feature's ink color picker.
-class _ColorOption {
-  final String label;
-  final Color color;
-  const _ColorOption(this.label, this.color);
-}
-
-const List<_ColorOption> _barColorOptions = [
-  _ColorOption('Black', Colors.black),
-  _ColorOption('Red', Color(0xFFDC2626)),
-  _ColorOption('Blue', Color(0xFF2563EB)),
-  _ColorOption('Gray', Color(0xFF64748B)),
-];
-
-/// Color + opacity controls for the redaction bar - purely a *look*
-/// choice (see [PdfRedactArea]'s doc comment): the underlying text is
-/// gone from the content stream no matter what this is set to, so a
-/// lower opacity only affects whether something drawn underneath (a
-/// background image, say) shows through the bar.
-class _BarStylePicker extends StatelessWidget {
-  final Color color;
+/// Just the opacity control now - color is auto-assigned per selection
+/// (see [redactPalette]), no manual picker in this pass.
+class _OpacitySlider extends StatelessWidget {
   final double opacity;
-  final ValueChanged<Color> onColorChanged;
-  final ValueChanged<double> onOpacityChanged;
+  final ValueChanged<double> onChanged;
 
-  const _BarStylePicker({
-    required this.color,
-    required this.opacity,
-    required this.onColorChanged,
-    required this.onOpacityChanged,
-  });
+  const _OpacitySlider({required this.opacity, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Row(
-          children: [
-            for (final option in _barColorOptions)
-              Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: GestureDetector(
-                  onTap: () => onColorChanged(option.color),
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: option.color,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: color == option.color
-                            ? _color
-                            : scheme.outlineVariant,
-                        width: color == option.color ? 3 : 1,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            Expanded(
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.opacity,
-                    size: 18,
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  Expanded(
-                    child: Slider(
-                      value: opacity,
-                      min: 0.3,
-                      max: 1.0,
-                      activeColor: _color,
-                      onChanged: onOpacityChanged,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        Icon(Icons.opacity, size: 18, color: scheme.onSurfaceVariant),
+        Expanded(
+          child: Slider(
+            value: opacity,
+            min: 0.3,
+            max: 1.0,
+            activeColor: _color,
+            onChanged: onChanged,
+          ),
         ),
       ],
     );
   }
 }
 
-/// Renders the current page at its natural aspect ratio, with a tappable
-/// box over each extracted text line that toggles into/out of the "marked
-/// for redaction" set.
-class _PageCanvas extends StatelessWidget {
+/// Renders the current page at its natural aspect ratio, with a box over
+/// each extracted word. A single canvas-level pan gesture handles both a
+/// plain tap (press+release without moving off the starting word) and a
+/// drag across a range - hit-testing which word boxes the pointer has
+/// passed over as it moves, committing the touched set as one selection
+/// on release. No per-word `GestureDetector` needed.
+class _PageCanvas extends StatefulWidget {
   final double width;
   final RedactState state;
-  final void Function(int lineIndex) onTapLine;
+  final void Function(Set<int> wordIndices) onCommitSelection;
 
   const _PageCanvas({
     required this.width,
     required this.state,
-    required this.onTapLine,
+    required this.onCommitSelection,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final page = state.pages[state.currentPageIndex];
-    final List<({int index, PdfTextLine line})> lines = [
-      for (int i = 0; i < state.textLines.length; i++)
-        if (state.textLines[i].pageIndex == state.currentPageIndex)
-          (index: i, line: state.textLines[i]),
-    ];
+  State<_PageCanvas> createState() => _PageCanvasState();
+}
 
-    final double dispWidth = width;
-    final double dispHeight =
-        dispWidth * page.pointsHeight / page.pointsWidth;
+class _PageCanvasState extends State<_PageCanvas> {
+  Set<int> _dragIndices = {};
 
-    return SizedBox(
-      width: dispWidth,
-      height: dispHeight,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.memory(page.bytes, fit: BoxFit.fill),
+  List<({int index, PdfTextWord word, Rect displayRect})> _wordsOnPage(
+    double dispWidth,
+    double dispHeight,
+  ) {
+    final page = widget.state.pages[widget.state.currentPageIndex];
+    return [
+      for (int i = 0; i < widget.state.words.length; i++)
+        if (widget.state.words[i].pageIndex == widget.state.currentPageIndex)
+          (
+            index: i,
+            word: widget.state.words[i],
+            displayRect: Rect.fromLTWH(
+              widget.state.words[i].left / page.pointsWidth * dispWidth,
+              widget.state.words[i].top / page.pointsHeight * dispHeight,
+              widget.state.words[i].width / page.pointsWidth * dispWidth,
+              widget.state.words[i].height / page.pointsHeight * dispHeight,
             ),
           ),
-          for (final entry in lines)
-            Positioned(
-              left: entry.line.left / page.pointsWidth * dispWidth,
-              top: entry.line.top / page.pointsHeight * dispHeight,
-              width: entry.line.width / page.pointsWidth * dispWidth,
-              height: entry.line.height / page.pointsHeight * dispHeight,
-              child: _LineOverlay(
-                marked: state.markedLines.contains(entry.index),
-                barColor: state.barColor,
-                barOpacity: state.barOpacity,
-                onTap: () => onTapLine(entry.index),
+    ];
+  }
+
+  int? _hitTest(
+    List<({int index, PdfTextWord word, Rect displayRect})> words,
+    Offset position,
+  ) {
+    for (final entry in words) {
+      if (entry.displayRect.contains(position)) return entry.index;
+    }
+    return null;
+  }
+
+  void _onPanDown(
+    List<({int index, PdfTextWord word, Rect displayRect})> words,
+    DragDownDetails details,
+  ) {
+    final int? hit = _hitTest(words, details.localPosition);
+    setState(() => _dragIndices = hit == null ? {} : {hit});
+  }
+
+  void _onPanUpdate(
+    List<({int index, PdfTextWord word, Rect displayRect})> words,
+    DragUpdateDetails details,
+  ) {
+    final int? hit = _hitTest(words, details.localPosition);
+    if (hit != null && !_dragIndices.contains(hit)) {
+      setState(() => _dragIndices = {..._dragIndices, hit});
+    }
+  }
+
+  void _onPanEnd(DragEndDetails details) {
+    if (_dragIndices.isNotEmpty) {
+      widget.onCommitSelection(_dragIndices);
+    }
+    setState(() => _dragIndices = {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final page = widget.state.pages[widget.state.currentPageIndex];
+    final double dispWidth = widget.width;
+    final double dispHeight =
+        dispWidth * page.pointsHeight / page.pointsWidth;
+    final words = _wordsOnPage(dispWidth, dispHeight);
+    final Color previewColor =
+        redactPalette[widget.state.nextColorIndex % redactPalette.length];
+
+    return GestureDetector(
+      onPanDown: (details) => _onPanDown(words, details),
+      onPanUpdate: (details) => _onPanUpdate(words, details),
+      onPanEnd: _onPanEnd,
+      child: SizedBox(
+        width: dispWidth,
+        height: dispHeight,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.memory(page.bytes, fit: BoxFit.fill),
               ),
             ),
-        ],
+            for (final entry in words)
+              Positioned.fromRect(
+                rect: entry.displayRect,
+                child: _WordOverlay(
+                  committedColor: widget.state.selectionOf(
+                    entry.index,
+                  )?.color,
+                  pending: _dragIndices.contains(entry.index),
+                  previewColor: previewColor,
+                  barOpacity: widget.state.barOpacity,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _LineOverlay extends StatelessWidget {
-  final bool marked;
-  final Color barColor;
+class _WordOverlay extends StatelessWidget {
+  /// Non-null once this word belongs to a committed selection - its color.
+  final Color? committedColor;
+  /// True while a drag-in-progress has touched this word but not released
+  /// yet (see [previewColor]).
+  final bool pending;
+  final Color previewColor;
   final double barOpacity;
-  final VoidCallback onTap;
 
-  const _LineOverlay({
-    required this.marked,
-    required this.barColor,
+  const _WordOverlay({
+    required this.committedColor,
+    required this.pending,
+    required this.previewColor,
     required this.barOpacity,
-    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      // Fill matches the chosen bar color/opacity once marked - previews
-      // the actual redaction bar this line will become, not just a
-      // selection hint.
+    final Color? fill = committedColor != null
+        ? committedColor!.withValues(alpha: barOpacity)
+        : pending
+        ? previewColor.withValues(alpha: 0.4)
+        : null;
+    final bool marked = committedColor != null || pending;
+    return IgnorePointer(
+      // Hit-testing happens at the canvas level (see _PageCanvasState) -
+      // these boxes are purely visual.
       child: Container(
         decoration: BoxDecoration(
-          color: marked
-              ? barColor.withValues(alpha: barOpacity)
-              : _color.withValues(alpha: 0.0),
+          color: fill ?? _color.withValues(alpha: 0.0),
           border: Border.all(
-            color: _color.withValues(alpha: marked ? 0.9 : 0.28),
+            color: _color.withValues(alpha: marked ? 0.9 : 0.22),
             width: marked ? 1.5 : 1,
           ),
           borderRadius: BorderRadius.circular(3),

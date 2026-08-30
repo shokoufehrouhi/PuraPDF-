@@ -45,6 +45,7 @@ import '../../domain/entities/pdf_page_edit.dart';
 import '../../domain/entities/pdf_page_image.dart';
 import '../../domain/entities/pdf_redact_area.dart';
 import '../../domain/entities/pdf_text_line.dart';
+import '../../domain/entities/pdf_text_word.dart';
 import '../../domain/entities/watermark_options.dart';
 import '../../domain/repositories/pdf_repository.dart';
 
@@ -701,6 +702,37 @@ class PdfRepositoryImpl implements PdfRepository {
   }
 
   @override
+  Future<List<PdfTextWord>> extractTextWords(String path) async {
+    final PdfDocument doc = await _loadDocument(path);
+    try {
+      final List<TextLine> lines = PdfTextExtractor(doc).extractTextLines();
+      final List<PdfTextWord> words = [];
+      int lineIndex = 0;
+      for (final TextLine line in lines) {
+        if (line.text.trim().isEmpty) continue;
+        for (final TextWord word in line.wordCollection) {
+          if (word.text.trim().isEmpty) continue;
+          words.add(
+            PdfTextWord(
+              pageIndex: line.pageIndex,
+              lineIndex: lineIndex,
+              text: word.text,
+              left: word.bounds.left,
+              top: word.bounds.top,
+              width: word.bounds.width,
+              height: word.bounds.height,
+            ),
+          );
+        }
+        lineIndex++;
+      }
+      return words;
+    } finally {
+      doc.dispose();
+    }
+  }
+
+  @override
   Future<List<PdfPageImage>> renderPageImages(String path) async {
     final rx.PdfDocument doc = await rx.PdfDocument.openFile(path);
     final List<PdfPageImage> images = [];
@@ -827,7 +859,7 @@ class PdfRepositoryImpl implements PdfRepository {
 
     for (final MapEntry<int, List<PdfRedactArea>> entry in byPage.entries) {
       final PdfPage page = doc.pages[entry.key];
-      _removeContentInAreas(page, entry.value);
+      _removeContentInAreas(doc, entry.key, page, entry.value);
       // Visual cover on top of the now-actually-empty area - handles any
       // background graphic/image still there (see the method doc comment
       // on why images aren't content-stream-redacted) and gives the
@@ -857,11 +889,12 @@ class PdfRepositoryImpl implements PdfRepository {
     );
   }
 
-  /// The actual removal half of redaction: permanently drops
-  /// text-showing operators (`Tj`/`TJ`/`'`/`"`) from [page]'s raw content
-  /// stream wherever they land inside [areas], so the text is gone from
-  /// copy-paste/extraction - not just visually covered (contrast
-  /// [editPdfContent], which only ever draws over existing content).
+  /// The actual removal half of redaction: permanently drops (or, since the
+  /// word/range-selection round, partially trims) text-showing operators
+  /// (`Tj`/`TJ`/`'`/`"`) from [page]'s raw content stream wherever they land
+  /// inside [areas], so the text is gone from copy-paste/extraction - not
+  /// just visually covered (contrast [editPdfContent], which only ever
+  /// draws over existing content).
   ///
   /// Syncfusion has no public API for this - reaches into its
   /// unexported `src/` internals for the same content-stream tokenizer
@@ -871,33 +904,40 @@ class PdfRepositoryImpl implements PdfRepository {
   /// `PdfStream`, `PdfArray`) - not a supported import, a Syncfusion
   /// version bump could move or remove any of these.
   ///
-  /// Deliberate scope, matching this feature's `PdfRedactArea` doc
-  /// comment:
-  /// - **Whole text lines only.** Matching is done by each text-showing
-  ///   operator's *y* position (via `Tm`/`Td`/`TD`/`T*`/`TL` - the operators
-  ///   that actually move the text cursor), not per-character/glyph, so an
-  ///   area that only partly overlaps a line still drops that line's
-  ///   entire operator.
-  /// - **`cm`/`q`/`Q` are tracked, but translation-only.** Turns out this
-  ///   isn't optional: Syncfusion's own `PdfGraphics` wraps *every* page's
-  ///   drawing in a `cm` translation to implement its top-left-origin
-  ///   convenience over PDF's native bottom-left space, so ignoring CTM
-  ///   entirely (which is what Syncfusion's own extractor does - confirmed
-  ///   by reading its source) put every redact-candidate line hundreds of
-  ///   points off, on ordinary output from this app's own generator.
-  ///   Rotation/scale (`a`/`b`/`c`/`d`) is still ignored - fine for
-  ///   ordinary axis-aligned text; a page with a rotated/scaled `cm` on its
-  ///   text could still mis-position the match.
+  /// Word/range-precision mechanism: matching is still gated on each
+  /// operator's *y* position first (`Tm`/`Td`/`TD`/`T*`/`TL`/translation-only
+  /// `cm`/`q`/`Q`, exactly as before - see those tracking vars below and the
+  /// CTM note that was already load-bearing for whole-line redaction). Once
+  /// an operator's line is near an area, [_splitTextOperator] does the new
+  /// part: it cross-references the operator's raw string byte-for-byte
+  /// against [PdfTextExtractor]'s own already-correct per-glyph positions
+  /// ([_flattenPageGlyphs]) to find exactly which glyphs fall inside an
+  /// area, and rewrites the operator as a `TJ` array with the redacted
+  /// run(s) replaced by a spacing number (so the surviving text doesn't
+  /// visually shift to close the gap) instead of dropping the whole thing.
+  ///
+  /// This byte-for-byte cross-reference only works when the font's string
+  /// encoding is simple single-byte (WinAnsi, every base-14 standard font)
+  /// - confirmed empirically, not assumed. Anything that doesn't verify
+  /// cleanly (a hex-string operand, a CID-keyed/multi-byte embedded font,
+  /// ...) permanently drops this whole page back to the *original*
+  /// whole-operator behavior for every operator from that point on, since
+  /// a broken byte↔glyph correlation can't be trusted for any operator
+  /// after it either - safe (never mis-splits mid-encoding-unit), just
+  /// coarser than word-precision in that case.
+  ///
+  /// Everything else about scope is unchanged from the whole-line version:
   /// - **Images are never touched.** A `Do` operator is always kept as-is
   ///   regardless of whether it points at an image inside a redact area -
-  ///   only the visual black bar (drawn by the caller) covers it. True
-  ///   pixel redaction of an embedded photo is a different, rasterize-based
-  ///   feature, not implemented here.
+  ///   only the visual bar (drawn by the caller) covers it.
   /// - **Nested Form XObjects are not recursed into** - text living inside
-  ///   a Form XObject's own content stream won't be found. Uncommon in the
-  ///   single-layer PDFs (scans, Word/PDF conversions, this app's own
-  ///   generated output) this feature targets.
-  void _removeContentInAreas(PdfPage page, List<PdfRedactArea> areas) {
+  ///   a Form XObject's own content stream won't be found.
+  void _removeContentInAreas(
+    PdfDocument doc,
+    int pageIndex,
+    PdfPage page,
+    List<PdfRedactArea> areas,
+  ) {
     final PdfArray contentRefs = PdfPageHelper.getHelper(page).contents;
     if (contentRefs.count == 0) return;
 
@@ -917,14 +957,24 @@ class PdfRepositoryImpl implements PdfRepository {
     // height for every comparison below.
     final double pageHeight = page.size.height;
     const double tolerance = 2.0; // baseline sits inside, not at, the box
-    bool hitsArea(double topOriginY) => areas.any(
+    bool hitsAreaY(double topOriginY) => areas.any(
       (PdfRedactArea a) =>
           topOriginY >= a.top - tolerance &&
           topOriginY <= a.top + a.height + tolerance,
     );
+    bool hitsAreaRect(Rect glyphBounds) => areas.any(
+      (PdfRedactArea a) => glyphBounds.overlaps(
+        Rect.fromLTWH(a.left, a.top, a.width, a.height),
+      ),
+    );
+
+    final List<TextGlyph> pageGlyphs = _flattenPageGlyphs(doc, pageIndex);
+    int glyphCursor = 0;
+    bool preciseMode = true;
 
     double tlmY = 0; // text line matrix y, reset per BT, bottom-left origin
     double leading = 0; // TL, or the implicit one TD sets
+    double fontSize = 0; // Tf's size operand - needed for gap-adjustment math
     // Translation-only CTM y - confirmed necessary by testing, not an
     // exotic case: Syncfusion's own PdfGraphics wraps *every* page's
     // drawing in `q ... cm 1 0 0 1 0 <pageHeight> ... cm 1 0 0 1 <x> <y>
@@ -946,36 +996,59 @@ class PdfRepositoryImpl implements PdfRepository {
       for (final PdfRecord record in records.recordCollection) {
         final String? op = record.operatorName;
         final List<String> operands = record.operands ?? const <String>[];
-        bool drop = false;
         if (op == 'q') {
           ctmStack.add(ctmY);
+          kept.add(record);
         } else if (op == 'Q') {
           if (ctmStack.isNotEmpty) ctmY = ctmStack.removeLast();
+          kept.add(record);
         } else if (op == 'cm' && operands.length == 6) {
           ctmY += double.tryParse(operands[5]) ?? 0;
+          kept.add(record);
         } else if (op == 'BT') {
           tlmY = 0;
+          kept.add(record);
         } else if (op == 'Tm' && operands.length == 6) {
           tlmY = double.tryParse(operands[5]) ?? tlmY;
+          kept.add(record);
         } else if (op == 'Td' && operands.length == 2) {
           tlmY += double.tryParse(operands[1]) ?? 0;
+          kept.add(record);
         } else if (op == 'TD' && operands.length == 2) {
           final double ty = double.tryParse(operands[1]) ?? 0;
           leading = -ty;
           tlmY += ty;
+          kept.add(record);
         } else if (op == 'TL' && operands.length == 1) {
           leading = double.tryParse(operands[0]) ?? leading;
+          kept.add(record);
         } else if (op == 'T*') {
           tlmY -= leading;
-        } else if (op == "'" || op == '"') {
-          // Both operators move to the next line (T*'s equivalent) *and*
-          // show text - the movement happens before the position check.
-          tlmY -= leading;
-          drop = hitsArea(pageHeight - (ctmY + tlmY));
-        } else if (op == 'Tj' || op == 'TJ') {
-          drop = hitsArea(pageHeight - (ctmY + tlmY));
+          kept.add(record);
+        } else if (op == 'Tf' && operands.length == 2) {
+          fontSize = double.tryParse(operands[1]) ?? fontSize;
+          kept.add(record);
+        } else if (op == "'" || op == '"' || op == 'Tj' || op == 'TJ') {
+          // '/" move to the next line (T*'s equivalent) *and* show text -
+          // the movement happens before the position check.
+          if (op == "'" || op == '"') tlmY -= leading;
+          final double topY = pageHeight - (ctmY + tlmY);
+          final bool lineNear = hitsAreaY(topY);
+          final _SplitOutcome outcome = _splitTextOperator(
+            record: record,
+            pageGlyphs: pageGlyphs,
+            cursor: glyphCursor,
+            lineNear: lineNear,
+            preciseMode: preciseMode,
+            fontSize: fontSize,
+            hitsAreaRect: hitsAreaRect,
+          );
+          glyphCursor = outcome.newCursor;
+          preciseMode = outcome.precisionHeld;
+          kept.addAll(outcome.records);
+        } else {
+          kept.add(record);
         }
-        if (!drop) kept.add(record);
       }
     }
 
@@ -1015,6 +1088,258 @@ class PdfRepositoryImpl implements PdfRepository {
     for (int i = 1; i < streams.length; i++) {
       streams[i].clearStream();
     }
+  }
+
+  /// This page's glyphs, in extraction (= reading/content-stream) order,
+  /// flattened from every line's already-public `wordCollection`/`glyphs`
+  /// (Syncfusion computes real per-glyph bounds here - no font-metrics math
+  /// to reimplement). Whitespace "words" are deliberately *not* filtered
+  /// out here (unlike [extractTextWords], which is UI-facing) - a raw
+  /// operator's string includes its spaces, so the byte↔glyph
+  /// cross-reference in [_splitTextOperator] needs them too, or every
+  /// count past the first space would be off by one.
+  List<TextGlyph> _flattenPageGlyphs(PdfDocument doc, int pageIndex) {
+    final List<TextLine> lines = PdfTextExtractor(
+      doc,
+    ).extractTextLines(startPageIndex: pageIndex, endPageIndex: pageIndex);
+    final List<TextGlyph> glyphs = [];
+    for (final TextLine line in lines) {
+      for (final TextWord word in line.wordCollection) {
+        glyphs.addAll(word.glyphs);
+      }
+    }
+    return glyphs;
+  }
+
+  /// Decides what a single text-showing [record] becomes in the rewritten
+  /// stream, and keeps [_removeContentInAreas]'s glyph cursor in sync so
+  /// the next operator's cross-reference starts in the right place.
+  ///
+  /// - Not near any area (`!lineNear`): kept unchanged. Still has to work
+  ///   out how many glyphs it consumed (via [_operatorGlyphCount]) purely
+  ///   to keep the cursor synced for later operators.
+  /// - Near an area but precision is already lost for this page
+  ///   (`!preciseMode`): falls back to the whole-line behavior - drop the
+  ///   entire record, since `lineNear` was already true.
+  /// - Near an area, precision still held: attempts the byte↔glyph
+  ///   cross-reference. A clean verification produces a precise split
+  ///   (unchanged if nothing in it was actually redacted); a failed one
+  ///   drops the whole record *and* permanently flips `precisionHeld` off
+  ///   for the rest of the page (see the big doc comment above).
+  _SplitOutcome _splitTextOperator({
+    required PdfRecord record,
+    required List<TextGlyph> pageGlyphs,
+    required int cursor,
+    required bool lineNear,
+    required bool preciseMode,
+    required double fontSize,
+    required bool Function(Rect) hitsAreaRect,
+  }) {
+    final List<String> operands = record.operands ?? const <String>[];
+
+    // Hex strings (`<...>`) aren't decoded here (see the class doc comment)
+    // - if one shows up, this operator can't be verified either way.
+    final bool hasHexOperand = operands.any((o) => o.startsWith('<'));
+
+    if (!preciseMode || !lineNear || hasHexOperand) {
+      final int n = hasHexOperand
+          ? 0 // truly unknown - fine, precision is off from here anyway
+          : _operatorGlyphCount(operands);
+      final bool drop = lineNear; // whole-operator behavior, as before
+      return _SplitOutcome(
+        records: drop ? const <PdfRecord>[] : [record],
+        newCursor: cursor + n,
+        precisionHeld: preciseMode && !hasHexOperand,
+      );
+    }
+
+    final int totalGlyphs = _operatorGlyphCount(operands);
+    if (cursor + totalGlyphs > pageGlyphs.length) {
+      // Ran out of glyphs to cross-reference against - can't trust this
+      // or anything after it on this page.
+      return _SplitOutcome(
+        records: const <PdfRecord>[],
+        newCursor: cursor + totalGlyphs,
+        precisionHeld: false,
+      );
+    }
+
+    // Verify every byte in every string operand matches the next glyph's
+    // text, in order, before trusting a split.
+    int probe = cursor;
+    for (final String operand in operands) {
+      if (!operand.startsWith('(')) continue; // number adjustment, skip
+      for (final int byteVal in _decodePdfLiteralBytes(operand)) {
+        final String glyphText = pageGlyphs[probe].text;
+        if (glyphText.length != 1 || glyphText.codeUnitAt(0) != byteVal) {
+          return _SplitOutcome(
+            records: const <PdfRecord>[],
+            newCursor: cursor + totalGlyphs,
+            precisionHeld: false,
+          );
+        }
+        probe++;
+      }
+    }
+
+    // Verified - build the real kept/dropped runs using each glyph's own
+    // bounds, chunk by chunk (a TJ's existing number adjustments pass
+    // through untouched between chunks).
+    final List<String> newOperands = [];
+    int glyphIdx = cursor;
+    bool anyDropped = false;
+    for (final String operand in operands) {
+      if (!operand.startsWith('(')) {
+        newOperands.add(operand);
+        continue;
+      }
+      final List<int> chunkBytes = _decodePdfLiteralBytes(operand);
+      final List<_GlyphRun> runs = [];
+      for (final int byteVal in chunkBytes) {
+        final TextGlyph g = pageGlyphs[glyphIdx];
+        final bool dropped = hitsAreaRect(g.bounds);
+        if (dropped) anyDropped = true;
+        if (runs.isNotEmpty && runs.last.dropped == dropped) {
+          runs.last.bytes.add(byteVal);
+          runs.last.width += g.bounds.width;
+        } else {
+          runs.add(_GlyphRun(dropped, [byteVal], g.bounds.width));
+        }
+        glyphIdx++;
+      }
+      for (final _GlyphRun run in runs) {
+        if (run.dropped) {
+          // Negative spacing adjustment (PDF's thousandths-of-em TJ unit)
+          // sized to the dropped run's width, so surviving text on either
+          // side keeps its original on-page position instead of the gap
+          // visually collapsing.
+          final double adjustment = fontSize > 0
+              ? -(run.width / fontSize) * 1000
+              : 0;
+          newOperands.add(adjustment.toStringAsFixed(3));
+        } else {
+          newOperands.add(_encodePdfLiteral(run.bytes));
+        }
+      }
+    }
+
+    if (!anyDropped) {
+      // Nothing in this operator was actually targeted - keep it verbatim
+      // rather than gratuitously rewriting an untouched line as a TJ array.
+      return _SplitOutcome(
+        records: [record],
+        newCursor: cursor + totalGlyphs,
+        precisionHeld: true,
+      );
+    }
+    if (newOperands.every((o) => !o.startsWith('('))) {
+      // Every glyph in it was dropped - nothing left to show at all.
+      return _SplitOutcome(
+        records: const <PdfRecord>[],
+        newCursor: cursor + totalGlyphs,
+        precisionHeld: true,
+      );
+    }
+    return _SplitOutcome(
+      records: [PdfRecord('TJ', newOperands)],
+      newCursor: cursor + totalGlyphs,
+      precisionHeld: true,
+    );
+  }
+
+  /// How many glyphs a text-showing operator's operands account for -
+  /// the sum of each string operand's decoded byte length (hex operands
+  /// contribute 0; callers already treat any hex operand's presence as
+  /// "can't verify" and stop relying on the cursor regardless).
+  int _operatorGlyphCount(List<String> operands) {
+    int total = 0;
+    for (final String operand in operands) {
+      if (operand.startsWith('(')) {
+        total += _decodePdfLiteralBytes(operand).length;
+      }
+    }
+    return total;
+  }
+
+  /// Decodes a raw PDF literal-string operand (still including its outer
+  /// parens, exactly as the lexer captured it) into the individual
+  /// character byte-values it represents, resolving `\(`, `\)`, `\\`,
+  /// `\n`/`\r`/`\t`/`\b`/`\f`, and up-to-3-digit octal (`\ddd`) escapes -
+  /// needed because the raw *text* length of an escape sequence (2+
+  /// characters) doesn't match the *one byte* it actually decodes to,
+  /// which would otherwise throw off every glyph-count comparison past the
+  /// first escape.
+  List<int> _decodePdfLiteralBytes(String literal) {
+    final String inner = literal.substring(1, literal.length - 1);
+    final List<int> bytes = [];
+    int i = 0;
+    while (i < inner.length) {
+      final int c = inner.codeUnitAt(i);
+      if (c == 0x5C && i + 1 < inner.length) {
+        final int next = inner.codeUnitAt(i + 1);
+        switch (String.fromCharCode(next)) {
+          case 'n':
+            bytes.add(0x0A);
+            i += 2;
+          case 'r':
+            bytes.add(0x0D);
+            i += 2;
+          case 't':
+            bytes.add(0x09);
+            i += 2;
+          case 'b':
+            bytes.add(0x08);
+            i += 2;
+          case 'f':
+            bytes.add(0x0C);
+            i += 2;
+          case '(':
+            bytes.add(0x28);
+            i += 2;
+          case ')':
+            bytes.add(0x29);
+            i += 2;
+          case '\\':
+            bytes.add(0x5C);
+            i += 2;
+          default:
+            if (next >= 0x30 && next <= 0x37) {
+              int j = i + 1;
+              int value = 0;
+              int digits = 0;
+              while (j < inner.length &&
+                  digits < 3 &&
+                  inner.codeUnitAt(j) >= 0x30 &&
+                  inner.codeUnitAt(j) <= 0x37) {
+                value = value * 8 + (inner.codeUnitAt(j) - 0x30);
+                j++;
+                digits++;
+              }
+              bytes.add(value & 0xFF);
+              i = j;
+            } else {
+              i += 2; // e.g. a backslash-newline line continuation
+            }
+        }
+      } else {
+        bytes.add(c & 0xFF);
+        i++;
+      }
+    }
+    return bytes;
+  }
+
+  /// The inverse of [_decodePdfLiteralBytes]: wraps raw character
+  /// byte-values back into a valid `(...)` PDF literal, escaping `(`, `)`,
+  /// and `\`.
+  String _encodePdfLiteral(List<int> rawBytes) {
+    final StringBuffer out = StringBuffer('(');
+    for (final int b in rawBytes) {
+      if (b == 0x28 || b == 0x29 || b == 0x5C) out.writeCharCode(0x5C);
+      out.writeCharCode(b);
+    }
+    out.write(')');
+    return out.toString();
   }
 
   /// Re-encodes arbitrary image bytes as PNG via `package:image` (which
@@ -1536,4 +1861,27 @@ class _ScriptRun {
   /// null marks a space run (see _splitScriptRuns).
   final bool? arabic;
   const _ScriptRun(this.text, this.arabic);
+}
+
+/// Result of processing one text-showing operator in
+/// [PdfRepositoryImpl._splitTextOperator] - see that method's doc comment.
+class _SplitOutcome {
+  final List<PdfRecord> records;
+  final int newCursor;
+  final bool precisionHeld;
+  const _SplitOutcome({
+    required this.records,
+    required this.newCursor,
+    required this.precisionHeld,
+  });
+}
+
+/// One consecutive run of kept-or-dropped glyph bytes within a single
+/// string operand, accumulated while walking its bytes in
+/// [PdfRepositoryImpl._splitTextOperator].
+class _GlyphRun {
+  final bool dropped;
+  final List<int> bytes;
+  double width;
+  _GlyphRun(this.dropped, this.bytes, this.width);
 }

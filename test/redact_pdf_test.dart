@@ -11,6 +11,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:purapdf/data/repositories/pdf_repository_impl.dart';
 import 'package:purapdf/domain/entities/pdf_redact_area.dart';
 import 'package:purapdf/domain/entities/pdf_text_line.dart';
+import 'package:purapdf/domain/entities/pdf_text_word.dart';
 import 'package:purapdf/domain/usecases/redact_pdf_usecase.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
@@ -103,5 +104,88 @@ void main() {
     final useCase = RedactPdfUseCase(PdfRepositoryImpl());
 
     expect(() => useCase(source, const []), throwsArgumentError);
+  });
+
+  test(
+    'RedactPdfUseCase removes just one word out of a line, not the whole '
+    'line - the neighboring words on either side must survive at their '
+    'original position (verified by rendering to a PNG during '
+    'development - this only re-checks via extraction, which can\'t see '
+    'position, but does prove nothing extra was dropped)',
+    () async {
+      final doc = PdfDocument();
+      final page = doc.pages.add();
+      page.graphics.drawString(
+        'My name is CONFIDENTIAL and I live here',
+        PdfStandardFont(PdfFontFamily.helvetica, 20),
+        bounds: const Rect.fromLTWH(40, 40, 500, 30),
+      );
+      final source = '${tempDir.path}/word_source.pdf';
+      await File(source).writeAsBytes(await doc.save());
+      doc.dispose();
+
+      final repo = PdfRepositoryImpl();
+      final List<PdfTextWord> words = await repo.extractTextWords(source);
+      final PdfTextWord target = words.firstWhere(
+        (w) => w.text == 'CONFIDENTIAL',
+      );
+
+      final useCase = RedactPdfUseCase(repo);
+      final outPath = await useCase(source, [
+        PdfRedactArea(
+          pageIndex: target.pageIndex,
+          left: target.left,
+          top: target.top,
+          width: target.width,
+          height: target.height,
+        ),
+      ]);
+
+      final String extracted = PdfTextExtractor(
+        PdfDocument(inputBytes: File(outPath).readAsBytesSync()),
+      ).extractText();
+
+      expect(extracted, isNot(contains('CONFIDENTIAL')));
+      expect(extracted, contains('My name is'));
+      expect(extracted, contains('and I live here'));
+    },
+  );
+
+  test('RedactPdfUseCase removes a dragged range of consecutive words', () async {
+    final doc = PdfDocument();
+    final page = doc.pages.add();
+    page.graphics.drawString(
+      'Patient John Smith was admitted yesterday',
+      PdfStandardFont(PdfFontFamily.helvetica, 20),
+      bounds: const Rect.fromLTWH(40, 40, 500, 30),
+    );
+    final source = '${tempDir.path}/range_source.pdf';
+    await File(source).writeAsBytes(await doc.save());
+    doc.dispose();
+
+    final repo = PdfRepositoryImpl();
+    final List<PdfTextWord> words = await repo.extractTextWords(source);
+    final PdfTextWord john = words.firstWhere((w) => w.text == 'John');
+    final PdfTextWord smith = words.firstWhere((w) => w.text == 'Smith');
+
+    final useCase = RedactPdfUseCase(repo);
+    final outPath = await useCase(source, [
+      PdfRedactArea(
+        pageIndex: john.pageIndex,
+        left: john.left,
+        top: john.top,
+        width: (smith.left + smith.width) - john.left,
+        height: john.height,
+      ),
+    ]);
+
+    final String extracted = PdfTextExtractor(
+      PdfDocument(inputBytes: File(outPath).readAsBytesSync()),
+    ).extractText();
+
+    expect(extracted, isNot(contains('John')));
+    expect(extracted, isNot(contains('Smith')));
+    expect(extracted, contains('Patient'));
+    expect(extracted, contains('admitted yesterday'));
   });
 }
