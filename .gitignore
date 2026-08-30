@@ -31,6 +31,12 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+# Belt-and-suspenders for /build/: a `flutter build`/`pod install` run from
+# the wrong cwd once created a stray build/ under lib/l10n/, which the
+# anchored rule above didn't catch and which also confused `flutter
+# analyze` into treating vendored CocoaPods test sources as part of this
+# project. Catch a build/ at any depth, not just the root.
+build/
 /coverage/
 
 # Symbolication related

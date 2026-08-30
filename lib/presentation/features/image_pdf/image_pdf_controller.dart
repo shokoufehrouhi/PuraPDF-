@@ -112,7 +112,7 @@ class ImagePdfController extends Notifier<ImagePdfState> {
         if (state.images.isEmpty) {
           state = state.copyWith(
             isProcessing: false,
-            error: 'Hadde aghal ye aks entekhab kon.',
+            error: 'errorSelectAtLeastOneImage',
           );
           return;
         }
@@ -125,7 +125,7 @@ class ImagePdfController extends Notifier<ImagePdfState> {
         if (source == null) {
           state = state.copyWith(
             isProcessing: false,
-            error: 'Avval ye PDF entekhab kon.',
+            error: 'errorSelectPdfFirst',
           );
           return;
         }

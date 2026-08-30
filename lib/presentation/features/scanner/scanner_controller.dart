@@ -14,6 +14,7 @@ class ScannerState {
   final List<String> pages;
   final bool isScanning;
   final bool isCreatingPdf;
+  final bool runOcr;
   final String? resultPath;
   final String? error;
 
@@ -21,6 +22,7 @@ class ScannerState {
     this.pages = const [],
     this.isScanning = false,
     this.isCreatingPdf = false,
+    this.runOcr = true,
     this.resultPath,
     this.error,
   });
@@ -29,6 +31,7 @@ class ScannerState {
     List<String>? pages,
     bool? isScanning,
     bool? isCreatingPdf,
+    bool? runOcr,
     String? resultPath,
     String? error,
     bool clearResult = false,
@@ -38,6 +41,7 @@ class ScannerState {
       pages: pages ?? this.pages,
       isScanning: isScanning ?? this.isScanning,
       isCreatingPdf: isCreatingPdf ?? this.isCreatingPdf,
+      runOcr: runOcr ?? this.runOcr,
       resultPath: clearResult ? null : (resultPath ?? this.resultPath),
       error: clearError ? null : (error ?? this.error),
     );
@@ -71,6 +75,10 @@ class ScannerController extends Notifier<ScannerState> {
     }
   }
 
+  void setRunOcr(bool value) {
+    state = state.copyWith(runOcr: value);
+  }
+
   void removeAt(int index) {
     final updated = [...state.pages]..removeAt(index);
     state = state.copyWith(pages: updated);
@@ -98,7 +106,7 @@ class ScannerController extends Notifier<ScannerState> {
     );
     try {
       final useCase = ref.read(scanDocumentsUseCaseProvider);
-      final path = await useCase(state.pages);
+      final path = await useCase(state.pages, ocr: state.runOcr);
       state = state.copyWith(isCreatingPdf: false, resultPath: path);
     } catch (e) {
       state = state.copyWith(

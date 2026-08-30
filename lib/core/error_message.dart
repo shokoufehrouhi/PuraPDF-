@@ -81,6 +81,12 @@ String localizedError(BuildContext context, String value) {
       return l10n.errorWrongPasswordOrNotProtected;
     case 'errorUnsupportedImageFormat':
       return l10n.errorUnsupportedImageFormat;
+    case 'errorSelectWordFirst':
+      return l10n.errorSelectWordFirst;
+    case 'errorPdfHasNoExtractableText':
+      return l10n.errorPdfHasNoExtractableText;
+    case 'errorWordHasNoExtractableText':
+      return l10n.errorWordHasNoExtractableText;
     default:
       return value;
   }

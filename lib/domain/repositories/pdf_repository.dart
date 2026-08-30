@@ -38,8 +38,15 @@ abstract class PdfRepository {
   Future<String> imagesToPdf(List<String> imagePaths);
 
   /// Same as [imagesToPdf], but written under the scanner's own filename
-  /// prefix so Recents shows it as "Scan" rather than "Image -> PDF".
-  Future<String> scannedImagesToPdf(List<String> imagePaths);
+  /// prefix so Recents shows it as "Scan" rather than "Image -> PDF". When
+  /// [ocr] is true, each page also gets an invisible, searchable/selectable
+  /// text layer from on-device text recognition (Latin script only)
+  /// positioned under its recognized text; pages with no recognizable text
+  /// are unaffected.
+  Future<String> scannedImagesToPdf(
+    List<String> imagePaths, {
+    bool ocr = false,
+  });
 
   /// Renders every page of the PDF at [inputPath] as a raster image in
   /// [format] and returns one output path per page, in page order.
@@ -99,4 +106,13 @@ abstract class PdfRepository {
   /// positioned via its [PdfImageInsert] fields) onto one page of the PDF
   /// at [inputPath] and returns the new file's path.
   Future<String> signPdf(String inputPath, PdfImageInsert signature);
+
+  /// Extracts the text of the PDF at [inputPath] into a new .docx and
+  /// returns its path. Text-only: paragraph-level bold/italic/heading are
+  /// preserved, but not images, tables, or exact layout.
+  Future<String> pdfToWord(String inputPath);
+
+  /// Extracts the text of the .docx at [inputPath] into a new PDF and
+  /// returns its path. Same text-only fidelity as [pdfToWord].
+  Future<String> wordToPdf(String inputPath);
 }

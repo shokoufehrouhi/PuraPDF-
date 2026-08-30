@@ -50,4 +50,8 @@ class FeatureColors {
   static const Color signature = Color(0xFFE2E6EC);
   static const Color signatureDark = Color(0xFFCDD3DC);
   static const Color signatureIcon = Color(0xFF64748B);
+
+  static const Color pdfWord = Color(0xFFD6E4FB);
+  static const Color pdfWordDark = Color(0xFFBFD4F8);
+  static const Color pdfWordIcon = Color(0xFF2B579A); // MS Word's own blue
 }

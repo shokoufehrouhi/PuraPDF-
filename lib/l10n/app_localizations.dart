@@ -208,6 +208,18 @@ abstract class AppLocalizations {
   /// **'Convert between formats'**
   String get featureImagePdfSubtitle;
 
+  /// No description provided for @featurePdfWordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF ⇄ Word'**
+  String get featurePdfWordTitle;
+
+  /// No description provided for @featurePdfWordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert to and from Word'**
+  String get featurePdfWordSubtitle;
+
   /// No description provided for @featureScanTitle.
   ///
   /// In en, this message translates to:
@@ -958,6 +970,78 @@ abstract class AppLocalizations {
   /// **'Images'**
   String get imagesWord;
 
+  /// No description provided for @pdfWordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF ⇄ Word'**
+  String get pdfWordTitle;
+
+  /// No description provided for @pdfToWordDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Extract a PDF\'s text into an editable Word document.'**
+  String get pdfToWordDescription;
+
+  /// No description provided for @wordToPdfDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn a Word document\'s text into a PDF.'**
+  String get wordToPdfDescription;
+
+  /// No description provided for @pdfWordStepSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select file'**
+  String get pdfWordStepSelect;
+
+  /// No description provided for @pdfWordStepConvert.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert'**
+  String get pdfWordStepConvert;
+
+  /// No description provided for @pdfWordStepSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get pdfWordStepSave;
+
+  /// No description provided for @wordWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Word'**
+  String get wordWord;
+
+  /// No description provided for @selectAWordFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a Word file'**
+  String get selectAWordFile;
+
+  /// No description provided for @docCreatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Word document created successfully'**
+  String get docCreatedSuccess;
+
+  /// No description provided for @errorSelectWordFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a Word file first.'**
+  String get errorSelectWordFirst;
+
+  /// No description provided for @errorPdfHasNoExtractableText.
+  ///
+  /// In en, this message translates to:
+  /// **'This PDF has no text to extract.'**
+  String get errorPdfHasNoExtractableText;
+
+  /// No description provided for @errorWordHasNoExtractableText.
+  ///
+  /// In en, this message translates to:
+  /// **'This Word document has no text to extract.'**
+  String get errorWordHasNoExtractableText;
+
   /// No description provided for @addImages.
   ///
   /// In en, this message translates to:
@@ -1065,6 +1149,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Scan more'**
   String get scanMore;
+
+  /// No description provided for @scanOcrToggleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Make text searchable'**
+  String get scanOcrToggleLabel;
+
+  /// No description provided for @scanOcrToggleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'On-device text recognition (Latin-script text only)'**
+  String get scanOcrToggleHint;
 
   /// No description provided for @scanPageCount.
   ///

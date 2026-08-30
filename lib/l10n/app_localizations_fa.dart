@@ -62,6 +62,12 @@ class AppLocalizationsFa extends AppLocalizations {
   String get featureImagePdfSubtitle => 'تبدیل بین فرمت‌ها';
 
   @override
+  String get featurePdfWordTitle => 'PDF ⇄ Word';
+
+  @override
+  String get featurePdfWordSubtitle => 'تبدیل به Word و بازگشت';
+
+  @override
   String get featureScanTitle => 'اسکن سند';
 
   @override
@@ -489,6 +495,44 @@ class AppLocalizationsFa extends AppLocalizations {
   String get imagesWord => 'تصویر';
 
   @override
+  String get pdfWordTitle => 'PDF ⇄ Word';
+
+  @override
+  String get pdfToWordDescription =>
+      'متن یک PDF را در یک سند Word قابل ویرایش استخراج کنید.';
+
+  @override
+  String get wordToPdfDescription => 'متن یک سند Word را به PDF تبدیل کنید.';
+
+  @override
+  String get pdfWordStepSelect => 'انتخاب فایل';
+
+  @override
+  String get pdfWordStepConvert => 'تبدیل';
+
+  @override
+  String get pdfWordStepSave => 'ذخیره';
+
+  @override
+  String get wordWord => 'Word';
+
+  @override
+  String get selectAWordFile => 'یک فایل Word انتخاب کنید';
+
+  @override
+  String get docCreatedSuccess => 'سند Word با موفقیت ساخته شد';
+
+  @override
+  String get errorSelectWordFirst => 'اول یک فایل Word انتخاب کنید.';
+
+  @override
+  String get errorPdfHasNoExtractableText => 'این PDF متنی برای استخراج ندارد.';
+
+  @override
+  String get errorWordHasNoExtractableText =>
+      'این سند Word متنی برای استخراج ندارد.';
+
+  @override
   String get addImages => 'افزودن تصویر';
 
   @override
@@ -567,6 +611,12 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get scanMore => 'اسکن بیشتر';
+
+  @override
+  String get scanOcrToggleLabel => 'متن را قابل جستجو کن';
+
+  @override
+  String get scanOcrToggleHint => 'تشخیص متن روی دستگاه (فقط متن با خط لاتین)';
 
   @override
   String scanPageCount(num count) {

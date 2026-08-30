@@ -62,6 +62,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get featureImagePdfSubtitle => 'Convertir entre formatos';
 
   @override
+  String get featurePdfWordTitle => 'PDF ⇄ Word';
+
+  @override
+  String get featurePdfWordSubtitle => 'Convierte a Word y viceversa';
+
+  @override
   String get featureScanTitle => 'Escanear documento';
 
   @override
@@ -495,6 +501,46 @@ class AppLocalizationsEs extends AppLocalizations {
   String get imagesWord => 'Imágenes';
 
   @override
+  String get pdfWordTitle => 'PDF ⇄ Word';
+
+  @override
+  String get pdfToWordDescription =>
+      'Extrae el texto de un PDF a un documento de Word editable.';
+
+  @override
+  String get wordToPdfDescription =>
+      'Convierte el texto de un documento de Word en un PDF.';
+
+  @override
+  String get pdfWordStepSelect => 'Seleccionar archivo';
+
+  @override
+  String get pdfWordStepConvert => 'Convertir';
+
+  @override
+  String get pdfWordStepSave => 'Guardar';
+
+  @override
+  String get wordWord => 'Word';
+
+  @override
+  String get selectAWordFile => 'Selecciona un archivo de Word';
+
+  @override
+  String get docCreatedSuccess => 'Documento de Word creado correctamente';
+
+  @override
+  String get errorSelectWordFirst => 'Selecciona primero un archivo de Word.';
+
+  @override
+  String get errorPdfHasNoExtractableText =>
+      'Este PDF no tiene texto para extraer.';
+
+  @override
+  String get errorWordHasNoExtractableText =>
+      'Este documento de Word no tiene texto para extraer.';
+
+  @override
   String get addImages => 'Añadir imágenes';
 
   @override
@@ -573,6 +619,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get scanMore => 'Escanear más';
+
+  @override
+  String get scanOcrToggleLabel => 'Hacer el texto buscable';
+
+  @override
+  String get scanOcrToggleHint =>
+      'Reconocimiento de texto en el dispositivo (solo alfabeto latino)';
 
   @override
   String scanPageCount(num count) {

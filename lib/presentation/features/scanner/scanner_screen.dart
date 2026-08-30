@@ -187,6 +187,28 @@ class ScannerScreen extends ConsumerWidget {
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                 child: _ResultCard(path: state.resultPath!),
               ),
+            if (state.pages.isNotEmpty && state.resultPath == null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 20, 4),
+                child: SwitchListTile(
+                  value: state.runOcr,
+                  onChanged: controller.setRunOcr,
+                  activeThumbColor: _color,
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    l10n.scanOcrToggleLabel,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  subtitle: Text(
+                    l10n.scanOcrToggleHint,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ),
             SafeArea(
               top: false,
               child: Padding(

@@ -52,6 +52,11 @@ dependencies:
   shared_preferences: ^2.5.5
   doclens: ^0.0.8
   signature: ^6.4.0
+  google_mlkit_text_recognition: ^0.15.0
+  # Not docx_creator - its xml ^6.x pin conflicts with syncfusion_flutter_pdf's
+  # xml ^7.x, and no released version has updated it. DOCX read/write for the
+  # PDF<->Word feature is hand-rolled instead (see core/docx/).
+  xml: ^7.0.1
 
 dev_dependencies:
   flutter_test:

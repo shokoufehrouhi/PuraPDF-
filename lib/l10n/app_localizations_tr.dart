@@ -63,6 +63,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get featureImagePdfSubtitle => 'Formatlar arasında dönüştür';
 
   @override
+  String get featurePdfWordTitle => 'PDF ⇄ Word';
+
+  @override
+  String get featurePdfWordSubtitle => 'Word\'e ve Word\'den dönüştürün';
+
+  @override
   String get featureScanTitle => 'Belge Tara';
 
   @override
@@ -493,6 +499,46 @@ class AppLocalizationsTr extends AppLocalizations {
   String get imagesWord => 'Görsel';
 
   @override
+  String get pdfWordTitle => 'PDF ⇄ Word';
+
+  @override
+  String get pdfToWordDescription =>
+      'Bir PDF\'nin metnini düzenlenebilir bir Word belgesine çıkarın.';
+
+  @override
+  String get wordToPdfDescription =>
+      'Bir Word belgesinin metnini PDF\'ye dönüştürün.';
+
+  @override
+  String get pdfWordStepSelect => 'Dosya seç';
+
+  @override
+  String get pdfWordStepConvert => 'Dönüştür';
+
+  @override
+  String get pdfWordStepSave => 'Kaydet';
+
+  @override
+  String get wordWord => 'Word';
+
+  @override
+  String get selectAWordFile => 'Bir Word dosyası seçin';
+
+  @override
+  String get docCreatedSuccess => 'Word belgesi başarıyla oluşturuldu';
+
+  @override
+  String get errorSelectWordFirst => 'Önce bir Word dosyası seçin.';
+
+  @override
+  String get errorPdfHasNoExtractableText =>
+      'Bu PDF\'de çıkarılacak metin yok.';
+
+  @override
+  String get errorWordHasNoExtractableText =>
+      'Bu Word belgesinde çıkarılacak metin yok.';
+
+  @override
   String get addImages => 'Görsel ekle';
 
   @override
@@ -571,6 +617,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get scanMore => 'Daha fazla tara';
+
+  @override
+  String get scanOcrToggleLabel => 'Metni aranabilir yap';
+
+  @override
+  String get scanOcrToggleHint =>
+      'Cihaz üzerinde metin tanıma (yalnızca Latin alfabesi)';
 
   @override
   String scanPageCount(num count) {

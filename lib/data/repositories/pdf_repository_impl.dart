@@ -10,6 +10,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdfrx/pdfrx.dart' as rx;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../../core/docx/docx_paragraph.dart';
+import '../../core/docx/docx_reader.dart';
+import '../../core/docx/docx_writer.dart';
+import '../../core/ocr/ocr_service.dart';
 import '../../domain/entities/compress_result.dart';
 import '../../domain/entities/compression_level.dart';
 import '../../domain/entities/history_file.dart';
@@ -262,14 +266,26 @@ class PdfRepositoryImpl implements PdfRepository {
       _imagesToPdf(imagePaths, 'purapdf_images_');
 
   @override
-  Future<String> scannedImagesToPdf(List<String> imagePaths) =>
-      _imagesToPdf(imagePaths, 'purapdf_scan_');
+  Future<String> scannedImagesToPdf(List<String> imagePaths, {bool ocr = false}) =>
+      _imagesToPdf(imagePaths, 'purapdf_scan_', ocr: ocr);
 
   /// Shared by [imagesToPdf] and [scannedImagesToPdf] — same "one image per
   /// page" assembly either way, just written under a different filename
   /// prefix so Recents can tell "Image -> PDF" and "Scan" apart (see
   /// _operationFor in home_screen.dart).
-  Future<String> _imagesToPdf(List<String> imagePaths, String prefix) async {
+  ///
+  /// [ocr]: after drawing each page's image, run on-device text recognition
+  /// on it and draw every recognized line again on top, fully transparent
+  /// (same setTransparency trick as the watermark stamp below) — invisible
+  /// to the eye, but a real text run in the content stream, so the page
+  /// becomes searchable/selectable without changing how it looks. Only used
+  /// by [scannedImagesToPdf] — [imagesToPdf]'s general-purpose converter
+  /// leaves images as plain images.
+  Future<String> _imagesToPdf(
+    List<String> imagePaths,
+    String prefix, {
+    bool ocr = false,
+  }) async {
     const double maxDimension = 842; // cap so huge camera photos stay sane
     final PdfDocument output = PdfDocument();
     output.pageSettings.margins.all = 0;
@@ -278,8 +294,10 @@ class PdfRepositoryImpl implements PdfRepository {
       final Uint8List bytes = await File(imagePath).readAsBytes();
       final PdfBitmap bitmap = PdfBitmap(_normalizeImageBytes(bytes));
 
-      double w = bitmap.width.toDouble();
-      double h = bitmap.height.toDouble();
+      final double originalWidth = bitmap.width.toDouble();
+      final double originalHeight = bitmap.height.toDouble();
+      double w = originalWidth;
+      double h = originalHeight;
       if (w > maxDimension || h > maxDimension) {
         final double scale = maxDimension / (w > h ? w : h);
         w *= scale;
@@ -289,12 +307,73 @@ class PdfRepositoryImpl implements PdfRepository {
       output.pageSettings.size = Size(w, h);
       final PdfPage page = output.pages.add();
       page.graphics.drawImage(bitmap, Rect.fromLTWH(0, 0, w, h));
+
+      if (ocr) {
+        await _stampInvisibleTextLayer(
+          page,
+          imagePath,
+          scaleX: w / originalWidth,
+          scaleY: h / originalHeight,
+        );
+      }
+    }
+
+    if (ocr) {
+      await OcrService.instance.dispose();
     }
 
     return _writeOutput(
       output,
       '$prefix${DateTime.now().millisecondsSinceEpoch}.pdf',
     );
+  }
+
+  /// Recognizes text in the image at [imagePath] and draws each line back
+  /// onto [page], fully transparent, scaled from the source image's pixel
+  /// space into the page's point space via [scaleX]/[scaleY]. A page ML Kit
+  /// finds no text on (a blank page, a non-Latin-script scan, ...) is left
+  /// untouched — not an error, just no text layer.
+  Future<void> _stampInvisibleTextLayer(
+    PdfPage page,
+    String imagePath, {
+    required double scaleX,
+    required double scaleY,
+  }) async {
+    final List<OcrLine> lines = await OcrService.instance.recognizeLines(
+      imagePath,
+    );
+    if (lines.isEmpty) return;
+
+    final PdfGraphics g = page.graphics;
+    final PdfBrush brush = PdfSolidBrush(PdfColor(0, 0, 0));
+    g.save();
+    g.setTransparency(0);
+    for (final OcrLine line in lines) {
+      final double lineHeight = line.height * scaleY;
+      if (lineHeight < 1) continue;
+      final PdfFont font = PdfStandardFont(
+        PdfFontFamily.helvetica,
+        // ML Kit's box is the full glyph height (ascender to descender);
+        // a font's point size renders taller than its own cap-height, so
+        // sizing straight off the box tends to overshoot - 0.85 keeps the
+        // invisible run roughly matching the box without needing exact
+        // font-metric fidelity (nobody sees this, they only search/select
+        // it, so "roughly lines up" is the actual bar, not pixel-perfect).
+        lineHeight * 0.85,
+      );
+      g.drawString(
+        line.text,
+        font,
+        brush: brush,
+        bounds: Rect.fromLTWH(
+          line.left * scaleX,
+          line.top * scaleY,
+          line.width * scaleX,
+          lineHeight,
+        ),
+      );
+    }
+    g.restore();
   }
 
   @override
@@ -857,5 +936,157 @@ class PdfRepositoryImpl implements PdfRepository {
       return PdfFontFamily.timesRoman;
     }
     return PdfFontFamily.helvetica;
+  }
+
+  // --- PDF <-> Word (text-only) ---------------------------------------
+  //
+  // See core/docx/docx_paragraph.dart's doc comment for exactly what
+  // fidelity this supports: paragraph-level text/bold/italic/heading only
+  // - no images, tables, or per-word mixed formatting either direction.
+
+  @override
+  Future<String> pdfToWord(String inputPath) async {
+    final PdfDocument doc = await _loadDocument(inputPath);
+    final List<TextLine> lines;
+    try {
+      lines = PdfTextExtractor(doc).extractTextLines();
+    } finally {
+      doc.dispose();
+    }
+
+    final List<DocxParagraph> paragraphs = _groupLinesIntoParagraphs(lines);
+    if (paragraphs.isEmpty) {
+      throw ArgumentError('errorPdfHasNoExtractableText');
+    }
+
+    final Uint8List bytes = DocxWriter.write(paragraphs);
+    return _writeBytesOutput(
+      bytes,
+      'purapdf_pdftoword_${DateTime.now().millisecondsSinceEpoch}.docx',
+    );
+  }
+
+  /// Groups extracted [TextLine]s (Syncfusion hands back one per visual
+  /// line, not per paragraph) into paragraphs: a big vertical gap relative
+  /// to the previous line's own height, or a page boundary, starts a new
+  /// paragraph; otherwise the line is a wrapped continuation of the current
+  /// one. Bold/italic for the whole paragraph come from its first line's
+  /// font name (e.g. "ABCDEF+Helvetica-Bold") - the same one-style-per-
+  /// paragraph simplification as the Word->PDF direction.
+  List<DocxParagraph> _groupLinesIntoParagraphs(List<TextLine> lines) {
+    final List<DocxParagraph> paragraphs = [];
+    final List<TextLine> group = [];
+    int? currentPage;
+    double? previousBottom;
+    double? previousHeight;
+
+    void flush() {
+      if (group.isEmpty) return;
+      final String text = group.map((l) => l.text).join(' ').trim();
+      if (text.isNotEmpty) {
+        final String fontName = group.first.fontName.toLowerCase();
+        paragraphs.add(
+          DocxParagraph(
+            text: text,
+            bold: fontName.contains('bold'),
+            italic: fontName.contains('italic') || fontName.contains('oblique'),
+          ),
+        );
+      }
+      group.clear();
+    }
+
+    for (final TextLine line in lines) {
+      if (line.text.trim().isEmpty) continue;
+      final bool newPage = currentPage != null && currentPage != line.pageIndex;
+      final double gap = previousBottom == null
+          ? 0
+          : line.bounds.top - previousBottom;
+      final bool bigGap = previousHeight != null && gap > previousHeight * 0.6;
+      if (newPage || bigGap) flush();
+
+      group.add(line);
+      currentPage = line.pageIndex;
+      previousBottom = line.bounds.top + line.bounds.height;
+      previousHeight = line.bounds.height;
+    }
+    flush();
+    return paragraphs;
+  }
+
+  @override
+  Future<String> wordToPdf(String inputPath) async {
+    final Uint8List bytes = await File(inputPath).readAsBytes();
+    final List<DocxParagraph> paragraphs = DocxReader.read(bytes);
+    if (paragraphs.isEmpty) {
+      throw ArgumentError('errorWordHasNoExtractableText');
+    }
+
+    final PdfDocument doc = PdfDocument();
+    PdfPage page = doc.pages.add();
+    Size clientSize = page.getClientSize();
+    double y = 0;
+
+    for (final DocxParagraph p in paragraphs) {
+      // Bounds height would go negative past the page's bottom edge (the
+      // element's own pagination only kicks in once it's actually asked to
+      // lay out into insufficient bounds) - start the next page ourselves
+      // first rather than hand it a degenerate Rect.
+      if (y >= clientSize.height - 20) {
+        page = doc.pages.add();
+        clientSize = page.getClientSize();
+        y = 0;
+      }
+
+      final List<PdfFontStyle> styles = [
+        if (p.bold || p.headingLevel > 0) PdfFontStyle.bold,
+        if (p.italic) PdfFontStyle.italic,
+      ];
+      final PdfFont font = PdfStandardFont(
+        PdfFontFamily.helvetica,
+        _wordToPdfFontSize(p.headingLevel),
+        style: styles.isEmpty ? PdfFontStyle.regular : null,
+        multiStyle: styles.isEmpty ? null : styles,
+      );
+      final PdfLayoutResult? result = PdfTextElement(
+        text: p.text,
+        font: font,
+      ).draw(
+        page: page,
+        bounds: Rect.fromLTWH(0, y, clientSize.width, clientSize.height - y),
+        format: PdfLayoutFormat(layoutType: PdfLayoutType.paginate),
+      );
+      if (result != null) {
+        page = result.page;
+        clientSize = page.getClientSize();
+        y = result.bounds.bottom + (p.headingLevel > 0 ? 14 : 10);
+      }
+    }
+
+    return _writeOutput(
+      doc,
+      'purapdf_wordtopdf_${DateTime.now().millisecondsSinceEpoch}.pdf',
+    );
+  }
+
+  double _wordToPdfFontSize(int headingLevel) {
+    switch (headingLevel) {
+      case 1:
+        return 20;
+      case 2:
+        return 16;
+      case 3:
+        return 14;
+      default:
+        return headingLevel > 3 ? 13 : 11;
+    }
+  }
+
+  Future<String> _writeBytesOutput(Uint8List bytes, String fileName) async {
+    final Directory dir = await getApplicationDocumentsDirectory();
+    final String outPath = '${dir.path}/$fileName';
+    await File(outPath).writeAsBytes(bytes, flush: true);
+    await _recordGenerated(outPath);
+    return outPath;
   }
 }

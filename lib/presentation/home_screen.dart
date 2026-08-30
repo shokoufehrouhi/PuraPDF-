@@ -18,6 +18,7 @@ import 'features/history/history_controller.dart';
 import 'features/image_pdf/image_pdf_screen.dart';
 import 'features/merge/merge_screen.dart';
 import 'features/page_edit/page_edit_screen.dart';
+import 'features/pdf_word/pdf_word_screen.dart';
 import 'features/scanner/scanner_screen.dart';
 import 'features/signature/signature_screen.dart';
 import 'features/split/split_screen.dart';
@@ -242,6 +243,17 @@ class _ToolsTabState extends State<_ToolsTab> {
             subtitle: l10n.featureImagePdfSubtitle,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ImagePdfScreen()),
+            ),
+          ),
+          _FeatureRowCard(
+            icon: Icons.description_outlined,
+            color: FeatureColors.pdfWord,
+            colorDark: FeatureColors.pdfWordDark,
+            iconColor: FeatureColors.pdfWordIcon,
+            title: l10n.featurePdfWordTitle,
+            subtitle: l10n.featurePdfWordSubtitle,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const PdfWordScreen()),
             ),
           ),
           _FeatureRowCard(
@@ -682,6 +694,30 @@ _OperationInfo _operationFor(String fileName, AppLocalizations l10n) {
         from: 'PDF',
         to: l10n.imagesWord,
         iconColor: FeatureColors.imagePdfIcon,
+        iconSize: 12,
+      ),
+    );
+  }
+  if (fileName.startsWith('purapdf_pdftoword_')) {
+    return _OperationInfo(
+      Icons.description_outlined,
+      FeatureColors.pdfWordIcon,
+      DirectionLabel(
+        from: 'PDF',
+        to: l10n.wordWord,
+        iconColor: FeatureColors.pdfWordIcon,
+        iconSize: 12,
+      ),
+    );
+  }
+  if (fileName.startsWith('purapdf_wordtopdf_')) {
+    return _OperationInfo(
+      Icons.description_outlined,
+      FeatureColors.pdfWordIcon,
+      DirectionLabel(
+        from: l10n.wordWord,
+        to: 'PDF',
+        iconColor: FeatureColors.pdfWordIcon,
         iconSize: 12,
       ),
     );

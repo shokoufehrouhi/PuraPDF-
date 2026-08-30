@@ -62,6 +62,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get featureImagePdfSubtitle => 'التحويل بين الصيغ';
 
   @override
+  String get featurePdfWordTitle => 'PDF ⇄ Word';
+
+  @override
+  String get featurePdfWordSubtitle => 'التحويل من وإلى Word';
+
+  @override
   String get featureScanTitle => 'مسح مستند';
 
   @override
@@ -491,6 +497,45 @@ class AppLocalizationsAr extends AppLocalizations {
   String get imagesWord => 'صور';
 
   @override
+  String get pdfWordTitle => 'PDF ⇄ Word';
+
+  @override
+  String get pdfToWordDescription =>
+      'استخرج نص ملف PDF إلى مستند Word قابل للتحرير.';
+
+  @override
+  String get wordToPdfDescription => 'حوّل نص مستند Word إلى PDF.';
+
+  @override
+  String get pdfWordStepSelect => 'اختيار الملف';
+
+  @override
+  String get pdfWordStepConvert => 'تحويل';
+
+  @override
+  String get pdfWordStepSave => 'حفظ';
+
+  @override
+  String get wordWord => 'Word';
+
+  @override
+  String get selectAWordFile => 'اختر ملف Word';
+
+  @override
+  String get docCreatedSuccess => 'تم إنشاء مستند Word بنجاح';
+
+  @override
+  String get errorSelectWordFirst => 'اختر ملف Word أولاً.';
+
+  @override
+  String get errorPdfHasNoExtractableText =>
+      'لا يحتوي ملف PDF هذا على نص يمكن استخراجه.';
+
+  @override
+  String get errorWordHasNoExtractableText =>
+      'لا يحتوي مستند Word هذا على نص يمكن استخراجه.';
+
+  @override
   String get addImages => 'إضافة صور';
 
   @override
@@ -568,6 +613,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get scanMore => 'مسح المزيد';
+
+  @override
+  String get scanOcrToggleLabel => 'اجعل النص قابلاً للبحث';
+
+  @override
+  String get scanOcrToggleHint =>
+      'التعرف على النص على الجهاز (نص بالأحرف اللاتينية فقط)';
 
   @override
   String scanPageCount(num count) {
