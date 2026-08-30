@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'dart:ui';
 
+import 'package:flutter/painting.dart' show Color, HSVColor;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
@@ -16,21 +16,22 @@ final redactPdfUseCaseProvider = Provider(
   (ref) => RedactPdfUseCase(ref.watch(pdfRepositoryProvider)),
 );
 
-/// Auto-assigned, in this order, to each new selection - no manual color
-/// picker (a deliberate scope call: one less tap per selection).
-const List<Color> redactPalette = [
-  Color(0xFF000000), // black
-  Color(0xFFDC2626), // red
-  Color(0xFF2563EB), // blue
-  Color(0xFF64748B), // gray
-  Color(0xFFEC4899), // pink
-  Color(0xFFF97316), // orange
-  Color(0xFF14B8A6), // turquoise
-];
+/// Where [RedactState.nextColor] starts, and the saturation/value every
+/// hue picked off the spectrum bar keeps (only *hue* is user-adjustable -
+/// see `_ColorSpectrumBar` in the screen) - a mid-bright, fully-saturated
+/// blue.
+const HSVColor _defaultHsv = HSVColor.fromAHSV(1, 210, 0.85, 0.85);
+
+/// Consecutive default picks (whenever the user hasn't dragged the
+/// spectrum bar for this particular selection) are spaced by this many
+/// degrees of hue - the "golden angle", the standard trick for generating
+/// a sequence of maximally-distinct hues without ever repeating a cycle.
+const double _goldenAngle = 137.508;
 
 /// One tap (a single word) or one drag (a range of adjacent words) - each
-/// gets its own color from [redactPalette]. [wordIndices] are indices into
-/// [RedactState.words].
+/// gets its own color, either [RedactState.nextColor] as last left on the
+/// spectrum bar or the next auto-advanced default. [wordIndices] are
+/// indices into [RedactState.words].
 class RedactSelection {
   final Color color;
   final Set<int> wordIndices;
@@ -45,15 +46,15 @@ class RedactState {
   final List<PdfTextWord> words;
   final int currentPageIndex;
   final List<RedactSelection> selections;
-  // Counts every selection ever created (not selections.length, which
-  // shrinks when one is removed) so color assignment always advances
-  // through the palette instead of ever reusing a color still in use.
-  final int nextColorIndex;
+  // What the *next* selection becomes - either wherever the user last left
+  // the spectrum bar, or the last auto-advanced default (see
+  // RedactController.commitSelection).
+  final Color nextColor;
   final double barOpacity; // 0..1 - see PdfRedactArea's doc comment on why
   final String? resultPath;
   final String? error;
 
-  const RedactState({
+  RedactState({
     this.sourceFile,
     this.isLoading = false,
     this.isSaving = false,
@@ -61,11 +62,11 @@ class RedactState {
     this.words = const [],
     this.currentPageIndex = 0,
     this.selections = const [],
-    this.nextColorIndex = 0,
+    Color? nextColor,
     this.barOpacity = 1.0,
     this.resultPath,
     this.error,
-  });
+  }) : nextColor = nextColor ?? _defaultHsv.toColor();
 
   /// The selection (if any) that currently holds [wordIndex] - at most one
   /// ever will, since [RedactController.commitSelection] always claims a
@@ -85,7 +86,7 @@ class RedactState {
     List<PdfTextWord>? words,
     int? currentPageIndex,
     List<RedactSelection>? selections,
-    int? nextColorIndex,
+    Color? nextColor,
     double? barOpacity,
     String? resultPath,
     String? error,
@@ -100,7 +101,7 @@ class RedactState {
       words: words ?? this.words,
       currentPageIndex: currentPageIndex ?? this.currentPageIndex,
       selections: selections ?? this.selections,
-      nextColorIndex: nextColorIndex ?? this.nextColorIndex,
+      nextColor: nextColor ?? this.nextColor,
       barOpacity: barOpacity ?? this.barOpacity,
       resultPath: clearResult ? null : (resultPath ?? this.resultPath),
       error: clearError ? null : (error ?? this.error),
@@ -110,7 +111,7 @@ class RedactState {
 
 class RedactController extends Notifier<RedactState> {
   @override
-  RedactState build() => const RedactState();
+  RedactState build() => RedactState();
 
   Future<void> setSourceFile(PdfFile file) async {
     state = RedactState(sourceFile: file, isLoading: true);
@@ -137,10 +138,14 @@ class RedactController extends Notifier<RedactState> {
   }
 
   /// A plain tap passes a single-word set; a drag passes every word index
-  /// the gesture passed over. Becomes one new selection with the next
-  /// palette color. A gesture that *starts* on an already-marked word
-  /// removes that whole selection instead - see [removeSelection], called
-  /// by the screen itself before this ever gets reached in that case.
+  /// the gesture passed over. Becomes one new selection using whatever
+  /// color the spectrum bar is currently showing ([RedactState.nextColor]),
+  /// then auto-advances that to a new default (golden-angle hue step) so
+  /// the *following* selection defaults to a visibly different color too,
+  /// unless the user drags the spectrum bar to a specific one first. A
+  /// gesture that *starts* on an already-marked word removes that whole
+  /// selection instead - see [removeSelection], called by the screen
+  /// itself before this ever gets reached in that case.
   void commitSelection(Set<int> wordIndices) {
     if (wordIndices.isEmpty) return;
 
@@ -154,14 +159,16 @@ class RedactController extends Notifier<RedactState> {
             wordIndices: s.wordIndices.difference(wordIndices),
           ),
     ];
-    final Color color =
-        redactPalette[state.nextColorIndex % redactPalette.length];
+    final HSVColor hsv = HSVColor.fromColor(state.nextColor);
+    final Color advanced = hsv
+        .withHue((hsv.hue + _goldenAngle) % 360)
+        .toColor();
     state = state.copyWith(
       selections: [
         ...claimed,
-        RedactSelection(color: color, wordIndices: wordIndices),
+        RedactSelection(color: state.nextColor, wordIndices: wordIndices),
       ],
-      nextColorIndex: state.nextColorIndex + 1,
+      nextColor: advanced,
       clearResult: true,
     );
   }
@@ -177,6 +184,13 @@ class RedactController extends Notifier<RedactState> {
       ],
       clearResult: true,
     );
+  }
+
+  /// Manual override from dragging the spectrum bar - the color the *next*
+  /// selection will use (until this or the auto-advance in
+  /// [commitSelection] changes it again).
+  void setNextColor(Color color) {
+    state = state.copyWith(nextColor: color);
   }
 
   void setBarOpacity(double opacity) {
@@ -250,7 +264,7 @@ class RedactController extends Notifier<RedactState> {
   }
 
   void reset() {
-    state = const RedactState();
+    state = RedactState();
   }
 }
 

@@ -196,18 +196,24 @@ class RedactScreen extends ConsumerWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: _OpacitySlider(
-                                  opacity: state.barOpacity,
-                                  onChanged: controller.setBarOpacity,
-                                ),
+                              Row(
+                                children: [
+                                  _NextColorSwatch(color: state.nextColor),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: _ColorSpectrumBar(
+                                      value: state.nextColor,
+                                      onChanged: controller.setNextColor,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 12),
-                              _NextColorSwatch(
-                                color: redactPalette[state.nextColorIndex %
-                                    redactPalette.length],
+                              _OpacitySlider(
+                                opacity: state.barOpacity,
+                                onChanged: controller.setBarOpacity,
                               ),
                             ],
                           ),
@@ -279,8 +285,9 @@ class RedactScreen extends ConsumerWidget {
   }
 }
 
-/// Just the opacity control now - color is auto-assigned per selection
-/// (see [redactPalette]), no manual picker in this pass.
+/// Opacity control - shared by every selection's bar (see
+/// [PdfRedactArea]'s doc comment on why a non-1.0 value here is just a
+/// look, not a privacy, choice).
 class _OpacitySlider extends StatelessWidget {
   final double opacity;
   final ValueChanged<double> onChanged;
@@ -307,9 +314,9 @@ class _OpacitySlider extends StatelessWidget {
   }
 }
 
-/// A small swatch previewing which color the *next* selection will get
-/// (see [redactPalette]/[RedactState.nextColorIndex]) - otherwise there's
-/// no way to know in advance what shade a new tap/drag is about to become.
+/// A swatch previewing which color the *next* selection will get (see
+/// [RedactState.nextColor]) - otherwise there's no way to know in advance
+/// what shade a new tap/drag is about to become.
 class _NextColorSwatch extends StatelessWidget {
   final Color color;
 
@@ -318,13 +325,100 @@ class _NextColorSwatch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 24,
-      height: 24,
+      width: 32,
+      height: 32,
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
         border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
+    );
+  }
+}
+
+/// A horizontal hue-spectrum bar - drag (or tap) along it to set
+/// [RedactState.nextColor]'s hue directly, live-updating the swatch next
+/// to it so it's clear what color is under your finger while you drag,
+/// instead of only finding out after marking something.
+class _ColorSpectrumBar extends StatelessWidget {
+  final Color value;
+  final ValueChanged<Color> onChanged;
+
+  const _ColorSpectrumBar({required this.value, required this.onChanged});
+
+  static const List<Color> _hueStops = [
+    Color(0xFFFF0000),
+    Color(0xFFFFFF00),
+    Color(0xFF00FF00),
+    Color(0xFF00FFFF),
+    Color(0xFF0000FF),
+    Color(0xFFFF00FF),
+    Color(0xFFFF0000),
+  ];
+
+  void _updateFromLocalX(double localX, double barWidth) {
+    final double hue = (localX / barWidth).clamp(0.0, 1.0) * 360.0;
+    final HSVColor hsv = HSVColor.fromColor(value);
+    onChanged(hsv.withHue(hue == 360 ? 0 : hue).toColor());
+  }
+
+  static const double _trackHeight = 10;
+  static const double _thumbSize = 28;
+
+  @override
+  Widget build(BuildContext context) {
+    final double hue = HSVColor.fromColor(value).hue;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double barWidth = constraints.maxWidth;
+        final double thumbLeft = (hue / 360 * barWidth - _thumbSize / 2)
+            .clamp(0.0, barWidth - _thumbSize);
+        return GestureDetector(
+          onPanDown: (d) => _updateFromLocalX(d.localPosition.dx, barWidth),
+          onPanUpdate: (d) => _updateFromLocalX(d.localPosition.dx, barWidth),
+          child: SizedBox(
+            width: barWidth,
+            height: _thumbSize,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.centerLeft,
+              children: [
+                Container(
+                  height: _trackHeight,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(_trackHeight / 2),
+                    gradient: const LinearGradient(colors: _hueStops),
+                  ),
+                ),
+                // A white disc with a ring in the *currently selected*
+                // color (not just the hue at this thumb position - same
+                // thing while dragging, but this also reflects saturation/
+                // value if those ever become adjustable later) - the
+                // usual look for this kind of hue-slider handle.
+                Positioned(
+                  left: thumbLeft,
+                  child: Container(
+                    width: _thumbSize,
+                    height: _thumbSize,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      border: Border.all(color: value, width: 3),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -499,8 +593,7 @@ class _PageCanvasState extends State<_PageCanvas> {
     final double dispHeight =
         dispWidth * page.pointsHeight / page.pointsWidth;
     final words = _wordsOnPage(dispWidth, dispHeight);
-    final Color previewColor =
-        redactPalette[widget.state.nextColorIndex % redactPalette.length];
+    final Color previewColor = widget.state.nextColor;
 
     return Transform(
       transform: Matrix4.identity()
