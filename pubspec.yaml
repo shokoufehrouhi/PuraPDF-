@@ -57,6 +57,7 @@ dependencies:
   # xml ^7.x, and no released version has updated it. DOCX read/write for the
   # PDF<->Word feature is hand-rolled instead (see core/docx/).
   xml: ^7.0.1
+  sentry_flutter: ^9.28.0
 
 dev_dependencies:
   flutter_test:

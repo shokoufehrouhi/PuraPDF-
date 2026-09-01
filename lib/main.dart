@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'core/ads/ads_service.dart';
+import 'core/crash/sentry_config.dart';
 import 'core/locale/app_language.dart';
 import 'core/locale/locale_controller.dart';
 import 'core/share_intent/share_intent_router.dart';
@@ -23,7 +25,20 @@ Future<void> main() async {
   // in whichever of the 6 supported languages the user picks - without
   // this, DateFormat throws for any non-English locale on first use.
   await initializeDateFormatting();
-  runApp(const ProviderScope(child: PuraPdfApp()));
+  // SentryFlutter.init wires up FlutterError.onError and
+  // PlatformDispatcher.instance.onError itself (both framework-level and
+  // uncaught async Dart errors reach Sentry with zero extra plumbing), and
+  // attaches device model/OS/app version context to every event
+  // automatically. With sentryDsn left empty (see sentry_config.dart) this
+  // is a harmless no-op - runApp() still happens via appRunner either way.
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = sentryDsn;
+      options.tracesSampleRate = 1.0;
+      options.attachStacktrace = true;
+    },
+    appRunner: () => runApp(const ProviderScope(child: PuraPdfApp())),
+  );
   // Fire-and-forget: ad setup (GDPR/UK consent, the iOS tracking prompt,
   // then the Mobile Ads SDK itself) runs in the background instead of
   // gating the home screen's first frame on it. None of PuraPDF+'s actual
