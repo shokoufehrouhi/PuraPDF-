@@ -737,6 +737,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get addCheckmarkToPage => 'Häkchen hinzufügen';
 
   @override
+  String get addTextToPage => 'Text hinzufügen';
+
+  @override
+  String get tapPageToPlaceText =>
+      'Tippen Sie auf die Seite, wo der Text platziert werden soll.';
+
+  @override
   String get addImage => 'Bild hinzufügen';
 
   @override

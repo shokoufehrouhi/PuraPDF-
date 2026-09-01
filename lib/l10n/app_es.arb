@@ -301,6 +301,8 @@
   "delete": "Eliminar",
   "addImageToPage": "Añadir imagen a esta página",
   "addCheckmarkToPage": "Añadir marca de verificación",
+  "addTextToPage": "Añadir texto",
+  "tapPageToPlaceText": "Toca la página donde quieras colocar el texto.",
   "addImage": "Añadir imagen",
   "thisPdfHasNoPages": "Este PDF no tiene páginas.",
   "thisPdfHasNoFormFields": "Este PDF no tiene campos de formulario rellenables.",

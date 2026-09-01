@@ -725,6 +725,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addCheckmarkToPage => 'إضافة علامة صح';
 
   @override
+  String get addTextToPage => 'إضافة نص';
+
+  @override
+  String get tapPageToPlaceText =>
+      'اضغط على الصفحة في المكان الذي تريد وضع النص فيه.';
+
+  @override
   String get addImage => 'إضافة صورة';
 
   @override

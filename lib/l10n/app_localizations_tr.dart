@@ -728,6 +728,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get addCheckmarkToPage => 'Onay işareti ekle';
 
   @override
+  String get addTextToPage => 'Metin ekle';
+
+  @override
+  String get tapPageToPlaceText =>
+      'Metni yerleştirmek istediğiniz yere sayfada dokunun.';
+
+  @override
   String get addImage => 'Görsel ekle';
 
   @override

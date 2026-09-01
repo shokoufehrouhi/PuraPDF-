@@ -301,6 +301,8 @@
   "delete": "Sil",
   "addImageToPage": "Bu sayfaya görsel ekle",
   "addCheckmarkToPage": "Onay işareti ekle",
+  "addTextToPage": "Metin ekle",
+  "tapPageToPlaceText": "Metni yerleştirmek istediğiniz yere sayfada dokunun.",
   "addImage": "Görsel ekle",
   "thisPdfHasNoPages": "Bu PDF'nin sayfası yok.",
   "thisPdfHasNoFormFields": "Bu PDF'de doldurulabilir form alanı yok.",

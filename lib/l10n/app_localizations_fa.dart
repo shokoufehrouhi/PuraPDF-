@@ -721,6 +721,13 @@ class AppLocalizationsFa extends AppLocalizations {
   String get addCheckmarkToPage => 'افزودن علامت تیک';
 
   @override
+  String get addTextToPage => 'افزودن متن';
+
+  @override
+  String get tapPageToPlaceText =>
+      'روی صفحه، جایی که می‌خواهید متن قرار بگیرد ضربه بزنید.';
+
+  @override
   String get addImage => 'افزودن تصویر';
 
   @override

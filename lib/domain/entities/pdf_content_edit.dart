@@ -61,6 +61,36 @@ class PdfImageInsert extends PdfContentEdit {
   }) : super(pageIndex);
 }
 
+/// Draws brand-new [text] into the box at ([left], [top], [width], [height])
+/// on [pageIndex] — for adding fresh text where none existed before (an
+/// image-only/scanned page has no extractable lines for [PdfTextReplace] to
+/// target in the first place). Unlike [PdfTextReplace] this draws directly
+/// with no cover rectangle first — there's nothing underneath to redact.
+class PdfTextStamp extends PdfContentEdit {
+  final double left;
+  final double top;
+  final double width;
+  final double height;
+  final String text;
+  final double fontSize;
+  final int colorRed;
+  final int colorGreen;
+  final int colorBlue;
+
+  const PdfTextStamp({
+    required int pageIndex,
+    required this.left,
+    required this.top,
+    required this.width,
+    required this.height,
+    required this.text,
+    this.fontSize = 14,
+    this.colorRed = 0,
+    this.colorGreen = 0,
+    this.colorBlue = 0,
+  }) : super(pageIndex);
+}
+
 /// Draws a checkmark stroke (two line segments, not a bitmap) into the box
 /// at ([left], [top], [width], [height]) on [pageIndex] — for the "tick a
 /// blank checkbox" case specifically, drawn as native PDF vector content

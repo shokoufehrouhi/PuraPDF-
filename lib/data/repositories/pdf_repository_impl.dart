@@ -838,6 +838,23 @@ class PdfRepositoryImpl implements PdfRepository {
             Rect.fromLTWH(e.left, e.top, e.width, e.height),
             color: PdfColor(e.colorRed, e.colorGreen, e.colorBlue),
           );
+        case PdfTextStamp e:
+          // Same "don't hand drawString a too-tight box" guard as
+          // PdfTextReplace above — pad by estimated text width/line height
+          // rather than trusting the box the user dragged on screen.
+          final double drawWidth = math.max(
+            e.width,
+            e.fontSize * 0.65 * e.text.length,
+          );
+          final double drawHeight = math.max(e.height, e.fontSize * 1.5);
+          page.graphics.drawString(
+            e.text,
+            PdfStandardFont(PdfFontFamily.helvetica, e.fontSize),
+            brush: PdfSolidBrush(
+              PdfColor(e.colorRed, e.colorGreen, e.colorBlue),
+            ),
+            bounds: Rect.fromLTWH(e.left, e.top, drawWidth, drawHeight),
+          );
       }
     }
 

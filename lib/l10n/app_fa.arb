@@ -301,6 +301,8 @@
   "delete": "حذف",
   "addImageToPage": "افزودن تصویر به این صفحه",
   "addCheckmarkToPage": "افزودن علامت تیک",
+  "addTextToPage": "افزودن متن",
+  "tapPageToPlaceText": "روی صفحه، جایی که می‌خواهید متن قرار بگیرد ضربه بزنید.",
   "addImage": "افزودن تصویر",
   "thisPdfHasNoPages": "این PDF صفحه‌ای ندارد.",
   "thisPdfHasNoFormFields": "این PDF فیلد فرم قابل پرکردنی ندارد.",

@@ -724,6 +724,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addCheckmarkToPage => 'Add checkmark';
 
   @override
+  String get addTextToPage => 'Add text';
+
+  @override
+  String get tapPageToPlaceText =>
+      'Tap on the page where you want to place the text.';
+
+  @override
   String get addImage => 'Add image';
 
   @override

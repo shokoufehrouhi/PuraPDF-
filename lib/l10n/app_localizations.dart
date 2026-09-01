@@ -1324,6 +1324,18 @@ abstract class AppLocalizations {
   /// **'Add checkmark'**
   String get addCheckmarkToPage;
 
+  /// No description provided for @addTextToPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add text'**
+  String get addTextToPage;
+
+  /// No description provided for @tapPageToPlaceText.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap on the page where you want to place the text.'**
+  String get tapPageToPlaceText;
+
   /// No description provided for @addImage.
   ///
   /// In en, this message translates to:

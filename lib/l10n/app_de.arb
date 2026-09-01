@@ -301,6 +301,8 @@
   "delete": "Löschen",
   "addImageToPage": "Bild zu dieser Seite hinzufügen",
   "addCheckmarkToPage": "Häkchen hinzufügen",
+  "addTextToPage": "Text hinzufügen",
+  "tapPageToPlaceText": "Tippen Sie auf die Seite, wo der Text platziert werden soll.",
   "addImage": "Bild hinzufügen",
   "thisPdfHasNoPages": "Dieses PDF hat keine Seiten.",
   "thisPdfHasNoFormFields": "Dieses PDF hat keine ausfüllbaren Formularfelder.",
