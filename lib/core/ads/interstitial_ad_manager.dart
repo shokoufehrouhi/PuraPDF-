@@ -8,7 +8,10 @@ import 'ads_support.dart';
 /// Loads interstitial ads and shows one before an operation — always on
 /// the very first operation of the app session, then every [operationsPerAd]
 /// operations after that (so it isn't shown on literally every single tap,
-/// which the user found too aggressive after trying it).
+/// which the user found too aggressive after trying it). That every-Nth
+/// slot uses a rewarded-interstitial creative instead of a plain one (see
+/// [AdIds.rewardedInterstitial]) — same trigger point, longer/higher-value
+/// ad for the more-engaged user.
 class InterstitialAdManager {
   InterstitialAdManager({this.operationsPerAd = 3});
 
@@ -18,7 +21,17 @@ class InterstitialAdManager {
   InterstitialAd? _ad;
   bool _isLoading = false;
 
+  RewardedInterstitialAd? _rewardedAd;
+  bool _isLoadingRewarded = false;
+
+  /// Preloads both the plain interstitial and the every-Nth rewarded
+  /// interstitial, so whichever slot comes up next has an ad ready.
   void preload() {
+    _preloadPlain();
+    _preloadRewarded();
+  }
+
+  void _preloadPlain() {
     if (!adsSupported || _ad != null || _isLoading) return;
     _isLoading = true;
     InterstitialAd.load(
@@ -31,6 +44,24 @@ class InterstitialAdManager {
         },
         onAdFailedToLoad: (error) {
           _isLoading = false;
+        },
+      ),
+    );
+  }
+
+  void _preloadRewarded() {
+    if (!adsSupported || _rewardedAd != null || _isLoadingRewarded) return;
+    _isLoadingRewarded = true;
+    RewardedInterstitialAd.load(
+      adUnitId: AdIds.rewardedInterstitial,
+      request: const AdRequest(),
+      rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _rewardedAd = ad;
+          _isLoadingRewarded = false;
+        },
+        onAdFailedToLoad: (error) {
+          _isLoadingRewarded = false;
         },
       ),
     );
@@ -60,9 +91,14 @@ class InterstitialAdManager {
 
   Future<void> _showBeforeOperation() async {
     _operationCount++;
-    final bool shouldShow =
-        _operationCount == 1 || _operationCount % operationsPerAd == 0;
+    final bool isRewardedSlot = _operationCount % operationsPerAd == 0;
+    final bool shouldShow = _operationCount == 1 || isRewardedSlot;
     if (!shouldShow) return;
+
+    if (isRewardedSlot) {
+      await _showRewarded();
+      return;
+    }
 
     final InterstitialAd? ad = _ad;
     if (ad == null) {
@@ -85,6 +121,34 @@ class InterstitialAdManager {
       },
     );
     await ad.show();
+    await done.future;
+  }
+
+  Future<void> _showRewarded() async {
+    final RewardedInterstitialAd? ad = _rewardedAd;
+    if (ad == null) {
+      _preloadRewarded();
+      return;
+    }
+
+    _rewardedAd = null;
+    final Completer<void> done = Completer<void>();
+    ad.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (ad) {
+        ad.dispose();
+        _preloadRewarded();
+        if (!done.isCompleted) done.complete();
+      },
+      onAdFailedToShowFullScreenContent: (ad, error) {
+        ad.dispose();
+        _preloadRewarded();
+        if (!done.isCompleted) done.complete();
+      },
+    );
+    // No in-app reward is granted here — this slot just uses the
+    // rewarded-interstitial ad *format* for its longer/higher-value
+    // creative; onUserEarnedReward is intentionally a no-op.
+    await ad.show(onUserEarnedReward: (ad, reward) {});
     await done.future;
   }
 }
