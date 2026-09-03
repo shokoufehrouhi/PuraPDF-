@@ -58,10 +58,22 @@ class AdsService {
     //   AdMob Reports: account-wide requests were still flowing normally
     //   on other devices). Registering it as a test device here stops it
     //   from generating more invalid-traffic signal and gets ads showing
-    //   on it again (as clearly-labeled test ads).
+    //   on it again (as clearly-labeled test ads). Two IDs for this same
+    //   physical device because AdMob's test-device hash is derived from
+    //   ANDROID_ID, which Android scopes per app-signing-key since
+    //   Android 8 — the Play Store build (Play App Signing) and a
+    //   locally-built APK (local key) get different IDs on the same
+    //   device:
+    //     - 76727243A1D72EDF7249E3538D7AAD7F: the Play Store / testing
+    //       track build (Play App Signing)
+    //     - 0BCCE4A9D30AA56B0CD426D54B0E138A: a locally-built
+    //       `flutter run --release` install (local signing key)
     await MobileAds.instance.updateRequestConfiguration(
       RequestConfiguration(
-        testDeviceIds: const ['76727243A1D72EDF7249E3538D7AAD7F'],
+        testDeviceIds: const [
+          '76727243A1D72EDF7249E3538D7AAD7F',
+          '0BCCE4A9D30AA56B0CD426D54B0E138A',
+        ],
       ),
     );
     interstitial.preload();
