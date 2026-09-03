@@ -51,8 +51,18 @@ class AdsService {
     // below: run the app once, check the Xcode/logcat console for a line
     // like "... to get test ads on this device" quoting the ID, then add
     // it here.
+    //
+    // - Redmi Note 8 Pro (2026-09-03): got flagged for invalid traffic from
+    //   real-ad taps during testing before this list existed — AdMob had
+    //   throttled real ad serving to just this device (confirmed via
+    //   AdMob Reports: account-wide requests were still flowing normally
+    //   on other devices). Registering it as a test device here stops it
+    //   from generating more invalid-traffic signal and gets ads showing
+    //   on it again (as clearly-labeled test ads).
     await MobileAds.instance.updateRequestConfiguration(
-      RequestConfiguration(testDeviceIds: const []),
+      RequestConfiguration(
+        testDeviceIds: const ['76727243A1D72EDF7249E3538D7AAD7F'],
+      ),
     );
     interstitial.preload();
     appOpen.preload();
