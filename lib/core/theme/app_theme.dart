@@ -15,10 +15,27 @@ class AppTheme {
   static ThemeData get dark => _themeFor(Brightness.dark);
 
   static ThemeData _themeFor(Brightness brightness) {
-    final ColorScheme scheme = ColorScheme.fromSeed(
+    ColorScheme scheme = ColorScheme.fromSeed(
       seedColor: seedColor,
       brightness: brightness,
     );
+
+    // Material 3's generated dark surface tones sit close to pure black
+    // (~#141218) - noticeably darker than iOS/most apps' "dark mode" and
+    // read as harsh. A first pass lightened the ladder slightly but it
+    // still read as too dark, so this pushes the whole ladder up further
+    // (base scaffold now a mid charcoal instead of near-black) while
+    // keeping the same relative elevation spacing between tones.
+    if (brightness == Brightness.dark) {
+      scheme = scheme.copyWith(
+        surface: const Color(0xFF2C2C30),
+        surfaceContainerLowest: const Color(0xFF1E1E21),
+        surfaceContainerLow: const Color(0xFF26262A),
+        surfaceContainer: const Color(0xFF333338),
+        surfaceContainerHigh: const Color(0xFF3B3B41),
+        surfaceContainerHighest: const Color(0xFF45454B),
+      );
+    }
 
     return ThemeData(
       useMaterial3: true,

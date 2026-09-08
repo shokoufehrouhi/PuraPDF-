@@ -8,58 +8,64 @@ import 'package:flutter/material.dart';
 /// Each feature has a light/lighter pastel pair (soft card gradients) plus
 /// a separate saturated [Icon] color so icons read clearly against a white
 /// badge instead of blending into the pale card behind them.
+///
+/// Every hue below was sampled directly from the 2026-09-08 reference icon
+/// sheet (user-supplied mockup) and the pastel pair derived from that same
+/// sample - so a card's row background is always the same hue family as
+/// its own icon, matching the reference instead of an independently
+/// chosen palette.
 class FeatureColors {
   FeatureColors._();
 
-  static const Color merge = Color(0xFFC7E3FC);
-  static const Color mergeDark = Color(0xFFACD3FA);
-  static const Color mergeIcon = Color(0xFF3B82F6);
+  static const Color merge = Color(0xFFDFDBF5);
+  static const Color mergeDark = Color(0xFFCDC7F0);
+  static const Color mergeIcon = Color(0xFF4C36C9);
 
-  static const Color split = Color(0xFFE4D7F5);
-  static const Color splitDark = Color(0xFFD3BEEC);
-  static const Color splitIcon = Color(0xFF8B5CF6);
+  static const Color split = Color(0xFFF5D9E5);
+  static const Color splitDark = Color(0xFFF0C4D7);
+  static const Color splitIcon = Color(0xFFC92E70);
 
-  static const Color compress = Color(0xFFFFE3C4);
-  static const Color compressDark = Color(0xFFFFD1A0);
-  static const Color compressIcon = Color(0xFFF97316);
+  static const Color compress = Color(0xFFFEE2DB);
+  static const Color compressDark = Color(0xFFFDD2C6);
+  static const Color compressIcon = Color(0xFFF86035);
 
-  static const Color imagePdf = Color(0xFFCDEDD0);
-  static const Color imagePdfDark = Color(0xFFB8E4BC);
-  static const Color imagePdfIcon = Color(0xFF22C55E);
+  static const Color imagePdf = Color(0xFFD9F0DF);
+  static const Color imagePdfDark = Color(0xFFC4E8CD);
+  static const Color imagePdfIcon = Color(0xFF2DAE4B);
 
-  static const Color scanner = Color(0xFFC9F1E9);
-  static const Color scannerDark = Color(0xFFABE8DD);
-  static const Color scannerIcon = Color(0xFF14B8A6);
+  static const Color scanner = Color(0xFFD3ECEC);
+  static const Color scannerDark = Color(0xFFBAE2E1);
+  static const Color scannerIcon = Color(0xFF0A9694);
 
-  static const Color pageEdit = Color(0xFFFBD3E4);
-  static const Color pageEditDark = Color(0xFFF6BBD5);
-  static const Color pageEditIcon = Color(0xFFEC4899);
+  static const Color pageEdit = Color(0xFFFEE8F2);
+  static const Color pageEditDark = Color(0xFFFDDCEA);
+  static const Color pageEditIcon = Color(0xFFF982B5);
 
-  static const Color contentEdit = Color(0xFFD6D9FB);
-  static const Color contentEditDark = Color(0xFFC1C6F7);
-  static const Color contentEditIcon = Color(0xFF6366F1);
+  static const Color contentEdit = Color(0xFFE7E2FC);
+  static const Color contentEditDark = Color(0xFFD9D2FB);
+  static const Color contentEditIcon = Color(0xFF775FEF);
 
-  static const Color encrypt = Color(0xFFFFD2D2);
-  static const Color encryptDark = Color(0xFFFFB8B8);
-  static const Color encryptIcon = Color(0xFFEF4444);
+  static const Color encrypt = Color(0xFFF7DBDC);
+  static const Color encryptDark = Color(0xFFF2C7C8);
+  static const Color encryptIcon = Color(0xFFD1363A);
 
-  static const Color watermark = Color(0xFFCFF3F9);
-  static const Color watermarkDark = Color(0xFFAEE9F3);
-  static const Color watermarkIcon = Color(0xFF06B6D4);
+  static const Color watermark = Color(0xFFD5E9F0);
+  static const Color watermarkDark = Color(0xFFBDDDE8);
+  static const Color watermarkIcon = Color(0xFF1486AD);
 
-  static const Color signature = Color(0xFFE2E6EC);
-  static const Color signatureDark = Color(0xFFCDD3DC);
-  static const Color signatureIcon = Color(0xFF64748B);
+  static const Color signature = Color(0xFFD9DFF1);
+  static const Color signatureDark = Color(0xFFC4CDE9);
+  static const Color signatureIcon = Color(0xFF2E4CB1);
 
-  static const Color pdfWord = Color(0xFFD6E4FB);
-  static const Color pdfWordDark = Color(0xFFBFD4F8);
-  static const Color pdfWordIcon = Color(0xFF2B579A); // MS Word's own blue
+  static const Color pdfWord = Color(0xFFD9E6FE);
+  static const Color pdfWordDark = Color(0xFFC4D8FE);
+  static const Color pdfWordIcon = Color(0xFF2E75FC);
 
-  static const Color redact = Color(0xFFDEE1E6);
-  static const Color redactDark = Color(0xFFC9CDD5);
-  static const Color redactIcon = Color(0xFF334155); // slate, not pure black
+  static const Color redact = Color(0xFFF6D9E2);
+  static const Color redactDark = Color(0xFFF2C4D2);
+  static const Color redactIcon = Color(0xFFCF2E60);
 
-  static const Color fillSign = Color(0xFFD1F0E4);
-  static const Color fillSignDark = Color(0xFFB4E6D2);
-  static const Color fillSignIcon = Color(0xFF0D9488); // teal - "approved"
+  static const Color fillSign = Color(0xFFD5F0E0);
+  static const Color fillSignDark = Color(0xFFBEE8CF);
+  static const Color fillSignIcon = Color(0xFF18AC52);
 }

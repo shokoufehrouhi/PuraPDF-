@@ -226,7 +226,7 @@ class _ToolsTabState extends State<_ToolsTab> {
         final List<Widget> organizeCards = [
           if (scannerSupported)
             _FeatureRowCard(
-              icon: Icons.document_scanner_outlined,
+              assetIcon: 'assets/tool_icons/scan.png',
               color: FeatureColors.scanner,
               colorDark: FeatureColors.scannerDark,
               iconColor: FeatureColors.scannerIcon,
@@ -237,7 +237,7 @@ class _ToolsTabState extends State<_ToolsTab> {
               ),
             ),
           _FeatureRowCard(
-            icon: Icons.image_outlined,
+            assetIcon: 'assets/tool_icons/image_pdf.png',
             color: FeatureColors.imagePdf,
             colorDark: FeatureColors.imagePdfDark,
             iconColor: FeatureColors.imagePdfIcon,
@@ -248,7 +248,7 @@ class _ToolsTabState extends State<_ToolsTab> {
             ),
           ),
           _FeatureRowCard(
-            icon: Icons.description_outlined,
+            assetIcon: 'assets/tool_icons/pdf_word.png',
             color: FeatureColors.pdfWord,
             colorDark: FeatureColors.pdfWordDark,
             iconColor: FeatureColors.pdfWordIcon,
@@ -259,7 +259,7 @@ class _ToolsTabState extends State<_ToolsTab> {
             ),
           ),
           _FeatureRowCard(
-            icon: Icons.call_merge,
+            assetIcon: 'assets/tool_icons/merge.png',
             color: FeatureColors.merge,
             colorDark: FeatureColors.mergeDark,
             iconColor: FeatureColors.mergeIcon,
@@ -270,7 +270,7 @@ class _ToolsTabState extends State<_ToolsTab> {
             ),
           ),
           _FeatureRowCard(
-            icon: Icons.call_split,
+            assetIcon: 'assets/tool_icons/split.png',
             color: FeatureColors.split,
             colorDark: FeatureColors.splitDark,
             iconColor: FeatureColors.splitIcon,
@@ -281,7 +281,7 @@ class _ToolsTabState extends State<_ToolsTab> {
             ),
           ),
           _FeatureRowCard(
-            icon: Icons.compress,
+            assetIcon: 'assets/tool_icons/compress.png',
             color: FeatureColors.compress,
             colorDark: FeatureColors.compressDark,
             iconColor: FeatureColors.compressIcon,
@@ -295,7 +295,7 @@ class _ToolsTabState extends State<_ToolsTab> {
 
         final List<Widget> editCards = [
           _FeatureRowCard(
-            icon: Icons.text_fields,
+            assetIcon: 'assets/tool_icons/edit_pdf.png',
             color: FeatureColors.contentEdit,
             colorDark: FeatureColors.contentEditDark,
             iconColor: FeatureColors.contentEditIcon,
@@ -306,7 +306,7 @@ class _ToolsTabState extends State<_ToolsTab> {
             ),
           ),
           _FeatureRowCard(
-            icon: Icons.visibility_off_outlined,
+            assetIcon: 'assets/tool_icons/redact.png',
             color: FeatureColors.redact,
             colorDark: FeatureColors.redactDark,
             iconColor: FeatureColors.redactIcon,
@@ -317,7 +317,7 @@ class _ToolsTabState extends State<_ToolsTab> {
             ),
           ),
           _FeatureRowCard(
-            icon: Icons.crop_rotate,
+            assetIcon: 'assets/tool_icons/edit_pages.png',
             color: FeatureColors.pageEdit,
             colorDark: FeatureColors.pageEditDark,
             iconColor: FeatureColors.pageEditIcon,
@@ -328,7 +328,7 @@ class _ToolsTabState extends State<_ToolsTab> {
             ),
           ),
           _FeatureRowCard(
-            icon: Icons.lock_outline,
+            assetIcon: 'assets/tool_icons/password.png',
             color: FeatureColors.encrypt,
             colorDark: FeatureColors.encryptDark,
             iconColor: FeatureColors.encryptIcon,
@@ -339,7 +339,7 @@ class _ToolsTabState extends State<_ToolsTab> {
             ),
           ),
           _FeatureRowCard(
-            icon: Icons.branding_watermark_outlined,
+            assetIcon: 'assets/tool_icons/watermark.png',
             color: FeatureColors.watermark,
             colorDark: FeatureColors.watermarkDark,
             iconColor: FeatureColors.watermarkIcon,
@@ -350,7 +350,7 @@ class _ToolsTabState extends State<_ToolsTab> {
             ),
           ),
           _FeatureRowCard(
-            icon: Icons.draw_outlined,
+            assetIcon: 'assets/tool_icons/signature.png',
             color: FeatureColors.signature,
             colorDark: FeatureColors.signatureDark,
             iconColor: FeatureColors.signatureIcon,
@@ -361,7 +361,7 @@ class _ToolsTabState extends State<_ToolsTab> {
             ),
           ),
           _FeatureRowCard(
-            icon: Icons.edit_document,
+            assetIcon: 'assets/tool_icons/fill_sign.png',
             color: FeatureColors.fillSign,
             colorDark: FeatureColors.fillSignDark,
             iconColor: FeatureColors.fillSignIcon,
@@ -486,7 +486,7 @@ class _CategoryTabSegment extends StatelessWidget {
 }
 
 class _FeatureRowCard extends StatelessWidget {
-  final IconData icon;
+  final String assetIcon;
   final Color color;
   final Color colorDark;
   final Color iconColor;
@@ -495,7 +495,7 @@ class _FeatureRowCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _FeatureRowCard({
-    required this.icon,
+    required this.assetIcon,
     required this.color,
     required this.colorDark,
     required this.iconColor,
@@ -517,7 +517,7 @@ class _FeatureRowCard extends StatelessWidget {
     // dark corner that reads as a shadow. No box shadow at all in dark
     // mode (a glow or a plain black one both looked wrong against a dark
     // scaffold); light mode keeps its colored shadow for lift.
-    const Color darkMuted = Color(0xFF2A2A30);
+    const Color darkMuted = Color(0xFF3B3B41);
     final Color cardTop = isDark
         ? Color.lerp(iconColor, darkMuted, 0.50)!
         : color;
@@ -525,10 +525,6 @@ class _FeatureRowCard extends StatelessWidget {
         ? Color.lerp(iconColor, darkMuted, 0.62)!
         : colorDark;
     final Color textColor = isDark ? Colors.white : const Color(0xFF1F2937);
-    final Color badgeColor = isDark
-        ? iconColor
-        : Colors.white.withValues(alpha: 0.85);
-    final Color badgeIconColor = isDark ? Colors.white : iconColor;
     final List<BoxShadow> shadow = isDark
         ? const []
         : [
@@ -573,15 +569,7 @@ class _FeatureRowCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Row(
                     children: [
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: badgeColor,
-                          borderRadius: BorderRadius.circular(11),
-                        ),
-                        child: Icon(icon, color: badgeIconColor, size: 20),
-                      ),
+                      _ToolIconImage(assetPath: assetIcon),
                       const SizedBox(width: 11),
                       Expanded(
                         child: Column(
@@ -626,6 +614,28 @@ class _FeatureRowCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// The reference sheet's own pre-rendered 3D icon (own shading/gradient
+/// baked in), so unlike the old [_StickerBadge] this needs no tint or
+/// colored backdrop of its own — plain [Image.asset] at a fixed box. (A
+/// synthetic drop shadow was tried here but a rectangular [BoxShadow]
+/// behind a transparent PNG paints a visible box edge outside the icon's
+/// actual silhouette instead of hugging it, so this is left flat, same
+/// as the reference sheet itself.)
+class _ToolIconImage extends StatelessWidget {
+  final String assetPath;
+
+  const _ToolIconImage({required this.assetPath});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 52,
+      height: 52,
+      child: Image.asset(assetPath, fit: BoxFit.contain),
     );
   }
 }
