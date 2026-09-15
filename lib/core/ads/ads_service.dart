@@ -69,12 +69,7 @@ class AdsService {
     //     - 0BCCE4A9D30AA56B0CD426D54B0E138A: a locally-built
     //       `flutter run --release` install (local signing key)
     await MobileAds.instance.updateRequestConfiguration(
-      RequestConfiguration(
-        testDeviceIds: const [
-          '76727243A1D72EDF7249E3538D7AAD7F',
-          '0BCCE4A9D30AA56B0CD426D54B0E138A',
-        ],
-      ),
+      RequestConfiguration(testDeviceIds: const []),
     );
     interstitial.preload();
     appOpen.preload();

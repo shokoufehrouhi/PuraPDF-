@@ -63,8 +63,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: [
           _RecentsIconButton(
             active: _tabIndex == 1,
-            onPressed: () =>
-                setState(() => _tabIndex = _tabIndex == 1 ? 0 : 1),
+            onPressed: () => setState(() => _tabIndex = _tabIndex == 1 ? 0 : 1),
           ),
           const SizedBox(width: 4),
           IconButton(
@@ -232,9 +231,9 @@ class _ToolsTabState extends State<_ToolsTab> {
               iconColor: FeatureColors.scannerIcon,
               title: l10n.featureScanTitle,
               subtitle: l10n.featureScanSubtitle,
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const ScannerScreen()),
-              ),
+              onTap: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const ScannerScreen())),
             ),
           _FeatureRowCard(
             assetIcon: 'assets/tool_icons/image_pdf.png',
@@ -243,9 +242,9 @@ class _ToolsTabState extends State<_ToolsTab> {
             iconColor: FeatureColors.imagePdfIcon,
             title: l10n.featureImagePdfTitle,
             subtitle: l10n.featureImagePdfSubtitle,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ImagePdfScreen()),
-            ),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const ImagePdfScreen())),
           ),
           _FeatureRowCard(
             assetIcon: 'assets/tool_icons/pdf_word.png',
@@ -254,9 +253,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             iconColor: FeatureColors.pdfWordIcon,
             title: l10n.featurePdfWordTitle,
             subtitle: l10n.featurePdfWordSubtitle,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const PdfWordScreen()),
-            ),
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const PdfWordScreen())),
           ),
           _FeatureRowCard(
             assetIcon: 'assets/tool_icons/merge.png',
@@ -265,9 +263,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             iconColor: FeatureColors.mergeIcon,
             title: l10n.featureMergeTitle,
             subtitle: l10n.featureMergeSubtitle,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const MergeScreen()),
-            ),
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const MergeScreen())),
           ),
           _FeatureRowCard(
             assetIcon: 'assets/tool_icons/split.png',
@@ -276,9 +273,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             iconColor: FeatureColors.splitIcon,
             title: l10n.featureSplitTitle,
             subtitle: l10n.featureSplitSubtitle,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const SplitScreen()),
-            ),
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const SplitScreen())),
           ),
           _FeatureRowCard(
             assetIcon: 'assets/tool_icons/compress.png',
@@ -287,9 +283,9 @@ class _ToolsTabState extends State<_ToolsTab> {
             iconColor: FeatureColors.compressIcon,
             title: l10n.featureCompressTitle,
             subtitle: l10n.featureCompressSubtitle,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const CompressScreen()),
-            ),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const CompressScreen())),
           ),
         ];
 
@@ -312,9 +308,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             iconColor: FeatureColors.redactIcon,
             title: l10n.featureRedactTitle,
             subtitle: l10n.featureRedactSubtitle,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const RedactScreen()),
-            ),
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const RedactScreen())),
           ),
           _FeatureRowCard(
             assetIcon: 'assets/tool_icons/edit_pages.png',
@@ -323,9 +318,9 @@ class _ToolsTabState extends State<_ToolsTab> {
             iconColor: FeatureColors.pageEditIcon,
             title: l10n.featurePageEditTitle,
             subtitle: l10n.featurePageEditSubtitle,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const PageEditScreen()),
-            ),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const PageEditScreen())),
           ),
           _FeatureRowCard(
             assetIcon: 'assets/tool_icons/password.png',
@@ -334,9 +329,8 @@ class _ToolsTabState extends State<_ToolsTab> {
             iconColor: FeatureColors.encryptIcon,
             title: l10n.featureEncryptTitle,
             subtitle: l10n.featureEncryptSubtitle,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const EncryptScreen()),
-            ),
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const EncryptScreen())),
           ),
           _FeatureRowCard(
             assetIcon: 'assets/tool_icons/watermark.png',
@@ -345,9 +339,9 @@ class _ToolsTabState extends State<_ToolsTab> {
             iconColor: FeatureColors.watermarkIcon,
             title: l10n.featureWatermarkTitle,
             subtitle: l10n.featureWatermarkSubtitle,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const WatermarkScreen()),
-            ),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const WatermarkScreen())),
           ),
           _FeatureRowCard(
             assetIcon: 'assets/tool_icons/signature.png',
@@ -356,9 +350,9 @@ class _ToolsTabState extends State<_ToolsTab> {
             iconColor: FeatureColors.signatureIcon,
             title: l10n.featureSignatureTitle,
             subtitle: l10n.featureSignatureSubtitle,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const SignatureScreen()),
-            ),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const SignatureScreen())),
           ),
           _FeatureRowCard(
             assetIcon: 'assets/tool_icons/fill_sign.png',
@@ -367,9 +361,9 @@ class _ToolsTabState extends State<_ToolsTab> {
             iconColor: FeatureColors.fillSignIcon,
             title: l10n.featureFillSignTitle,
             subtitle: l10n.featureFillSignSubtitle,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const FillSignScreen()),
-            ),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const FillSignScreen())),
           ),
         ];
 
@@ -553,63 +547,49 @@ class _FeatureRowCard extends StatelessWidget {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // The reference mockup's glossy sheen — soft diagonal
-                // light streaks over the flat gradient.
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: _DiagonalSheenPainter(
-                      opacity: isDark ? 0.045 : 0.16,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                children: [
+                  _ToolIconImage(assetPath: assetIcon),
+                  const SizedBox(width: 11),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            color: textColor,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14.5,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 1),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            color: textColor.withValues(
+                              alpha: isDark ? 0.82 : 0.72,
+                            ),
+                            fontSize: 11.5,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    children: [
-                      _ToolIconImage(assetPath: assetIcon),
-                      const SizedBox(width: 11),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              title,
-                              style: TextStyle(
-                                color: textColor,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14.5,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 1),
-                            Text(
-                              subtitle,
-                              style: TextStyle(
-                                color: textColor.withValues(
-                                  alpha: isDark ? 0.82 : 0.72,
-                                ),
-                                fontSize: 11.5,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(
-                        Icons.chevron_right,
-                        size: 20,
-                        color: textColor.withValues(alpha: isDark ? 0.7 : 0.55),
-                      ),
-                    ],
+                  Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: textColor.withValues(alpha: isDark ? 0.7 : 0.55),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -638,40 +618,6 @@ class _ToolIconImage extends StatelessWidget {
       child: Image.asset(assetPath, fit: BoxFit.contain),
     );
   }
-}
-
-/// Paints soft, evenly-spaced diagonal white streaks — the glossy sheen
-/// look from the reference mockup, layered under the card's content.
-///
-/// [opacity] is theme-specific: the same white stripe reads very
-/// differently against a light pastel card vs. a dark muted one, so this
-/// isn't one fixed value — see the two call sites in _FeatureRowCard.
-class _DiagonalSheenPainter extends CustomPainter {
-  final double opacity;
-
-  const _DiagonalSheenPainter({required this.opacity});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = Colors.white.withValues(alpha: opacity)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 14;
-
-    const double spacing = 34;
-    final double span = size.width + size.height;
-    for (double x = -size.height; x < span; x += spacing) {
-      canvas.drawLine(
-        Offset(x, 0),
-        Offset(x + size.height, size.height),
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DiagonalSheenPainter oldDelegate) =>
-      oldDelegate.opacity != opacity;
 }
 
 /// What kind of tool produced a generated file — derived from the output
@@ -827,9 +773,7 @@ _OperationInfo _operationFor(String fileName, AppLocalizations l10n) {
 }
 
 String _formatDateTime(DateTime dt, Locale locale) {
-  final DateFormat format = DateFormat.MMMd(
-    locale.toLanguageTag(),
-  ).add_jm();
+  final DateFormat format = DateFormat.MMMd(locale.toLanguageTag()).add_jm();
   return format.format(dt.toLocal());
 }
 
