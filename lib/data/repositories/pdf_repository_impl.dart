@@ -60,29 +60,45 @@ import '../../domain/repositories/pdf_repository.dart';
 /// a single-call "merge"/"split" API, since that keeps output page sizes
 /// faithful to each source page.
 class PdfRepositoryImpl implements PdfRepository {
-  // Runs off the main isolate: the underlying Syncfusion save() does its
-  // zlib deflate synchronously, which on a large/image-heavy PDF blocks the
-  // UI thread long enough to trip Android's ANR watchdog (observed in
-  // production - Sentry issue PURAPDF-8). RootIsolateToken lets the spawned
-  // isolate still use platform-channel plugins (path_provider, in
-  // _writeOutput) via BackgroundIsolateBinaryMessenger.
+  /// Runs [computation] on a fresh isolate instead of the UI isolate - the
+  /// Syncfusion PDF engine's save()/rendering work is synchronous, CPU-heavy
+  /// work that on a large/image-heavy PDF blocks the UI thread long enough
+  /// to trip Android's ANR watchdog (observed in production - Sentry issue
+  /// PURAPDF-8, first fixed for compressPdf then extended to every other
+  /// PDF-processing method below). BackgroundIsolateBinaryMessenger lets the
+  /// spawned isolate still use platform-channel plugins (path_provider in
+  /// _writeOutput, ML Kit in OcrService, ...).
+  ///
+  /// Under `flutter test` this runs [computation] inline instead: the
+  /// headless test engine mocks plugins (e.g. path_provider in
+  /// compress_pdf_test.dart) by swapping their platform-interface singleton
+  /// in-process, which a real spawned isolate never sees (each isolate has
+  /// its own copy of static state) - and spawning one there crashes outright
+  /// ("Callbacks into the Dart VM are currently prohibited", from
+  /// Syncfusion's native calls mid-spawn inside the Tester harness).
+  /// FLUTTER_TEST is the same env var Flutter's own framework checks
+  /// (WidgetsBinding) to detect the test runner.
+  Future<T> _runInIsolate<T>(Future<T> Function() computation) {
+    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+      return computation();
+    }
+    final RootIsolateToken token = RootIsolateToken.instance!;
+    return Isolate.run(() {
+      BackgroundIsolateBinaryMessenger.ensureInitialized(token);
+      return computation();
+    });
+  }
+
   @override
   Future<CompressResult> compressPdf(
     String inputPath,
     CompressionLevel level,
-  ) {
-    final RootIsolateToken token = RootIsolateToken.instance!;
-    return Isolate.run(
-      () => _compressPdfImpl(token, inputPath, level),
-    );
-  }
+  ) => _runInIsolate(() => _compressPdfImpl(inputPath, level));
 
   Future<CompressResult> _compressPdfImpl(
-    RootIsolateToken token,
     String inputPath,
     CompressionLevel level,
   ) async {
-    BackgroundIsolateBinaryMessenger.ensureInitialized(token);
     final int originalSize = await File(inputPath).length();
 
     // Low/Medium: lossless stream (font/text/vector) compression - keeps
@@ -226,7 +242,10 @@ class PdfRepositoryImpl implements PdfRepository {
   }
 
   @override
-  Future<String> mergePdfs(List<String> inputPaths) async {
+  Future<String> mergePdfs(List<String> inputPaths) =>
+      _runInIsolate(() => _mergePdfsImpl(inputPaths));
+
+  Future<String> _mergePdfsImpl(List<String> inputPaths) async {
     final PdfDocument output = PdfDocument();
     output.pageSettings.margins.all = 0;
 
@@ -255,6 +274,11 @@ class PdfRepositoryImpl implements PdfRepository {
 
   @override
   Future<List<String>> splitPdf(
+    String inputPath,
+    List<PageRange> ranges,
+  ) => _runInIsolate(() => _splitPdfImpl(inputPath, ranges));
+
+  Future<List<String>> _splitPdfImpl(
     String inputPath,
     List<PageRange> ranges,
   ) async {
@@ -293,7 +317,10 @@ class PdfRepositoryImpl implements PdfRepository {
   }
 
   @override
-  Future<String> zipFiles(List<String> filePaths, String zipName) async {
+  Future<String> zipFiles(List<String> filePaths, String zipName) =>
+      _runInIsolate(() => _zipFilesImpl(filePaths, zipName));
+
+  Future<String> _zipFilesImpl(List<String> filePaths, String zipName) async {
     final Directory dir = await getApplicationDocumentsDirectory();
     final String zipPath = '${dir.path}/$zipName';
     final encoder = ZipFileEncoder();
@@ -308,11 +335,11 @@ class PdfRepositoryImpl implements PdfRepository {
 
   @override
   Future<String> imagesToPdf(List<String> imagePaths) =>
-      _imagesToPdf(imagePaths, 'purapdf_images_');
+      _runInIsolate(() => _imagesToPdf(imagePaths, 'purapdf_images_'));
 
   @override
   Future<String> scannedImagesToPdf(List<String> imagePaths, {bool ocr = false}) =>
-      _imagesToPdf(imagePaths, 'purapdf_scan_', ocr: ocr);
+      _runInIsolate(() => _imagesToPdf(imagePaths, 'purapdf_scan_', ocr: ocr));
 
   /// Shared by [imagesToPdf] and [scannedImagesToPdf] — same "one image per
   /// page" assembly either way, just written under a different filename
@@ -423,6 +450,11 @@ class PdfRepositoryImpl implements PdfRepository {
 
   @override
   Future<List<String>> pdfToImages(
+    String inputPath, {
+    required ImageOutputFormat format,
+  }) => _runInIsolate(() => _pdfToImagesImpl(inputPath, format: format));
+
+  Future<List<String>> _pdfToImagesImpl(
     String inputPath, {
     required ImageOutputFormat format,
   }) async {
@@ -629,7 +661,10 @@ class PdfRepositoryImpl implements PdfRepository {
   }
 
   @override
-  Future<List<Uint8List>> renderPageThumbnails(String path) async {
+  Future<List<Uint8List>> renderPageThumbnails(String path) =>
+      _runInIsolate(() => _renderPageThumbnailsImpl(path));
+
+  Future<List<Uint8List>> _renderPageThumbnailsImpl(String path) async {
     final rx.PdfDocument doc = await rx.PdfDocument.openFile(path);
     final List<Uint8List> thumbnails = [];
 
@@ -667,6 +702,11 @@ class PdfRepositoryImpl implements PdfRepository {
 
   @override
   Future<String> editPdfPages(
+    String inputPath,
+    List<PdfPageEdit> edits,
+  ) => _runInIsolate(() => _editPdfPagesImpl(inputPath, edits));
+
+  Future<String> _editPdfPagesImpl(
     String inputPath,
     List<PdfPageEdit> edits,
   ) async {
@@ -755,7 +795,10 @@ class PdfRepositoryImpl implements PdfRepository {
   }
 
   @override
-  Future<List<PdfPageImage>> renderPageImages(String path) async {
+  Future<List<PdfPageImage>> renderPageImages(String path) =>
+      _runInIsolate(() => _renderPageImagesImpl(path));
+
+  Future<List<PdfPageImage>> _renderPageImagesImpl(String path) async {
     final rx.PdfDocument doc = await rx.PdfDocument.openFile(path);
     final List<PdfPageImage> images = [];
 
@@ -797,6 +840,11 @@ class PdfRepositoryImpl implements PdfRepository {
 
   @override
   Future<String> editPdfContent(
+    String inputPath,
+    List<PdfContentEdit> edits,
+  ) => _runInIsolate(() => _editPdfContentImpl(inputPath, edits));
+
+  Future<String> _editPdfContentImpl(
     String inputPath,
     List<PdfContentEdit> edits,
   ) async {
@@ -885,7 +933,13 @@ class PdfRepositoryImpl implements PdfRepository {
   }
 
   @override
-  Future<String> redactPdf(String inputPath, List<PdfRedactArea> areas) async {
+  Future<String> redactPdf(String inputPath, List<PdfRedactArea> areas) =>
+      _runInIsolate(() => _redactPdfImpl(inputPath, areas));
+
+  Future<String> _redactPdfImpl(
+    String inputPath,
+    List<PdfRedactArea> areas,
+  ) async {
     final PdfDocument doc = await _loadDocument(inputPath);
     final int pageCount = doc.pages.count;
     for (final area in areas) {
@@ -1402,7 +1456,10 @@ class PdfRepositoryImpl implements PdfRepository {
   }
 
   @override
-  Future<String> encryptPdf(String inputPath, String password) async {
+  Future<String> encryptPdf(String inputPath, String password) =>
+      _runInIsolate(() => _encryptPdfImpl(inputPath, password));
+
+  Future<String> _encryptPdfImpl(String inputPath, String password) async {
     final PdfDocument doc = await _loadDocument(inputPath);
     doc.security.userPassword = password;
     doc.security.ownerPassword = password;
@@ -1413,7 +1470,10 @@ class PdfRepositoryImpl implements PdfRepository {
   }
 
   @override
-  Future<String> decryptPdf(String inputPath, String password) async {
+  Future<String> decryptPdf(String inputPath, String password) =>
+      _runInIsolate(() => _decryptPdfImpl(inputPath, password));
+
+  Future<String> _decryptPdfImpl(String inputPath, String password) async {
     final PdfDocument doc;
     try {
       doc = await _loadDocument(inputPath, password: password);
@@ -1434,6 +1494,11 @@ class PdfRepositoryImpl implements PdfRepository {
 
   @override
   Future<String> watermarkPdf(
+    String inputPath,
+    WatermarkOptions options,
+  ) => _runInIsolate(() => _watermarkPdfImpl(inputPath, options));
+
+  Future<String> _watermarkPdfImpl(
     String inputPath,
     WatermarkOptions options,
   ) async {
@@ -1492,7 +1557,13 @@ class PdfRepositoryImpl implements PdfRepository {
   }
 
   @override
-  Future<String> signPdf(String inputPath, PdfImageInsert signature) async {
+  Future<String> signPdf(String inputPath, PdfImageInsert signature) =>
+      _runInIsolate(() => _signPdfImpl(inputPath, signature));
+
+  Future<String> _signPdfImpl(
+    String inputPath,
+    PdfImageInsert signature,
+  ) async {
     final PdfDocument doc = await _loadDocument(inputPath);
     final int pageCount = doc.pages.count;
     if (signature.pageIndex < 0 || signature.pageIndex >= pageCount) {
@@ -1585,6 +1656,11 @@ class PdfRepositoryImpl implements PdfRepository {
 
   @override
   Future<String> fillAndSignPdf(
+    String inputPath,
+    List<PdfFormFill> fills,
+  ) => _runInIsolate(() => _fillAndSignPdfImpl(inputPath, fills));
+
+  Future<String> _fillAndSignPdfImpl(
     String inputPath,
     List<PdfFormFill> fills,
   ) async {
@@ -1692,7 +1768,10 @@ class PdfRepositoryImpl implements PdfRepository {
   // - no images, tables, or per-word mixed formatting either direction.
 
   @override
-  Future<String> pdfToWord(String inputPath) async {
+  Future<String> pdfToWord(String inputPath) =>
+      _runInIsolate(() => _pdfToWordImpl(inputPath));
+
+  Future<String> _pdfToWordImpl(String inputPath) async {
     final PdfDocument doc = await _loadDocument(inputPath);
     final List<TextLine> lines;
     try {
@@ -1762,7 +1841,10 @@ class PdfRepositoryImpl implements PdfRepository {
   }
 
   @override
-  Future<String> wordToPdf(String inputPath) async {
+  Future<String> wordToPdf(String inputPath) =>
+      _runInIsolate(() => _wordToPdfImpl(inputPath));
+
+  Future<String> _wordToPdfImpl(String inputPath) async {
     final Uint8List bytes = await File(inputPath).readAsBytes();
     final List<DocxParagraph> paragraphs = DocxReader.read(bytes);
     if (paragraphs.isEmpty) {
