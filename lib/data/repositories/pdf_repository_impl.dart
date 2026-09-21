@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:archive/archive_io.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart'
+    show rootBundle, BackgroundIsolateBinaryMessenger, RootIsolateToken;
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfrx/pdfrx.dart' as rx;
@@ -58,11 +60,29 @@ import '../../domain/repositories/pdf_repository.dart';
 /// a single-call "merge"/"split" API, since that keeps output page sizes
 /// faithful to each source page.
 class PdfRepositoryImpl implements PdfRepository {
+  // Runs off the main isolate: the underlying Syncfusion save() does its
+  // zlib deflate synchronously, which on a large/image-heavy PDF blocks the
+  // UI thread long enough to trip Android's ANR watchdog (observed in
+  // production - Sentry issue PURAPDF-8). RootIsolateToken lets the spawned
+  // isolate still use platform-channel plugins (path_provider, in
+  // _writeOutput) via BackgroundIsolateBinaryMessenger.
   @override
   Future<CompressResult> compressPdf(
     String inputPath,
     CompressionLevel level,
+  ) {
+    final RootIsolateToken token = RootIsolateToken.instance!;
+    return Isolate.run(
+      () => _compressPdfImpl(token, inputPath, level),
+    );
+  }
+
+  Future<CompressResult> _compressPdfImpl(
+    RootIsolateToken token,
+    String inputPath,
+    CompressionLevel level,
   ) async {
+    BackgroundIsolateBinaryMessenger.ensureInitialized(token);
     final int originalSize = await File(inputPath).length();
 
     // Low/Medium: lossless stream (font/text/vector) compression - keeps
