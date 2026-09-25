@@ -101,6 +101,8 @@
   "errorNewNameEmpty": "New name cannot be empty.",
   "errorScanAtLeastOnePage": "Scan at least one page.",
   "errorScanAtLeastOnePageFirst": "Scan at least one page first.",
+  "errorCameraPermissionDenied": "Camera access is denied. Enable it in Settings to scan documents.",
+  "errorCameraUnavailable": "The document scanner isn't available on this device.",
   "errorProvideAtLeastOneRange": "Provide at least one page range to split.",
   "errorInvalidPageRange": "Invalid page range: {range}",
   "@errorInvalidPageRange": {

@@ -1,3 +1,4 @@
+import 'package:doclens/doclens.dart';
 import 'package:flutter/widgets.dart';
 
 import '../l10n/app_localizations.dart';
@@ -20,6 +21,12 @@ import '../l10n/app_localizations.dart';
 String friendlyErrorMessage(Object error) {
   if (error is ArgumentError && error.message is String) {
     return error.message as String;
+  }
+  if (error is ScannerPermissionException) {
+    return 'errorCameraPermissionDenied';
+  }
+  if (error is ScannerUnavailableException) {
+    return 'errorCameraUnavailable';
   }
   return 'errorGeneric';
 }
@@ -71,6 +78,10 @@ String localizedError(BuildContext context, String value) {
       return l10n.errorScanAtLeastOnePage;
     case 'errorScanAtLeastOnePageFirst':
       return l10n.errorScanAtLeastOnePageFirst;
+    case 'errorCameraPermissionDenied':
+      return l10n.errorCameraPermissionDenied;
+    case 'errorCameraUnavailable':
+      return l10n.errorCameraUnavailable;
     case 'errorProvideAtLeastOneRange':
       return l10n.errorProvideAtLeastOneRange;
     case 'errorInvalidPageRange':

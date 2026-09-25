@@ -287,6 +287,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Escanea primero al menos una página.';
 
   @override
+  String get errorCameraPermissionDenied =>
+      'El acceso a la cámara está denegado. Activalo en Configuración para escanear documentos.';
+
+  @override
+  String get errorCameraUnavailable =>
+      'El escáner de documentos no está disponible en este dispositivo.';
+
+  @override
   String get errorProvideAtLeastOneRange =>
       'Indica al menos un rango de páginas para dividir.';
 

@@ -291,6 +291,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Scannen Sie zuerst mindestens eine Seite.';
 
   @override
+  String get errorCameraPermissionDenied =>
+      'Kamerazugriff verweigert. Aktivieren Sie ihn in den Einstellungen, um Dokumente zu scannen.';
+
+  @override
+  String get errorCameraUnavailable =>
+      'Der Dokumentenscanner ist auf diesem Gerät nicht verfügbar.';
+
+  @override
   String get errorProvideAtLeastOneRange =>
       'Geben Sie mindestens einen Seitenbereich zum Teilen an.';
 

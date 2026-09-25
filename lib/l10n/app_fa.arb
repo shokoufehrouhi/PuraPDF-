@@ -101,6 +101,8 @@
   "errorNewNameEmpty": "نام جدید نمی‌تواند خالی باشد.",
   "errorScanAtLeastOnePage": "حداقل یک صفحه اسکن کنید.",
   "errorScanAtLeastOnePageFirst": "اول حداقل یک صفحه اسکن کنید.",
+  "errorCameraPermissionDenied": "دسترسی دوربین رد شده. برای اسکن سند، آن را در تنظیمات فعال کنید.",
+  "errorCameraUnavailable": "اسکنر سند روی این دستگاه قابل استفاده نیست.",
   "errorProvideAtLeastOneRange": "حداقل یک بازه صفحه برای تقسیم وارد کنید.",
   "errorInvalidPageRange": "بازه صفحه نامعتبر: {range}",
   "@errorInvalidPageRange": {

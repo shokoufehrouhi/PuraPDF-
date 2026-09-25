@@ -281,6 +281,14 @@ class AppLocalizationsFa extends AppLocalizations {
   String get errorScanAtLeastOnePageFirst => 'اول حداقل یک صفحه اسکن کنید.';
 
   @override
+  String get errorCameraPermissionDenied =>
+      'دسترسی دوربین رد شده. برای اسکن سند، آن را در تنظیمات فعال کنید.';
+
+  @override
+  String get errorCameraUnavailable =>
+      'اسکنر سند روی این دستگاه قابل استفاده نیست.';
+
+  @override
   String get errorProvideAtLeastOneRange =>
       'حداقل یک بازه صفحه برای تقسیم وارد کنید.';
 

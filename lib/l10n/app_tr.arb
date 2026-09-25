@@ -101,6 +101,8 @@
   "errorNewNameEmpty": "Yeni ad boş olamaz.",
   "errorScanAtLeastOnePage": "En az bir sayfa tarayın.",
   "errorScanAtLeastOnePageFirst": "Önce en az bir sayfa tarayın.",
+  "errorCameraPermissionDenied": "Kamera erişimi reddedildi. Belge taramak için Ayarlar'dan izin verin.",
+  "errorCameraUnavailable": "Belge tarayıcı bu cihazda kullanılamıyor.",
   "errorProvideAtLeastOneRange": "Bölmek için en az bir sayfa aralığı belirtin.",
   "errorInvalidPageRange": "Geçersiz sayfa aralığı: {range}",
   "@errorInvalidPageRange": {

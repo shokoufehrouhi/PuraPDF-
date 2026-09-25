@@ -101,6 +101,8 @@
   "errorNewNameEmpty": "El nuevo nombre no puede estar vacío.",
   "errorScanAtLeastOnePage": "Escanea al menos una página.",
   "errorScanAtLeastOnePageFirst": "Escanea primero al menos una página.",
+  "errorCameraPermissionDenied": "El acceso a la cámara está denegado. Activalo en Configuración para escanear documentos.",
+  "errorCameraUnavailable": "El escáner de documentos no está disponible en este dispositivo.",
   "errorProvideAtLeastOneRange": "Indica al menos un rango de páginas para dividir.",
   "errorInvalidPageRange": "Rango de páginas no válido: {range}",
   "@errorInvalidPageRange": {

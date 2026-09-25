@@ -284,6 +284,14 @@ class AppLocalizationsTr extends AppLocalizations {
   String get errorScanAtLeastOnePageFirst => 'Önce en az bir sayfa tarayın.';
 
   @override
+  String get errorCameraPermissionDenied =>
+      'Kamera erişimi reddedildi. Belge taramak için Ayarlar\'dan izin verin.';
+
+  @override
+  String get errorCameraUnavailable =>
+      'Belge tarayıcı bu cihazda kullanılamıyor.';
+
+  @override
   String get errorProvideAtLeastOneRange =>
       'Bölmek için en az bir sayfa aralığı belirtin.';
 

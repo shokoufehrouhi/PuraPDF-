@@ -284,6 +284,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorScanAtLeastOnePageFirst => 'امسح صفحة واحدة على الأقل أولًا.';
 
   @override
+  String get errorCameraPermissionDenied =>
+      'تم رفض الوصول إلى الكاميرا. فعّله من الإعدادات لمسح المستندات.';
+
+  @override
+  String get errorCameraUnavailable =>
+      'ماسح المستندات غير متاح على هذا الجهاز.';
+
+  @override
   String get errorProvideAtLeastOneRange =>
       'حدد نطاق صفحات واحدًا على الأقل للتقسيم.';
 

@@ -622,6 +622,18 @@ abstract class AppLocalizations {
   /// **'Scan at least one page first.'**
   String get errorScanAtLeastOnePageFirst;
 
+  /// No description provided for @errorCameraPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access is denied. Enable it in Settings to scan documents.'**
+  String get errorCameraPermissionDenied;
+
+  /// No description provided for @errorCameraUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The document scanner isn\'t available on this device.'**
+  String get errorCameraUnavailable;
+
   /// No description provided for @errorProvideAtLeastOneRange.
   ///
   /// In en, this message translates to:

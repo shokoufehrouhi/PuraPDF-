@@ -283,6 +283,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorScanAtLeastOnePageFirst => 'Scan at least one page first.';
 
   @override
+  String get errorCameraPermissionDenied =>
+      'Camera access is denied. Enable it in Settings to scan documents.';
+
+  @override
+  String get errorCameraUnavailable =>
+      'The document scanner isn\'t available on this device.';
+
+  @override
   String get errorProvideAtLeastOneRange =>
       'Provide at least one page range to split.';
 

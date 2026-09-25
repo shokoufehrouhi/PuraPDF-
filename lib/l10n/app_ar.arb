@@ -101,6 +101,8 @@
   "errorNewNameEmpty": "لا يمكن أن يكون الاسم الجديد فارغًا.",
   "errorScanAtLeastOnePage": "امسح صفحة واحدة على الأقل.",
   "errorScanAtLeastOnePageFirst": "امسح صفحة واحدة على الأقل أولًا.",
+  "errorCameraPermissionDenied": "تم رفض الوصول إلى الكاميرا. فعّله من الإعدادات لمسح المستندات.",
+  "errorCameraUnavailable": "ماسح المستندات غير متاح على هذا الجهاز.",
   "errorProvideAtLeastOneRange": "حدد نطاق صفحات واحدًا على الأقل للتقسيم.",
   "errorInvalidPageRange": "نطاق صفحات غير صالح: {range}",
   "@errorInvalidPageRange": {
