@@ -8,7 +8,11 @@
         <!-- Android 12+ draws its own splash screen (ignoring the bitmap in
              launch_background above), sourced from these attributes instead. -->
         <item name="android:windowSplashScreenBackground">@android:color/white</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <!-- A padded, non-adaptive icon - the raw @mipmap/ic_launcher is
+             full-bleed with no margin, and Android 12's masking/scaling for
+             the splash icon crops and blurs a source with no safe-zone
+             padding around it. -->
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon_light</item>
     </style>
     <!-- Theme applied to the Android Window as soon as the process has started.
          This theme determines the color of the Android Window while your
