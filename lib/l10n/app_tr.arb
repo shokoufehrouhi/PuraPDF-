@@ -79,6 +79,8 @@
     }
   },
   "downloadCancelled": "İptal edildi",
+  "showInFolder": "Klasörde göster",
+  "showInFolderFailed": "Klasör açılamadı",
   "downloadNoDirectory": "İndirilenler klasörü kullanılamıyor",
   "errorGeneric": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
   "errorSelectPdfFirst": "Önce bir PDF seçin.",

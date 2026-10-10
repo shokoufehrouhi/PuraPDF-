@@ -226,6 +226,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get downloadCancelled => 'Cancelled';
 
   @override
+  String get showInFolder => 'Show in folder';
+
+  @override
+  String get showInFolderFailed => 'Couldn\'t open the folder';
+
+  @override
   String get downloadNoDirectory => 'No Downloads directory available';
 
   @override

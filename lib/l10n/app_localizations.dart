@@ -520,6 +520,18 @@ abstract class AppLocalizations {
   /// **'Cancelled'**
   String get downloadCancelled;
 
+  /// No description provided for @showInFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in folder'**
+  String get showInFolder;
+
+  /// No description provided for @showInFolderFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the folder'**
+  String get showInFolderFailed;
+
   /// No description provided for @downloadNoDirectory.
   ///
   /// In en, this message translates to:

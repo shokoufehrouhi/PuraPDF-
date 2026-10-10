@@ -79,6 +79,8 @@
     }
   },
   "downloadCancelled": "لغو شد",
+  "showInFolder": "نمایش در پوشه",
+  "showInFolderFailed": "باز کردن پوشه ممکن نشد",
   "downloadNoDirectory": "پوشه Downloads در دسترس نیست",
   "errorGeneric": "مشکلی پیش آمد. دوباره امتحان کنید.",
   "errorSelectPdfFirst": "اول یک PDF انتخاب کنید.",

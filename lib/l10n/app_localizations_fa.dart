@@ -224,6 +224,12 @@ class AppLocalizationsFa extends AppLocalizations {
   String get downloadCancelled => 'لغو شد';
 
   @override
+  String get showInFolder => 'نمایش در پوشه';
+
+  @override
+  String get showInFolderFailed => 'باز کردن پوشه ممکن نشد';
+
+  @override
   String get downloadNoDirectory => 'پوشه Downloads در دسترس نیست';
 
   @override

@@ -79,6 +79,8 @@
     }
   },
   "downloadCancelled": "Cancelled",
+  "showInFolder": "Show in folder",
+  "showInFolderFailed": "Couldn't open the folder",
   "downloadNoDirectory": "No Downloads directory available",
   "errorGeneric": "Something went wrong. Please try again.",
   "errorSelectPdfFirst": "Select a PDF first.",

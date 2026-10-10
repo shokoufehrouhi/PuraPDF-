@@ -79,6 +79,8 @@
     }
   },
   "downloadCancelled": "Cancelado",
+  "showInFolder": "Mostrar en carpeta",
+  "showInFolderFailed": "No se pudo abrir la carpeta",
   "downloadNoDirectory": "No hay carpeta de Descargas disponible",
   "errorGeneric": "Algo salió mal. Inténtalo de nuevo.",
   "errorSelectPdfFirst": "Selecciona primero un PDF.",

@@ -227,6 +227,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get downloadCancelled => 'İptal edildi';
 
   @override
+  String get showInFolder => 'Klasörde göster';
+
+  @override
+  String get showInFolderFailed => 'Klasör açılamadı';
+
+  @override
   String get downloadNoDirectory => 'İndirilenler klasörü kullanılamıyor';
 
   @override

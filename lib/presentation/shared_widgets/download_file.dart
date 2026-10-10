@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../core/platform/file_location.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Lets the user pick where to save the file at [sourcePath] — and under
@@ -41,12 +42,33 @@ Future<void> downloadFile(BuildContext context, String sourcePath) async {
   );
 
   if (!context.mounted) return;
-  final String message = savedUri != null
-      ? l10n.downloadSaved(fileName)
-      : l10n.downloadCancelled;
-  ScaffoldMessenger.of(
-    context,
-  ).showSnackBar(SnackBar(content: Text(message)));
+  if (savedUri == null) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.downloadCancelled)));
+    return;
+  }
+
+  final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+  messenger.showSnackBar(
+    SnackBar(
+      content: Text(l10n.downloadSaved(fileName)),
+      duration: const Duration(seconds: 6),
+      action: FileLocation.supported
+          ? SnackBarAction(
+              label: l10n.showInFolder,
+              onPressed: () async {
+                final bool opened = await FileLocation.showInFolder(savedUri);
+                if (!opened) {
+                  messenger.showSnackBar(
+                    SnackBar(content: Text(l10n.showInFolderFailed)),
+                  );
+                }
+              },
+            )
+          : null,
+    ),
+  );
 }
 
 String _mimeTypeFor(String fileName) {

@@ -79,6 +79,8 @@
     }
   },
   "downloadCancelled": "تم الإلغاء",
+  "showInFolder": "عرض في المجلد",
+  "showInFolderFailed": "تعذّر فتح المجلد",
   "downloadNoDirectory": "مجلد التنزيلات غير متاح",
   "errorGeneric": "حدث خطأ ما. حاول مرة أخرى.",
   "errorSelectPdfFirst": "اختر ملف PDF أولًا.",

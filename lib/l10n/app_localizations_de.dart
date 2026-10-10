@@ -228,6 +228,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get downloadCancelled => 'Abgebrochen';
 
   @override
+  String get showInFolder => 'Im Ordner anzeigen';
+
+  @override
+  String get showInFolderFailed => 'Ordner konnte nicht geöffnet werden';
+
+  @override
   String get downloadNoDirectory => 'Kein Downloads-Ordner verfügbar';
 
   @override

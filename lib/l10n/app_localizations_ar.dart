@@ -225,6 +225,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get downloadCancelled => 'تم الإلغاء';
 
   @override
+  String get showInFolder => 'عرض في المجلد';
+
+  @override
+  String get showInFolderFailed => 'تعذّر فتح المجلد';
+
+  @override
   String get downloadNoDirectory => 'مجلد التنزيلات غير متاح';
 
   @override

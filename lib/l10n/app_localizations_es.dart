@@ -226,6 +226,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get downloadCancelled => 'Cancelado';
 
   @override
+  String get showInFolder => 'Mostrar en carpeta';
+
+  @override
+  String get showInFolderFailed => 'No se pudo abrir la carpeta';
+
+  @override
   String get downloadNoDirectory => 'No hay carpeta de Descargas disponible';
 
   @override
