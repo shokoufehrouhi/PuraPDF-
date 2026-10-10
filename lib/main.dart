@@ -17,6 +17,7 @@ import 'core/theme/theme_mode_controller.dart';
 import 'l10n/app_localizations.dart';
 import 'presentation/home_screen.dart';
 import 'presentation/language_picker_screen.dart';
+import 'presentation/shared_widgets/download_file.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -116,6 +117,7 @@ class _PuraPdfAppState extends ConsumerState<PuraPdfApp>
 
     return MaterialApp(
       navigatorKey: rootNavigatorKey,
+      navigatorObservers: [downloadSnackBarObserver],
       title: 'PuraPDF+',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,

@@ -50,10 +50,13 @@ Future<void> downloadFile(BuildContext context, String sourcePath) async {
   }
 
   final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
-  messenger.showSnackBar(
+  downloadSnackBarObserver._current = messenger.showSnackBar(
     SnackBar(
       content: Text(l10n.downloadSaved(fileName)),
       duration: const Duration(seconds: 6),
+      // A SnackBar with an action persists by default until dismissed —
+      // let this one time out like any other message instead.
+      persist: false,
       action: FileLocation.supported
           ? SnackBarAction(
               label: l10n.showInFolder,
@@ -69,6 +72,38 @@ Future<void> downloadFile(BuildContext context, String sourcePath) async {
           : null,
     ),
   );
+}
+
+/// Closes the "Saved" snackbar as soon as the user navigates anywhere.
+/// The app has a single root [ScaffoldMessenger], so without this the
+/// message (and its "Show in folder" action) would follow the user onto
+/// the next screen and cover its bottom controls. Registered on
+/// MaterialApp.navigatorObservers.
+final DownloadSnackBarObserver downloadSnackBarObserver =
+    DownloadSnackBarObserver._();
+
+class DownloadSnackBarObserver extends NavigatorObserver {
+  DownloadSnackBarObserver._();
+
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? _current;
+
+  void _dismiss() {
+    final controller = _current;
+    _current = null;
+    controller?.close();
+  }
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    // Dialogs and popup menus are routes too, but they don't leave the
+    // screen — only full page changes should drop the message.
+    if (route is PageRoute) _dismiss();
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (route is PageRoute) _dismiss();
+  }
 }
 
 String _mimeTypeFor(String fileName) {
