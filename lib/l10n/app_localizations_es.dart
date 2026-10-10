@@ -38,6 +38,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get languageTooltip => 'Idioma';
 
   @override
+  String get rateAppTooltip => 'Valorar PuraPDF+';
+
+  @override
   String get featureMergeTitle => 'Combinar PDFs';
 
   @override

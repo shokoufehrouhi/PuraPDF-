@@ -9,6 +9,7 @@
   "themeLightTooltip": "Tema claro",
   "themeDarkTooltip": "Tema oscuro",
   "languageTooltip": "Idioma",
+  "rateAppTooltip": "Valorar PuraPDF+",
   "featureMergeTitle": "Combinar PDFs",
   "featureMergeSubtitle": "Combinar varios documentos",
   "featureSplitTitle": "Dividir PDF",

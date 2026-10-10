@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:doclens/doclens.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
+import '../../../core/review/review_service.dart';
 import '../../../core/error_message.dart';
 import '../../../core/providers.dart';
 import '../../../domain/usecases/scan_documents_usecase.dart';
@@ -108,6 +111,7 @@ class ScannerController extends Notifier<ScannerState> {
       final useCase = ref.read(scanDocumentsUseCaseProvider);
       final path = await useCase(state.pages, ocr: state.runOcr);
       state = state.copyWith(isCreatingPdf: false, resultPath: path);
+      unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
       state = state.copyWith(
         isCreatingPdf: false,

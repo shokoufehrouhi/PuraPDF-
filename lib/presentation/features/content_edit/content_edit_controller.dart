@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
+import '../../../core/review/review_service.dart';
 import '../../../core/error_message.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/pdf_content_edit.dart';
@@ -494,6 +496,7 @@ class ContentEditController extends Notifier<ContentEditState> {
       final useCase = ref.read(editPdfContentUseCaseProvider);
       final path = await useCase(file.path, edits);
       state = state.copyWith(isSaving: false, resultPath: path);
+      unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
       state = state.copyWith(isSaving: false, error: friendlyErrorMessage(e));
     }

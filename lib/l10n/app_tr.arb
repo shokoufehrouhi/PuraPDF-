@@ -9,6 +9,7 @@
   "themeLightTooltip": "Açık tema",
   "themeDarkTooltip": "Koyu tema",
   "languageTooltip": "Dil",
+  "rateAppTooltip": "PuraPDF+'yı değerlendir",
   "featureMergeTitle": "PDF'leri Birleştir",
   "featureMergeSubtitle": "Birden fazla belgeyi birleştir",
   "featureSplitTitle": "PDF Böl",

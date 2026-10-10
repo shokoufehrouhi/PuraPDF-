@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/ads/ads_service.dart';
+import '../../../core/review/review_service.dart';
 import '../../../core/error_message.dart';
 import '../../../core/providers.dart';
 import '../../../domain/entities/image_output_format.dart';
@@ -120,6 +123,7 @@ class ImagePdfController extends Notifier<ImagePdfState> {
         final useCase = ref.read(imagesToPdfUseCaseProvider);
         final path = await useCase(state.images.map((f) => f.path).toList());
         state = state.copyWith(isProcessing: false, resultPdfPath: path);
+        unawaited(ReviewService.instance.recordSuccessfulOperation());
       } else {
         final source = state.sourcePdf;
         if (source == null) {
@@ -133,6 +137,7 @@ class ImagePdfController extends Notifier<ImagePdfState> {
         final useCase = ref.read(pdfToImagesUseCaseProvider);
         final paths = await useCase(source.path, format: state.outputFormat);
         state = state.copyWith(isProcessing: false, resultImagePaths: paths);
+        unawaited(ReviewService.instance.recordSuccessfulOperation());
       }
     } catch (e) {
       state = state.copyWith(isProcessing: false, error: friendlyErrorMessage(e));

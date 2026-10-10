@@ -160,6 +160,12 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get languageTooltip;
 
+  /// No description provided for @rateAppTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate PuraPDF+'**
+  String get rateAppTooltip;
+
   /// No description provided for @featureMergeTitle.
   ///
   /// In en, this message translates to:

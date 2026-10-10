@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../core/review/review_service.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/feature_colors.dart';
 import '../core/theme/theme_mode_controller.dart';
@@ -66,6 +67,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onPressed: () => setState(() => _tabIndex = _tabIndex == 1 ? 0 : 1),
           ),
           const SizedBox(width: 4),
+          if (reviewSupported)
+            IconButton(
+              icon: const Icon(Icons.star_outline_rounded),
+              tooltip: AppLocalizations.of(context).rateAppTooltip,
+              onPressed: ReviewService.instance.openStoreListing,
+            ),
           IconButton(
             icon: Icon(_themeIcon(themeMode)),
             tooltip: _themeLabel(context, themeMode),
