@@ -69,11 +69,13 @@ class ScannerController extends Notifier<ScannerState> {
     try {
       final List<String>? scanned = await DoclensPlatform.instance
           .scanWithNativeUI(allowGalleryImport: true);
+      if (!ref.mounted) return;
       state = state.copyWith(
         isScanning: false,
         pages: scanned == null ? state.pages : [...state.pages, ...scanned],
       );
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isScanning: false, error: friendlyErrorMessage(e));
     }
   }
@@ -102,6 +104,7 @@ class ScannerController extends Notifier<ScannerState> {
       return;
     }
     await AdsService.instance.interstitial.showBeforeOperation();
+    if (!ref.mounted) return;
     state = state.copyWith(
       isCreatingPdf: true,
       clearError: true,
@@ -110,9 +113,11 @@ class ScannerController extends Notifier<ScannerState> {
     try {
       final useCase = ref.read(scanDocumentsUseCaseProvider);
       final path = await useCase(state.pages, ocr: state.runOcr);
+      if (!ref.mounted) return;
       state = state.copyWith(isCreatingPdf: false, resultPath: path);
       unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(
         isCreatingPdf: false,
         error: friendlyErrorMessage(e),

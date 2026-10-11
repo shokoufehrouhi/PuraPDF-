@@ -76,6 +76,7 @@ class MergeController extends Notifier<MergeState> {
       return;
     }
     await AdsService.instance.interstitial.showBeforeOperation();
+    if (!ref.mounted) return;
     state = state.copyWith(
       isMerging: true,
       clearError: true,
@@ -84,9 +85,11 @@ class MergeController extends Notifier<MergeState> {
     try {
       final useCase = ref.read(mergePdfsUseCaseProvider);
       final path = await useCase(state.files.map((f) => f.path).toList());
+      if (!ref.mounted) return;
       state = state.copyWith(isMerging: false, resultPath: path);
       unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isMerging: false, error: friendlyErrorMessage(e));
     }
   }

@@ -84,6 +84,7 @@ class PageEditController extends Notifier<PageEditState> {
     try {
       final repo = ref.read(pdfRepositoryProvider);
       final thumbnails = await repo.renderPageThumbnails(file.path);
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoadingPages: false,
         pages: [
@@ -92,6 +93,7 @@ class PageEditController extends Notifier<PageEditState> {
         ],
       );
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoadingPages: false,
         error: friendlyErrorMessage(e),
@@ -129,6 +131,7 @@ class PageEditController extends Notifier<PageEditState> {
     }
 
     await AdsService.instance.interstitial.showBeforeOperation();
+    if (!ref.mounted) return;
     state = state.copyWith(
       isSaving: true,
       clearError: true,
@@ -140,9 +143,11 @@ class PageEditController extends Notifier<PageEditState> {
         for (final p in state.pages)
           PdfPageEdit(originalIndex: p.originalIndex, rotationDegrees: p.rotation),
       ]);
+      if (!ref.mounted) return;
       state = state.copyWith(isSaving: false, resultPath: path);
       unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isSaving: false, error: friendlyErrorMessage(e));
     }
   }

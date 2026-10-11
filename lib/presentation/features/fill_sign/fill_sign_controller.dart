@@ -90,6 +90,7 @@ class FillSignController extends Notifier<FillSignState> {
         repo.renderPageImages(file.path),
         repo.extractFormFields(file.path),
       ]);
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoading: false,
         pages: results[0] as List<PdfPageImage>,
@@ -97,6 +98,7 @@ class FillSignController extends Notifier<FillSignState> {
         currentPageIndex: 0,
       );
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isLoading: false, error: friendlyErrorMessage(e));
     }
   }
@@ -139,6 +141,7 @@ class FillSignController extends Notifier<FillSignState> {
     }
 
     await AdsService.instance.interstitial.showBeforeOperation();
+    if (!ref.mounted) return;
     state = state.copyWith(
       isSaving: true,
       clearError: true,
@@ -147,9 +150,11 @@ class FillSignController extends Notifier<FillSignState> {
     try {
       final useCase = ref.read(fillSignPdfUseCaseProvider);
       final path = await useCase(file.path, state.edits.values.toList());
+      if (!ref.mounted) return;
       state = state.copyWith(isSaving: false, resultPath: path);
       unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isSaving: false, error: friendlyErrorMessage(e));
     }
   }

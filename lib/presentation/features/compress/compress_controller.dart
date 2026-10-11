@@ -62,8 +62,10 @@ class CompressController extends Notifier<CompressState> {
     state = CompressState(sourceFile: file);
     try {
       final size = await File(file.path).length();
+      if (!ref.mounted) return;
       state = state.copyWith(originalSizeBytes: size);
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(error: friendlyErrorMessage(e));
     }
   }
@@ -79,6 +81,7 @@ class CompressController extends Notifier<CompressState> {
       return;
     }
     await AdsService.instance.interstitial.showBeforeOperation();
+    if (!ref.mounted) return;
     state = state.copyWith(
       isCompressing: true,
       clearError: true,
@@ -87,9 +90,11 @@ class CompressController extends Notifier<CompressState> {
     try {
       final useCase = ref.read(compressPdfUseCaseProvider);
       final result = await useCase(file.path, state.level);
+      if (!ref.mounted) return;
       state = state.copyWith(isCompressing: false, result: result);
       unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(
         isCompressing: false,
         error: friendlyErrorMessage(e),

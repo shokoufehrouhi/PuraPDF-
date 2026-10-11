@@ -29,13 +29,14 @@ class SignatureScreen extends ConsumerWidget {
       ),
     );
     if (picked.isEmpty || picked.first.path == null) return;
+    if (!context.mounted) return;
     final file = PdfFile(path: picked.first.path!, name: picked.first.name);
     await ref.read(signatureControllerProvider.notifier).setSourceFile(file);
   }
 
   Future<void> _createSignature(BuildContext context, WidgetRef ref) async {
     final bytes = await showSignaturePad(context);
-    if (bytes != null) {
+    if (bytes != null && context.mounted) {
       ref.read(signatureControllerProvider.notifier).setSignature(bytes);
     }
   }

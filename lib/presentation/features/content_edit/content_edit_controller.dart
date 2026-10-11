@@ -193,6 +193,7 @@ class ContentEditController extends Notifier<ContentEditState> {
         repo.renderPageImages(file.path),
         repo.extractTextLines(file.path),
       ]);
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoading: false,
         pages: results[0] as List<PdfPageImage>,
@@ -200,6 +201,7 @@ class ContentEditController extends Notifier<ContentEditState> {
         currentPageIndex: 0,
       );
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isLoading: false, error: friendlyErrorMessage(e));
     }
   }
@@ -422,6 +424,7 @@ class ContentEditController extends Notifier<ContentEditState> {
     }
 
     await AdsService.instance.interstitial.showBeforeOperation();
+    if (!ref.mounted) return;
     state = state.copyWith(
       isSaving: true,
       clearError: true,
@@ -495,9 +498,11 @@ class ContentEditController extends Notifier<ContentEditState> {
 
       final useCase = ref.read(editPdfContentUseCaseProvider);
       final path = await useCase(file.path, edits);
+      if (!ref.mounted) return;
       state = state.copyWith(isSaving: false, resultPath: path);
       unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isSaving: false, error: friendlyErrorMessage(e));
     }
   }

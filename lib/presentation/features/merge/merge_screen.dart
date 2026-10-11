@@ -31,7 +31,7 @@ class MergeScreen extends ConsumerWidget {
         .where((f) => f.path != null)
         .map((f) => PdfFile(path: f.path!, name: f.name))
         .toList();
-    if (files.isNotEmpty) {
+    if (files.isNotEmpty && context.mounted) {
       ref.read(mergeControllerProvider.notifier).addFiles(files);
     }
   }

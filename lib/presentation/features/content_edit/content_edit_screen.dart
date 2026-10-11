@@ -33,6 +33,7 @@ class ContentEditScreen extends ConsumerWidget {
       ),
     );
     if (picked.isEmpty || picked.first.path == null) return;
+    if (!context.mounted) return;
     final file = PdfFile(path: picked.first.path!, name: picked.first.name);
     await ref.read(contentEditControllerProvider.notifier).setSourceFile(file);
   }
@@ -43,7 +44,9 @@ class ContentEditScreen extends ConsumerWidget {
       () => FilePicker.pickFiles(type: FileType.image),
     );
     if (picked.isEmpty || picked.first.path == null) return;
+    if (!context.mounted) return;
     final bytes = await File(picked.first.path!).readAsBytes();
+    if (!context.mounted) return;
     ref.read(contentEditControllerProvider.notifier).addImage(bytes);
   }
 
@@ -53,6 +56,7 @@ class ContentEditScreen extends ConsumerWidget {
   /// quickest way to mark one without leaving the app to find an image.
   Future<void> _addCheckmark(WidgetRef ref) async {
     final Uint8List bytes = await _renderCheckmarkPng();
+    if (!ref.context.mounted) return;
     final state = ref.read(contentEditControllerProvider);
     final page = state.pages[state.currentPageIndex];
     // A fixed fraction of page width alone would come out non-square on a

@@ -92,8 +92,10 @@ class SplitController extends Notifier<SplitState> {
     try {
       final repo = ref.read(pdfRepositoryProvider);
       final count = await repo.getPageCount(file.path);
+      if (!ref.mounted) return;
       state = state.copyWith(pageCount: count);
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(error: friendlyErrorMessage(e));
     }
   }
@@ -127,6 +129,7 @@ class SplitController extends Notifier<SplitState> {
     }
 
     await AdsService.instance.interstitial.showBeforeOperation();
+    if (!ref.mounted) return;
     state = state.copyWith(
       isSplitting: true,
       clearError: true,
@@ -135,9 +138,11 @@ class SplitController extends Notifier<SplitState> {
     try {
       final useCase = ref.read(splitPdfUseCaseProvider);
       final paths = await useCase(file.path, ranges);
+      if (!ref.mounted) return;
       state = state.copyWith(isSplitting: false, resultPaths: paths);
       unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isSplitting: false, error: friendlyErrorMessage(e));
     }
   }

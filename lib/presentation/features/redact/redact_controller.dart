@@ -117,6 +117,7 @@ class RedactController extends Notifier<RedactState> {
         repo.renderPageImages(file.path),
         repo.extractTextWords(file.path),
       ]);
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoading: false,
         pages: results[0] as List<PdfPageImage>,
@@ -124,6 +125,7 @@ class RedactController extends Notifier<RedactState> {
         currentPageIndex: 0,
       );
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isLoading: false, error: friendlyErrorMessage(e));
     }
   }
@@ -201,6 +203,7 @@ class RedactController extends Notifier<RedactState> {
     }
 
     await AdsService.instance.interstitial.showBeforeOperation();
+    if (!ref.mounted) return;
     state = state.copyWith(
       isSaving: true,
       clearError: true,
@@ -249,9 +252,11 @@ class RedactController extends Notifier<RedactState> {
 
       final useCase = ref.read(redactPdfUseCaseProvider);
       final path = await useCase(file.path, areas);
+      if (!ref.mounted) return;
       state = state.copyWith(isSaving: false, resultPath: path);
       unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isSaving: false, error: friendlyErrorMessage(e));
     }
   }

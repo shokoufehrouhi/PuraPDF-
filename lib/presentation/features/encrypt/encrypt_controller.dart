@@ -139,6 +139,7 @@ class EncryptController extends Notifier<EncryptState> {
     }
 
     await AdsService.instance.interstitial.showBeforeOperation();
+    if (!ref.mounted) return;
     state = state.copyWith(
       isProcessing: true,
       clearError: true,
@@ -149,13 +150,16 @@ class EncryptController extends Notifier<EncryptState> {
       if (state.action == PasswordAction.add) {
         final useCase = ref.read(encryptPdfUseCaseProvider);
         path = await useCase(file.path, state.password);
+        if (!ref.mounted) return;
       } else {
         final useCase = ref.read(decryptPdfUseCaseProvider);
         path = await useCase(file.path, state.password);
+        if (!ref.mounted) return;
       }
       state = state.copyWith(isProcessing: false, resultPath: path);
       unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isProcessing: false, error: friendlyErrorMessage(e));
     }
   }

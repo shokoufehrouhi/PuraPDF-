@@ -28,6 +28,7 @@ class PageEditScreen extends ConsumerWidget {
       ),
     );
     if (picked.isEmpty || picked.first.path == null) return;
+    if (!context.mounted) return;
     final file = PdfFile(path: picked.first.path!, name: picked.first.name);
     await ref.read(pageEditControllerProvider.notifier).setSourceFile(file);
   }

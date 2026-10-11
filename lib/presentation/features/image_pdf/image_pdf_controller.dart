@@ -120,8 +120,10 @@ class ImagePdfController extends Notifier<ImagePdfState> {
           return;
         }
         await AdsService.instance.interstitial.showBeforeOperation();
+        if (!ref.mounted) return;
         final useCase = ref.read(imagesToPdfUseCaseProvider);
         final path = await useCase(state.images.map((f) => f.path).toList());
+        if (!ref.mounted) return;
         state = state.copyWith(isProcessing: false, resultPdfPath: path);
         unawaited(ReviewService.instance.recordSuccessfulOperation());
       } else {
@@ -134,12 +136,15 @@ class ImagePdfController extends Notifier<ImagePdfState> {
           return;
         }
         await AdsService.instance.interstitial.showBeforeOperation();
+        if (!ref.mounted) return;
         final useCase = ref.read(pdfToImagesUseCaseProvider);
         final paths = await useCase(source.path, format: state.outputFormat);
+        if (!ref.mounted) return;
         state = state.copyWith(isProcessing: false, resultImagePaths: paths);
         unawaited(ReviewService.instance.recordSuccessfulOperation());
       }
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isProcessing: false, error: friendlyErrorMessage(e));
     }
   }

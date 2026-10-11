@@ -87,15 +87,19 @@ class PdfWordController extends Notifier<PdfWordState> {
     );
     try {
       await AdsService.instance.interstitial.showBeforeOperation();
+      if (!ref.mounted) return;
       final String path;
       if (state.direction == PdfWordDirection.pdfToWord) {
         path = await ref.read(pdfToWordUseCaseProvider)(source.path);
+        if (!ref.mounted) return;
       } else {
         path = await ref.read(wordToPdfUseCaseProvider)(source.path);
+        if (!ref.mounted) return;
       }
       state = state.copyWith(isProcessing: false, resultPath: path);
       unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isProcessing: false, error: friendlyErrorMessage(e));
     }
   }

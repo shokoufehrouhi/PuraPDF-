@@ -30,7 +30,7 @@ class ImagePdfScreen extends ConsumerWidget {
         .where((f) => f.path != null)
         .map((f) => PdfFile(path: f.path!, name: f.name))
         .toList();
-    if (files.isNotEmpty) {
+    if (files.isNotEmpty && context.mounted) {
       ref.read(imagePdfControllerProvider.notifier).addImages(files);
     }
   }
@@ -44,6 +44,7 @@ class ImagePdfScreen extends ConsumerWidget {
       ),
     );
     if (picked.isEmpty || picked.first.path == null) return;
+    if (!context.mounted) return;
     final file = PdfFile(path: picked.first.path!, name: picked.first.name);
     ref.read(imagePdfControllerProvider.notifier).setSourcePdf(file);
   }

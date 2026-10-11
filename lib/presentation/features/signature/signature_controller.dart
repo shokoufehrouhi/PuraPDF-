@@ -93,8 +93,10 @@ class SignatureController extends Notifier<SignatureState> {
     try {
       final repo = ref.read(pdfRepositoryProvider);
       final pages = await repo.renderPageImages(file.path);
+      if (!ref.mounted) return;
       state = state.copyWith(isLoadingPages: false, pages: pages);
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoadingPages: false,
         error: friendlyErrorMessage(e),
@@ -141,6 +143,7 @@ class SignatureController extends Notifier<SignatureState> {
     }
 
     await AdsService.instance.interstitial.showBeforeOperation();
+    if (!ref.mounted) return;
     state = state.copyWith(
       isProcessing: true,
       clearError: true,
@@ -160,9 +163,11 @@ class SignatureController extends Notifier<SignatureState> {
           height: state.heightFrac * page.pointsHeight,
         ),
       );
+      if (!ref.mounted) return;
       state = state.copyWith(isProcessing: false, resultPath: path);
       unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isProcessing: false, error: friendlyErrorMessage(e));
     }
   }

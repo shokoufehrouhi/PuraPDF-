@@ -124,6 +124,7 @@ class WatermarkController extends Notifier<WatermarkState> {
     }
 
     await AdsService.instance.interstitial.showBeforeOperation();
+    if (!ref.mounted) return;
     state = state.copyWith(
       isProcessing: true,
       clearError: true,
@@ -142,9 +143,11 @@ class WatermarkController extends Notifier<WatermarkState> {
           colorB: state.color.b,
         ),
       );
+      if (!ref.mounted) return;
       state = state.copyWith(isProcessing: false, resultPath: path);
       unawaited(ReviewService.instance.recordSuccessfulOperation());
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isProcessing: false, error: friendlyErrorMessage(e));
     }
   }
