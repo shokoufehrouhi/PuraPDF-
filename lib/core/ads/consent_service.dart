@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+import 'ads_support.dart';
 
 /// GDPR/UK-DPA consent (Google's User Messaging Platform). Required by
 /// AdMob policy before requesting ads for users in the EEA, UK, and
@@ -50,6 +53,40 @@ class ConsentService {
       (_) => resolveFromCurrentStatus(),
     );
 
-    return completer.future.timeout(timeout, onTimeout: () => false);
+    final bool canRequestAds = await completer.future.timeout(
+      timeout,
+      onTimeout: () => false,
+    );
+    unawaited(_refreshPrivacyOptionsRequired());
+    return canRequestAds;
+  }
+
+  /// Whether the user's region requires a way to change or withdraw their
+  /// consent later (EEA/UK/Switzerland). The home screen shows a "Privacy
+  /// settings" button only while this is true - AdMob policy requires that
+  /// entry point wherever the consent form can appear.
+  final ValueNotifier<bool> privacyOptionsRequired = ValueNotifier<bool>(false);
+
+  Future<void> _refreshPrivacyOptionsRequired() async {
+    if (!adsSupported) return;
+    try {
+      final status = await ConsentInformation.instance
+          .getPrivacyOptionsRequirementStatus();
+      privacyOptionsRequired.value =
+          status == PrivacyOptionsRequirementStatus.required;
+    } catch (_) {
+      // Leave the button hidden if the status can't be read.
+    }
+  }
+
+  /// Re-opens the consent form so the user can change their choices.
+  /// Never throws; a form error just means nothing is shown.
+  Future<void> showPrivacyOptions() async {
+    if (!adsSupported) return;
+    try {
+      await ConsentForm.showPrivacyOptionsForm((_) {});
+    } catch (_) {
+      // Nothing actionable to show the user here.
+    }
   }
 }

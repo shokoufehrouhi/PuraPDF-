@@ -41,6 +41,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get rateAppTooltip => 'Valorar PuraPDF+';
 
   @override
+  String get privacySettingsTooltip => 'Configuración de privacidad';
+
+  @override
   String get featureMergeTitle => 'Combinar PDFs';
 
   @override

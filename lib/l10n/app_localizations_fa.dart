@@ -41,6 +41,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get rateAppTooltip => 'امتیاز به PuraPDF+';
 
   @override
+  String get privacySettingsTooltip => 'تنظیمات حریم خصوصی';
+
+  @override
   String get featureMergeTitle => 'ادغام PDF';
 
   @override

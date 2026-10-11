@@ -41,6 +41,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get rateAppTooltip => 'PuraPDF+\'yı değerlendir';
 
   @override
+  String get privacySettingsTooltip => 'Gizlilik ayarları';
+
+  @override
   String get featureMergeTitle => 'PDF\'leri Birleştir';
 
   @override

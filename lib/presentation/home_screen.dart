@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../core/ads/consent_service.dart';
 import '../core/review/review_service.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/feature_colors.dart';
@@ -67,6 +68,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onPressed: () => setState(() => _tabIndex = _tabIndex == 1 ? 0 : 1),
           ),
           const SizedBox(width: 4),
+          ValueListenableBuilder<bool>(
+            valueListenable: ConsentService.instance.privacyOptionsRequired,
+            builder: (context, required, _) => required
+                ? IconButton(
+                    icon: const Icon(Icons.privacy_tip_outlined),
+                    tooltip: AppLocalizations.of(context)
+                        .privacySettingsTooltip,
+                    onPressed: ConsentService.instance.showPrivacyOptions,
+                  )
+                : const SizedBox.shrink(),
+          ),
           if (reviewSupported)
             IconButton(
               icon: const Icon(Icons.star_outline_rounded),

@@ -166,6 +166,12 @@ abstract class AppLocalizations {
   /// **'Rate PuraPDF+'**
   String get rateAppTooltip;
 
+  /// No description provided for @privacySettingsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy settings'**
+  String get privacySettingsTooltip;
+
   /// No description provided for @featureMergeTitle.
   ///
   /// In en, this message translates to:
