@@ -35,8 +35,8 @@ class MainActivity : FlutterActivity() {
      *    whose parent folder can be opened directly;
      *  - "raw:/storage/emulated/0/Download/x.pdf" → Downloads provider with a
      *    real path, mapped back to the external-storage folder;
-     *  - "msf:123" / "123" → Downloads provider without a path, so the
-     *    Downloads screen is the best available target.
+     *  - "msf:123" / "123" → Downloads provider without a path; these live
+     *    under the Download folder, so that folder is opened.
      * Returns false when nothing could be opened (e.g. a cloud provider).
      */
     private fun showInFolder(path: String): Boolean {
@@ -58,7 +58,7 @@ class MainActivity : FlutterActivity() {
         }
 
         if (documentId.startsWith("msf:") || documentId.all(Char::isDigit)) {
-            return openDownloads()
+            return openDirectory("primary:Download") || openDownloads()
         }
         return false
     }
@@ -78,8 +78,23 @@ class MainActivity : FlutterActivity() {
 
     private fun openDownloads(): Boolean = start(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS))
 
-    private fun start(intent: Intent): Boolean = try {
-        startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    /**
+     * Prefers the system Files app (DocumentsUI) explicitly: when another
+     * file manager also handles these intents (e.g. AnExplorer, or MIUI's
+     * Downloads app for ACTION_VIEW_DOWNLOADS) an implicit intent shows an
+     * app chooser instead of the folder. Falls back to the implicit intent
+     * on devices that ship DocumentsUI under neither package name.
+     */
+    private fun start(intent: Intent): Boolean {
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        for (pkg in DOCUMENTS_UI_PACKAGES) {
+            if (tryStart(Intent(intent).setPackage(pkg))) return true
+        }
+        return tryStart(intent)
+    }
+
+    private fun tryStart(intent: Intent): Boolean = try {
+        startActivity(intent)
         true
     } catch (e: ActivityNotFoundException) {
         false
@@ -88,6 +103,10 @@ class MainActivity : FlutterActivity() {
     }
 
     private companion object {
+        val DOCUMENTS_UI_PACKAGES = listOf(
+            "com.google.android.documentsui",
+            "com.android.documentsui",
+        )
         const val EXTERNAL_STORAGE_AUTHORITY = "com.android.externalstorage.documents"
         val VOLUME_UUID = Regex("[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}")
     }
