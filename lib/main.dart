@@ -18,6 +18,7 @@ import 'l10n/app_localizations.dart';
 import 'presentation/home_screen.dart';
 import 'presentation/language_picker_screen.dart';
 import 'presentation/shared_widgets/download_file.dart';
+import 'presentation/splash/animated_splash.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,9 +56,14 @@ Future<void> main() async {
   // after init() actually gets there, or it'd find nothing preloaded yet
   // and skip the app-open ad for this launch every time.
   unawaited(
-    AdsService.instance.init().then(
-      (_) => AdsService.instance.appOpen.showIfReady(),
-    ),
+    AdsService.instance.init().then((_) async {
+      // First launch: the language picker is on screen, and an ad popping
+      // up over it before the user has even chosen a language is a bad
+      // first impression - skip the app-open ad until a language is saved.
+      if (await hasSavedLocale()) {
+        await AdsService.instance.appOpen.showIfReady();
+      }
+    }),
   );
 }
 
@@ -124,6 +130,8 @@ class _PuraPdfAppState extends ConsumerState<PuraPdfApp>
       darkTheme: AppTheme.dark,
       themeMode: themeMode,
       locale: locale,
+      builder: (context, child) =>
+          SplashOverlay(child: child ?? const SizedBox.shrink()),
       supportedLocales: [for (final l in supportedAppLanguages) l.locale],
       localizationsDelegates: const [
         AppLocalizations.delegate,

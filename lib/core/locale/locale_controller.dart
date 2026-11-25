@@ -4,6 +4,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const String _prefsKey = 'purapdf_locale';
 
+/// Whether the user has already picked a language (i.e. this isn't the very
+/// first launch, when the language picker is on screen instead of Home).
+Future<bool> hasSavedLocale() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString(_prefsKey) != null;
+}
+
 /// The app's current UI language. `null` means "not chosen yet" — the very
 /// first launch, before the user has picked one on the language-picker
 /// screen — and is the signal `main.dart`/the app root uses to show that
