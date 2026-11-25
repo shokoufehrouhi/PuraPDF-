@@ -4,7 +4,7 @@ Paste the block for each language into Play Console → Release → "Release
 notes". Each is well under the 500-character limit per language. The tags
 below are exactly what Play Console's multi-language box expects.
 
-## Next release (animated splash + first-launch ad fix)
+## Next release (1.1.2 — animated splash + first-launch ad fix)
 
 ```
 <en-US>
